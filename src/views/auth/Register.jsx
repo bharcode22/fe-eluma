@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from '../../service/api.js'
 import { Link } from "react-router-dom";
 import show from '../../assets/svg/show.svg'
-import hide from '../../assets/svg/hode.svg'
+import hide from '../../assets/svg/hide.svg'
 
 export default function Register() {
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function Register() {
     const register = async (e) => {
         e.preventDefault();
 
-        await api.post('/register', {
+        await api.post('/auth/register', {
             username: username,
             name: name,
             email: email,

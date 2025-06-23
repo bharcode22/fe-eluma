@@ -2,16 +2,16 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from '../../service/api.js';
 import Cookies from 'js-cookie';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext.jsx';
 import show from '../../assets/svg/show.svg'
-import hide from '../../assets/svg/hode.svg'
+import hide from '../../assets/svg/hide.svg'
 
 export default function Login() {
     const navigate = useNavigate();
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
 
-    const [username, setUsername] = useState("");
+    const [email, setUEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [validation, setValidation] = useState([]);
@@ -23,13 +23,15 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await api.post('/login', {
-                username: username,
+            const response = await api.post('/auth/login', {
+                email: email,
                 password: password,
             });
 
+            console.log(response);
+
             const { token, user } = response.data.data;
-            
+
             Cookies.set('token', token);
             Cookies.set('user', JSON.stringify(user));
 
@@ -82,10 +84,10 @@ export default function Login() {
                                 </label>
                                 <input 
                                     className="input input-bordered" 
-                                    type="text" 
-                                    value={username} 
-                                    onChange={(e) => setUsername(e.target.value)} 
-                                    placeholder="Username" 
+                                    type="email" 
+                                    value={email} 
+                                    onChange={(e) => setUEmail(e.target.value)} 
+                                    placeholder="E-mail" 
                                 />
                             </div>
 

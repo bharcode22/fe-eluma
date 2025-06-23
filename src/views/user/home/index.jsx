@@ -7,7 +7,7 @@ export default function Home() {
                 <NavbarLandingPage />
             </div>
             <div>
-                <h1>Halaman utama</h1>
+                <h1>Halaman user</h1>
             </div>
         </div>
     )
