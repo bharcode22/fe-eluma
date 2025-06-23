@@ -1,4 +1,4 @@
-import SidebarMenu from '../../../components/SideBarMenu.jsx';
+import NavbarAdmin from '../../../components/NavbarAdmin.jsx';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie'
 
@@ -14,14 +14,14 @@ export default function Dashboard() {
 
     return (
         <div>
-                <div>
-                    <SidebarMenu />
-                </div>
-                <div>
-                    <h1>
-                        Halaman admin
-                    </h1>
-                </div>
+            <div>
+                <NavbarAdmin />
+            </div>
+            <div>
+                <h1>
+                    Halaman admin
+                </h1>
+            </div>
         </div>
     )
 }

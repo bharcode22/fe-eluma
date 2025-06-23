@@ -1,10 +1,10 @@
-import NavbarLandingPage from "../../components/NavbarLandingPage.jsx";
+import NavbarUsers from "../../../components/NavbarUser.jsx";
 
 export default function Home() {
     return (
         <div>
             <div>
-                <NavbarLandingPage />
+                <NavbarUsers />
             </div>
             <div>
                 <h1>Halaman user</h1>

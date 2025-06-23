@@ -19,16 +19,8 @@ export default function AppRoutes() {
         <Routes>
             <Route path="/" element={<Home />} />
 
-            <Route path="/register" element={
-                isAuthenticated ? <Navigate to={userRole === 'admin' ? "/admin/dashboard" : "/user/home"} replace /> : <Register />
-            } />
-
-            <Route path="/login" element={
-                isAuthenticated ? <Navigate to={userRole === 'admin' ? "/admin/dashboard" : "/user/home"} replace /> : <Login />
-            } />
-
             {/* admin */}
-            <Route path="/admin/dashboard" element={
+            <Route path="/admin/home" element={
                 isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/login" replace />
             } />
 

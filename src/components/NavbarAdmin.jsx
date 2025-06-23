@@ -1,24 +1,24 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React, { useContext } from "react";
 import Cookies from 'js-cookie';
 import { AuthContext } from '../context/AuthContext';
-import dahsboard from '../assets/svg/dashboard.svg'
 
-export default function SidebarMenu() {
+export default function NavbarAdmin() {
     const navigate = useNavigate();
-    const location = useLocation();
     const { setIsAuthenticated } = useContext(AuthContext);
 
     const logout = () => {
         Cookies.remove('token');
         Cookies.remove('user');
         setIsAuthenticated(false);
-        navigate("/login", { replace: true });
+        window.location.href = "/";
     };
 
     return (
         <div>
-            <a onClick={logout} style={{ cursor: 'pointer' }} className="btn btn-outline px-4">Logout</a>
+            <button onClick={logout} className="btn btn-outline px-4" >
+                Logout
+            </button>
         </div>
     );
 }

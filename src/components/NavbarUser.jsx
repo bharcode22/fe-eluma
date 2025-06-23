@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie';
-import { AuthContext } from '../../../src/context/AuthContext.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
 
-function NavbarLandingPage() {
+function NavbarUsers() {
     const navigate = useNavigate();
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
     const [activeSection, setActiveSection] = useState("");
@@ -35,7 +35,7 @@ function NavbarLandingPage() {
         Cookies.remove('user');
         setIsAuthenticated(false);
         setUserRole(null);
-        navigate("/login", { replace: true });
+        window.location.href = "/";
     };
 
     return (
@@ -45,4 +45,4 @@ function NavbarLandingPage() {
     );
 }
 
-export default NavbarLandingPage;
+export default NavbarUsers;
