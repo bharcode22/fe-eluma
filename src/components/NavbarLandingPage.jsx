@@ -61,7 +61,6 @@ function NavbarLandingPage() {
                         </button>
                     </div>
 
-                    {/* Mobile menu button */}
                     <div className="md:hidden flex items-center">
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -99,27 +98,27 @@ function NavbarLandingPage() {
                             Home
                         </ScrollLink>
 
-                        {/* Auth Buttons - Mobile */}
-                        {isMenuOpen && (
-                            <div className="hidden md:flex items-center space-x-2">
-                                <button 
-                                    onClick={() => setIsLoginModalOpen(true)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors"
-                                >
-                                    Login
-                                </button>
+                        <div className="flex flex-col space-y-2 mt-2">
+                            <button 
+                                onClick={() => {
+                                    setIsLoginModalOpen(true);
+                                    setIsMenuOpen(false);
+                                }}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors text-left"
+                            >
+                                Login
+                            </button>
 
-                                <button 
-                                    onClick={() => {
-                                        setIsRegisterModalOpen(true);
-                                        setIsMenuOpen(false);
-                                    }}
-                                    className="block px-3 py-2 rounded-md text-base font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors w-full text-center"
-                                >
-                                    Register
-                                </button>
-                            </div>
-                        )}
+                            <button 
+                                onClick={() => {
+                                    setIsRegisterModalOpen(true);
+                                    setIsMenuOpen(false);
+                                }}
+                                className="px-4 py-2 rounded-md text-base font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors text-center"
+                            >
+                                Register
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

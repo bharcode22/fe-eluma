@@ -55,7 +55,7 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-slate-800/15 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Login</h2>
@@ -133,7 +133,7 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
 
                 <div className="mt-4 text-center">
                     <p className="text-sm">
-                        Belum punya akun?{' '}
+                        Don't have an account yet?{' '}
                         <button 
                             className="text-blue-500 hover:text-blue-800 font-medium"
                             onClick={() => {
@@ -141,7 +141,7 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
                                 onRegisterClick();
                             }}
                         >
-                            Daftar disini
+                            Register
                         </button>
                     </p>
                 </div>

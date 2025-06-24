@@ -16,9 +16,7 @@ export default function NavbarAdmin() {
 
     return (
         <div>
-            <button onClick={logout} className="btn btn-outline px-4" >
-                Logout
-            </button>
+            <button onClick={logout} className="btn btn-outline px-4" > Logout </button>
         </div>
     );
 }
