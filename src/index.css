@@ -1,1 +1,56 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+    name: "mytheme";
+    default: true; /* set as default */
+    prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+    color-scheme: light; /* color of browser-provided UI */
+
+    --color-primary: #4d5b42;
+    --color-primary-content: #c6d2be;
+
+    --color-secondary: #9db191;
+    --color-secondary-content: #1f1f1f;
+
+    --color-accent: #d4af33;
+    --color-accent-content: #f4f5f6;
+
+    --color-neutral: #444444;
+    --color-neutral-content: #ffffff;
+
+    --color-info: #3ABFF8;
+    --color-success: #22C55E;
+    --color-warning: #FACC15;
+    --color-error: #EF4444;
+
+    --radius-selector: 1rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+.custom-quill .ql-toolbar {
+    background-color: white;
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db; /* gray-300 */
+  }
+  .custom-quill .ql-container {
+    background-color: #c6d2be;
+    border-radius: 0 0 0.5rem 0.5rem;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    min-height: 150px;
+  }
+  .custom-quill .ql-editor {
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.625;
+    color: #1f2937; /* gray-800 */
+  }
+  

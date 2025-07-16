@@ -1,4 +1,5 @@
 import NavbarUsers from "../../../components/NavbarUser.jsx";
+import GetMyProperty from "../../getMyPeopery/GetMyProperty.jsx";
 
 export default function Home() {
     return (
@@ -7,7 +8,7 @@ export default function Home() {
                 <NavbarUsers />
             </div>
             <div>
-                <h1>Halaman user</h1>
+                <GetMyProperty />
             </div>
         </div>
     )

@@ -20,45 +20,72 @@ function NavbarLandingPage() {
     };
 
     return (
-        <nav className="bg-white shadow-lg sticky top-0 z-50">
-            <div className="max-w-6xl mx-auto px-4">
+        <nav className="bg-primary shadow-lg fixed top-0 z-50 w-full">
+            <div className="max-w-6xl mx-auto px-4 backdrop-blur-lg">
                 <div className="flex justify-between items-center h-16">
                     <div className="flex-shrink-0">
-                        <Link to="/" className="text-xl font-bold text-amber-600">
+                        <Link to="/" className="text-xl font-bold text-accent">
                             Eluma
                         </Link>
                     </div>
 
-                    <div className="hidden md:flex items-center space-x-1">
+                <div className='flex gap-10'>
+                    <a className="hidden md:flex items-center space-x-1">
                         <ScrollLink 
                             to="home" 
                             smooth={true} 
                             duration={500} 
-                            className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                            activeClass="text-amber-600 font-semibold"
+                            className="px-3 py-4 text-white border-none bg-transparent hover:bg-secondary hover:text-white hover:rounded hover:shadow-md transition duration-300"
+
+                            // activeClass="text-amber-600 font-semibold"
                         >
-                            Home
+                            Layanan
                         </ScrollLink>
-                    </div>
+                    </a>
+
+                    <a className="hidden md:flex items-center space-x-1">
+                        <ScrollLink 
+                            to="home" 
+                            smooth={true} 
+                            duration={500} 
+                            className="px-3 py-4 text-white border-none bg-transparent hover:bg-secondary hover:text-white hover:rounded hover:shadow-md transition duration-300"
+
+                            // activeClass="text-amber-600 font-semibold"
+                        >
+                            Tentang
+                        </ScrollLink>
+                    </a>
+
+                    <a className="hidden md:flex items-center space-x-1">
+                        <ScrollLink 
+                            to="home" 
+                            smooth={true} 
+                            duration={500} 
+                            className="px-3 py-4 text-white border-none bg-transparent hover:bg-secondary hover:text-white hover:rounded hover:shadow-md transition duration-300"
+
+                            // activeClass="text-amber-600 font-semibold"
+                        >
+                            Kontak
+                        </ScrollLink>
+                    </a>
+
+                </div>
 
                     {/* Auth Buttons - Desktop */}
                     <div className="hidden md:flex items-center space-x-2">
-                        <button 
-                            onClick={() => setIsLoginModalOpen(true)}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors"
-                        >
-                            Login
+                        <button onClick={() => setIsLoginModalOpen(true)} className="px-4 py-2 btn btn-accent font-medium text-white rounded-l" >
+                            Masuk
                         </button>
 
-                        <button 
+                        {/* <button 
                             onClick={() => {
                                 setIsRegisterModalOpen(true);
                                 setIsMenuOpen(false);
                             }}
-                            className="block px-3 py-2 rounded-md text-base font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors w-full text-center"
+                            className="block px-3 py-2 rounded-md text-base font-medium text-secondary bg-accent hover:bg-accent-200 transition-colors w-full text-center"
                         >
                             Register
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className="md:hidden flex items-center">

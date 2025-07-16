@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import api from '../../service/api.js';
 import { Link } from "react-router-dom";
 import show from '../../assets/svg/show.svg';
@@ -7,7 +7,7 @@ import hide from '../../assets/svg/hide.svg';
 import LoginModal from './LoginModal.jsx';
 
 const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
     const [registerFailed, setRegisterFailed] = useState([]);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    // const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
     const register = async (e) => {
         e.preventDefault();
@@ -49,16 +49,16 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
 
     return (
         <div className="fixed inset-0 bg-slate-800/15 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Register</h2>
+            <div className="bg-secondary/50 backdrop-blur-2xl rounded-lg p-6 w-full max-w-md">
+                <div className="flex justify-end items-center mb-4">
                     <button 
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700"
+                        className="font-bold hover:text-gray-700"
                     >
                         ✕
                     </button>
                 </div>
+                <h2 className="text-xl font-bold itemms-center text-center mb-3">Register</h2>
 
                 {validation.errors && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -73,13 +73,13 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
                     </div>
                 )}
 
-                <form onSubmit={register}>
+                <form onSubmit={register} aria-required>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="block text-sm font-bold mb-2">
                             Username
                         </label>
                         <input 
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                            className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg" 
                             type="text" 
                             value={username} 
                             onChange={(e) => setUsername(e.target.value)} 
@@ -88,38 +88,38 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="block text-sm font-bold mb-2">
                             Full Name
                         </label>
                         <input 
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                            className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg" 
                             type="text" 
                             value={name} 
                             onChange={(e) => setName(e.target.value)} 
-                            placeholder="Your Name" 
+                            placeholder="Full Name" 
                         />
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Email
+                        <label className="block text-sm font-bold mb-2">
+                            E-mail
                         </label>
                         <input 
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                            type="email" 
+                            className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg" 
+                            type="e-mail" 
                             value={email} 
                             onChange={(e) => setEmail(e.target.value)} 
-                            placeholder="Email" 
+                            placeholder="E-mail" 
                         />
                     </div>
 
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="block text-sm font-bold mb-2">
                             Password
                         </label>
                         <div className="relative">
                             <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                                className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg" 
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -138,9 +138,9 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-14">
                         <button 
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" 
+                            className="btn btn-primary text-white w-full rounded-lg shadow-lg" 
                             type="submit" 
                             disabled={isLoading}
                         >
@@ -151,9 +151,9 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick }) => {
 
                 <div className="mt-4 text-center">
                     <p className="text-sm">
-                        Already have an account?{' '}
+                        Sudah punya akun?{' '}
                         <button 
-                            className="text-blue-500 hover:text-blue-800 font-medium"
+                            className="font-bold hover:text-blue-400"
                             onClick={() => {
                                 onClose();
                                 onLoginClick();

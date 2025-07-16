@@ -39,9 +39,31 @@ function NavbarUsers() {
     };
 
     return (
-        <div>
-            <a onClick={logout} style={{ cursor: 'pointer' }} className="btn btn-outline px-4">Logout</a>
-        </div>
+        <nav className="bg-primary shadow-lg fixed top-0 z-50 w-full">
+            <div className="max-w-6xl mx-auto px-4 backdrop-blur-lg">
+                <div className="flex justify-between items-center h-16">
+                    {/* Logo */}
+                    <div className="flex-shrink-0">
+                        <a href="/" className="text-xl font-bold text-accent">Eluma</a>
+                    </div>
+                    {/* Tombol kanan */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => navigate('/user/add/property')}
+                            className="btn btn-primary px-4"
+                        >
+                            Tambah Properti
+                        </button>
+                        <button
+                            onClick={logout}
+                            className="btn btn-outline px-4"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
     );
 }
 

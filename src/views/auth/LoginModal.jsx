@@ -9,7 +9,7 @@ import hide from '../../assets/svg/hide.svg';
 const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
     const navigate = useNavigate();
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
-    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+    // const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [email, setUEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -56,16 +56,14 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
 
     return (
         <div className="fixed inset-0 bg-slate-800/15 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Login</h2>
-                    <button 
-                        onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700"
-                    >
+            <div className="bg-secondary/50 backdrop-blur-2xl rounded-lg p-6 w-full max-w-md">
+                <div className="flex justify-end items-center mb-4">
+                    <button  onClick={onClose}
+                        className="font-bold hover:text-gray-700" >
                         ✕
                     </button>
                 </div>
+                <h2 className="text-xl font-bold itemms-center text-center mb-3">Login</h2>
 
                 {validation.errors && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -82,25 +80,22 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
 
                 <form onSubmit={login}>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Email
+                        <label className="block text-sm font-bold mb-2">
+                            E-mail
                         </label>
-                        <input 
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                            type="email" 
-                            value={email} 
+                        <input className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg" type="E-mail" value={email} 
                             onChange={(e) => setUEmail(e.target.value)} 
                             placeholder="E-mail" 
                         />
                     </div>
 
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="font-bold">
                             Password
                         </label>
                         <div className="relative">
                             <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                                className="input input-primary w-full rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg"
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -119,13 +114,13 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-14">
                         <button 
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" 
+                            className="btn btn-primary text-white w-full rounded-lg shadow-lg" 
                             type="submit" 
                             disabled={loading}
                         >
-                            {loading ? 'Loading...' : 'Sign In'}
+                            {loading ? 'Loading...' : 'Login'}
                         </button>
                     </div>
                 </form>
@@ -133,9 +128,9 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
 
                 <div className="mt-4 text-center">
                     <p className="text-sm">
-                        Don't have an account yet?{' '}
+                        Belum punya akun?{' '}
                         <button 
-                            className="text-blue-500 hover:text-blue-800 font-medium"
+                            className="font-bold hover:text-blue-400"
                             onClick={() => {
                                 onClose();
                                 onRegisterClick();
