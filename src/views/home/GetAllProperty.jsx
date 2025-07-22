@@ -10,6 +10,7 @@ import love from '../../assets/svg/love.svg';
 import LoginModal from '../../../src/views/auth/LoginModal';
 import RegisterModal from '../../../src/views/auth/RegisterModal';
 import api from '../../service/api.js';
+import PropertyFilter from './PropertyFilter.jsx'; 
 const baseUrl = api.defaults.baseURL;
 
 function GetAllProperty() {
@@ -22,6 +23,7 @@ function GetAllProperty() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [priceView, setPriceView] = useState('monthly');
+  const [filteredProperties, setFilteredProperties] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +31,7 @@ function GetAllProperty() {
         const response = await axios.get(`${baseUrl}/property`);
         setProperties(response.data.data);
         setTotalData(response.data.totalData);
+        setFilteredProperties(properties);
 
         // Initialize carousel index for each property
         const initialIndexes = {};
@@ -117,8 +120,10 @@ function GetAllProperty() {
         <p className="text-gray-600">Discover our amazing properties</p>
       </div>
 
+      <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {properties.map((property) => {
+        {/* {properties.map((property) => { */}
+        {filteredProperties.map((property) => {
           const currentIndex = carouselIndexes[property.id] || 0;
 
           return (
