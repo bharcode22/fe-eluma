@@ -31,7 +31,7 @@ function GetAllProperty() {
         const response = await axios.get(`${baseUrl}/property`);
         setProperties(response.data.data);
         setTotalData(response.data.totalData);
-        setFilteredProperties(properties);
+        setFilteredProperties(response.data.data); // Set all data as default
 
         // Initialize carousel index for each property
         const initialIndexes = {};
@@ -120,7 +120,10 @@ function GetAllProperty() {
         <p className="text-gray-600">Discover our amazing properties</p>
       </div>
 
-      <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
+      <div className='mb-10'>
+        <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* {properties.map((property) => { */}
         {filteredProperties.map((property) => {
