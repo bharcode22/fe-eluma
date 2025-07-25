@@ -35,6 +35,12 @@
     --noise: 0;
 }
 
+.banner-hero {
+    background-image: url('https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp');
+    background-size: cover;
+    background-position: center;
+}
+
 .custom-quill .ql-toolbar {
     background-color: white;
     border-radius: 0.5rem 0.5rem 0 0;
@@ -53,4 +59,3 @@
     line-height: 1.625;
     color: #1f2937; /* gray-800 */
   }
-  
