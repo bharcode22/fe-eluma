@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -25,36 +26,54 @@ const GetMyProperty = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   // const [setIsMenuOpen] = useState(false);
+    const token = Cookies.get('token');
+
+const fetchData = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/property/my/property`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProperties(response.data.data || []);
+
+      const initialIndexes = {};
+      response.data.data.forEach((property) => {
+        initialIndexes[property.id] = 0;
+      });
+      setCarouselIndexes(initialIndexes);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const DeleteData = async (propertyId) => {
+    try {
+      const confirmed = window.confirm('Apakah Anda yakin ingin menghapus properti ini?');
+      if (!confirmed) return;
+
+      await axios.delete(`${baseUrl}/property/${propertyId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchData();
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  };
 
   useEffect(() => {
-    const token = Cookies.get('token');
     if (!token) {
       setError('Token tidak ditemukan. Harap login terlebih dahulu.');
       setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}/property/my/property`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProperties(response.data.data || []);
-
-        const initialIndexes = {};
-        response.data.data.forEach((property) => {
-          initialIndexes[property.id] = 0;
-        });
-        setCarouselIndexes(initialIndexes);
-      } catch (err) {
-        setError(err.response?.data?.message || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   const handlePrev = (propertyId, totalImages) => {
     setCarouselIndexes((prevIndexes) => ({
@@ -205,7 +224,16 @@ const GetMyProperty = () => {
                     </div>
                   </div>
 
-                  <div className="flex justify-end text-accent mt-5">
+                  <div className="flex justify-end text-accent mt-5 gap-5">
+                    <button onClick={() => DeleteData(property.id)} className="text-red-600 hover:underline font-bold flex gap-2 items-center" >
+                      <span>Hapus</span>
+                    </button>
+
+                    <Link to={`/user/update/property/${property.id}`} className="font-bold flex gap-2 items-center">
+                      <span>Update</span>
+                      <span>❯</span>
+                    </Link>
+
                     <Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
                       <span>Detail</span>
                       <span>❯</span>

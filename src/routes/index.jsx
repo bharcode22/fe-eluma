@@ -14,6 +14,7 @@ import Dashboard from "../views/admin/dashboard/index.jsx"
 // halaman user
 import HomeUsers from "../views/user/HomeUser.jsx"
 import AddProperty from "../views/user/propertyManagement/addProperty/index.jsx"
+import UpdateProperty from "../views/user/propertyManagement/updateProperty/index.jsx"
 
 export default function AppRoutes() {
     const { isAuthenticated, userRole } = useContext(AuthContext);
@@ -36,6 +37,9 @@ export default function AppRoutes() {
             } />
             <Route path="/user/add/property" element={
                 isAuthenticated && userRole === 'user' ? <AddProperty /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/update/property/:id" element={
+                isAuthenticated && userRole === 'user' ? <UpdateProperty /> : <Navigate to="/" replace />
             } />
         </Routes>
     );
