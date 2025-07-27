@@ -15,6 +15,9 @@ import Dashboard from "../views/admin/dashboard/index.jsx"
 import HomeUsers from "../views/user/HomeUser.jsx"
 import AddProperty from "../views/user/propertyManagement/addProperty/index.jsx"
 import UpdateProperty from "../views/user/propertyManagement/updateProperty/index.jsx"
+import GetAllPropertyByUsers from "../views/user/propertyManagement/getAllProperty/index.jsx"
+import GetPrivateProperty from "../views/user/propertyManagement/getPrivateProperty/index.jsx"
+import GetSavedProperty from "../views/user/propertyManagement/savedProperty/index.jsx"
 
 export default function AppRoutes() {
     const { isAuthenticated, userRole } = useContext(AuthContext);
@@ -41,6 +44,17 @@ export default function AppRoutes() {
             <Route path="/user/update/property/:id" element={
                 isAuthenticated && userRole === 'user' ? <UpdateProperty /> : <Navigate to="/" replace />
             } />
+            <Route path="/user/all/property" element={
+                isAuthenticated && userRole === 'user' ? <GetAllPropertyByUsers /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/private/property" element={
+                isAuthenticated && userRole === 'user' ? <GetPrivateProperty /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/saved/property" element={
+                isAuthenticated && userRole === 'user' ? <GetSavedProperty /> : <Navigate to="/" replace />
+            } />
+
+            {/* admin */}
         </Routes>
     );
 }

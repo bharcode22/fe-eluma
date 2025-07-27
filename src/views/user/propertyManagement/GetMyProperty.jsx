@@ -9,12 +9,8 @@ import bedroom from '../../../assets/svg/bedroom.svg';
 import guest from '../../../assets/svg/guest.svg';
 import calender from '../../../assets/svg/calender.svg';
 import duration from '../../../assets/svg/duration.svg';
-import love from '../../../assets/svg/love.svg';
-
-import LoginModal from '../../../views/auth/LoginModal';
-import RegisterModal from '../../../views/auth/RegisterModal';
-
 import api from '../../../service/api.js';
+
 const baseUrl = api.defaults.baseURL;
 
 const GetMyProperty = () => {
@@ -23,9 +19,6 @@ const GetMyProperty = () => {
   const [error, setError] = useState(null);
   const [carouselIndexes, setCarouselIndexes] = useState({});
   const [priceView, setPriceView] = useState('monthly');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  // const [setIsMenuOpen] = useState(false);
     const token = Cookies.get('token');
 
 const fetchData = async () => {
@@ -62,6 +55,22 @@ const fetchData = async () => {
     }
   };
 
+  const ToglePropertyStatus = async (propertyId) => {
+    try {
+      await axios.put(
+        `${baseUrl}/property/status/${propertyId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      fetchData();
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       setError('Token tidak ditemukan. Harap login terlebih dahulu.');
@@ -71,9 +80,6 @@ const fetchData = async () => {
 
     fetchData();
   }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
 
   const handlePrev = (propertyId, totalImages) => {
     setCarouselIndexes((prevIndexes) => ({
@@ -89,16 +95,6 @@ const fetchData = async () => {
       ...prevIndexes,
       [propertyId]: (prevIndexes[propertyId] + 1) % totalImages,
     }));
-  };
-
-  const handleOpenLogin = () => {
-    setIsRegisterModalOpen(false);
-    setIsLoginModalOpen(true);
-  };
-
-  const handleOpenRegister = () => {
-    setIsLoginModalOpen(false);
-    setIsRegisterModalOpen(true);
   };
 
   if (loading) {
@@ -153,9 +149,26 @@ const fetchData = async () => {
                       />
                     ))}
                   </div>
-                  <button onClick={handleOpenLogin}>
-                    <img src={love} className="absolute top-3 right-3 w-7 h-7 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
-                  </button>
+
+                  <div>
+                    <div>
+                      <Link to={`/user/update/property/${property.id}`} className="absolute top-3 right-3 backdrop-blur-lg">
+                        <span>Update</span>
+                      </Link>
+                    </div>
+
+                    <div>
+                      <Link onClick={() => DeleteData(property.id)} className="absolute top-3 right-20 backdrop-blur-lg" >
+                        <span>Hapus</span>
+                      </Link>
+                    </div>
+
+                    <div>
+                      <Link onClick={() => ToglePropertyStatus(property.id)} className="absolute top-3 right-36 backdrop-blur-lg" >
+                        <span>Private</span>
+                      </Link>
+                    </div>
+                  </div>
 
                   {/* Carousel Nav */}
                   <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between z-10">
@@ -168,7 +181,6 @@ const fetchData = async () => {
                   </div>
                 </div>
 
-                {/* Property Info */}
                 <div className="p-4">
                   <h2 className="text-xl font-bold mb-2 text-primary">{property.property_tittle}</h2>
                   <hr className="border-t-2 border-accent pr-10" />
@@ -225,15 +237,6 @@ const fetchData = async () => {
                   </div>
 
                   <div className="flex justify-end text-accent mt-5 gap-5">
-                    <button onClick={() => DeleteData(property.id)} className="text-red-600 hover:underline font-bold flex gap-2 items-center" >
-                      <span>Hapus</span>
-                    </button>
-
-                    <Link to={`/user/update/property/${property.id}`} className="font-bold flex gap-2 items-center">
-                      <span>Update</span>
-                      <span>❯</span>
-                    </Link>
-
                     <Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
                       <span>Detail</span>
                       <span>❯</span>
@@ -245,18 +248,6 @@ const fetchData = async () => {
           })}
         </div>
       )}
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onRegisterClick={handleOpenRegister}
-      />
-
-      <RegisterModal
-        isOpen={isRegisterModalOpen}
-        onClose={() => setIsRegisterModalOpen(false)}
-        onLoginClick={handleOpenLogin}
-      />
     </div>
   );
 };

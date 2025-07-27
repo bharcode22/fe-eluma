@@ -1,5 +1,5 @@
-import NavbarUsers from "../../components/NavbarUser.jsx";
-import GetMyProperty from "./propertyManagement/GetMyProperty.jsx";
+import NavbarUsers from "../../../../components/NavbarUser.jsx";
+import GetAllPropertyUser from "./GetAllPropertyByUsers.jsx";
 
 export default function Home() {
     return (
@@ -8,7 +8,7 @@ export default function Home() {
                 <NavbarUsers />
             </div>
             <div className="mt-12">
-                <GetMyProperty />
+                <GetAllPropertyUser />
             </div>
         </div>
     )

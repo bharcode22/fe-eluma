@@ -7,6 +7,7 @@ function UpdateProperty() {
     return (
         <div>
             <h1>Update Property</h1>
+            <h1>comming soon</h1>
             <p>ID Properti: <strong>{id}</strong></p>
         </div>
     );
