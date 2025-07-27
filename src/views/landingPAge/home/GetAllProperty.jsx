@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import location from '../../assets/svg/location.svg';
-import bedroom from '../../assets/svg/bedroom.svg';
-import guest from '../../assets/svg/guest.svg';
-import calender from '../../assets/svg/calender.svg';
-import duration from '../../assets/svg/duration.svg';
-import love from '../../assets/svg/love.svg';
-import LoginModal from '../../../src/views/auth/LoginModal';
-import RegisterModal from '../../../src/views/auth/RegisterModal';
-import api from '../../service/api.js';
+import location from '../../../assets/svg/location.svg';
+import bedroom from '../../../assets/svg/bedroom.svg';
+import guest from '../../../assets/svg/guest.svg';
+import calender from '../../../assets/svg/calender.svg';
+import duration from '../../../assets/svg/duration.svg';
+import love from '../../../assets/svg/love.svg';
+import LoginModal from '../../../../src/views/auth/LoginModal';
+import RegisterModal from '../../../../src/views/auth/RegisterModal';
+import api from '../../../service/api.js';
 import PropertyFilter from './PropertyFilter.jsx'; 
 const baseUrl = api.defaults.baseURL;
 

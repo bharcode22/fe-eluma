@@ -5,7 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import api from '../../service/api';
+import api from '../../../../service/api';
 
 const AddProperty = () => {
   const [generalAreas, setGeneralAreas] = useState([]);
@@ -29,7 +29,7 @@ const AddProperty = () => {
                 if (data.data) setTypeOptions(data.data);
             })
             .catch(err => console.error('Failed to fetch type property:', err));
-    }, []);
+    });
     const navigate = useNavigate();
     const [formState, setFormState] = useState({
         type_id: '',
@@ -193,7 +193,7 @@ const AddProperty = () => {
           setGeneralAreas(data.data || []);
         })
         .catch(err => console.error('Failed to fetch general areas:', err));
-    }, []);
+    });
 
   return (
     <div className="p-6 max-w-4xl mx-auto shadow-md rounded-md">
@@ -343,52 +343,52 @@ const AddProperty = () => {
           />
         </div>
 
-<div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-  <p>Detail</p>
-  <div className='flex gap-5'>
-        <input type="number" placeholder="Jumlah Kamar Tidur" value={formState.number_of_bedrooms}
-          onChange={e => setFormState({ ...formState, number_of_bedrooms: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
+        <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
+          <p>Detail</p>
+          <div className='flex gap-5'>
+                <input type="number" placeholder="Jumlah Kamar Tidur" value={formState.number_of_bedrooms}
+                  onChange={e => setFormState({ ...formState, number_of_bedrooms: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
 
-        <input type="number" placeholder="Jumlah Kamar Mandi" value={formState.number_of_bathrooms}
-          onChange={e => setFormState({ ...formState, number_of_bathrooms: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
-  </div>
+                <input type="number" placeholder="Jumlah Kamar Mandi" value={formState.number_of_bathrooms}
+                  onChange={e => setFormState({ ...formState, number_of_bathrooms: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
+          </div>
 
-  <div className='flex gap-5'>
-        <input type="number" placeholder="Tamu Maksimal" value={formState.maximum_guest}
-          onChange={e => setFormState({ ...formState, maximum_guest: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
+          <div className='flex gap-5'>
+                <input type="number" placeholder="Tamu Maksimal" value={formState.maximum_guest}
+                  onChange={e => setFormState({ ...formState, maximum_guest: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
 
-        <input type="number" placeholder="Minimal Menginap" value={formState.minimum_stay}
-          onChange={e => setFormState({ ...formState, minimum_stay: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
-  </div>
-</div>
+                <input type="number" placeholder="Minimal Menginap" value={formState.minimum_stay}
+                  onChange={e => setFormState({ ...formState, minimum_stay: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
+          </div>
+        </div>
 
-<div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-  <div className='bg-secondary'>
-    <p>Pricing</p>
-        <input type="number" placeholder="Harga Harian" value={formState.price}
-          onChange={e => setFormState({ ...formState, price: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
+        <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
+          <div className='bg-secondary'>
+            <p>Pricing</p>
+                <input type="number" placeholder="Harga Harian" value={formState.price}
+                  onChange={e => setFormState({ ...formState, price: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
 
-        <input type="number" placeholder="Harga Bulanan" value={formState.monthly_price}
-          onChange={e => setFormState({ ...formState, monthly_price: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
+                <input type="number" placeholder="Harga Bulanan" value={formState.monthly_price}
+                  onChange={e => setFormState({ ...formState, monthly_price: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
 
-        <input type="number" placeholder="Harga Tahunan" value={formState.yearly_price}
-          onChange={e => setFormState({ ...formState, yearly_price: e.target.value })}
-          className="input input-bordered w-full mb-2"
-        />
-  </div>
-</div>
+                <input type="number" placeholder="Harga Tahunan" value={formState.yearly_price}
+                  onChange={e => setFormState({ ...formState, yearly_price: e.target.value })}
+                  className="input input-bordered w-full mb-2"
+                />
+          </div>
+        </div>
 
         {/* Availability Group */}
         <div className="mb-2 p-4 border rounded bg-base-100 shadow-sm">

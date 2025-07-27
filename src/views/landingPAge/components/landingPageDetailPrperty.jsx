@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Api from '../../service/api.js';
+import Api from '../../../service/api.js';
 
 function LandingPageDetailProperty() {
   const { id } = useParams();

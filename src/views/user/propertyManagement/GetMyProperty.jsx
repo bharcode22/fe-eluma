@@ -3,17 +3,17 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 
-import location from '../../assets/svg/location.svg';
-import bedroom from '../../assets/svg/bedroom.svg';
-import guest from '../../assets/svg/guest.svg';
-import calender from '../../assets/svg/calender.svg';
-import duration from '../../assets/svg/duration.svg';
-import love from '../../assets/svg/love.svg';
+import location from '../../../assets/svg/location.svg';
+import bedroom from '../../../assets/svg/bedroom.svg';
+import guest from '../../../assets/svg/guest.svg';
+import calender from '../../../assets/svg/calender.svg';
+import duration from '../../../assets/svg/duration.svg';
+import love from '../../../assets/svg/love.svg';
 
-import LoginModal from '../../views/auth/LoginModal';
-import RegisterModal from '../../views/auth/RegisterModal';
+import LoginModal from '../../../views/auth/LoginModal';
+import RegisterModal from '../../../views/auth/RegisterModal';
 
-import api from '../../service/api.js';
+import api from '../../../service/api.js';
 const baseUrl = api.defaults.baseURL;
 
 const GetMyProperty = () => {
@@ -24,7 +24,7 @@ const GetMyProperty = () => {
   const [priceView, setPriceView] = useState('monthly');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [, setIsMenuOpen] = useState(false);
+  // const [setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get('token');

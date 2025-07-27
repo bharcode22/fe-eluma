@@ -2,15 +2,18 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Home from "../views/home/index.jsx";
-import DetailPropertyLandingPage from "../views/landingPageDetailProperty/landingPageDetailPrperty.jsx";
+// Landing Page
+import Home from "../views/landingPAge/home/Home.jsx";
+import DetailPropertyLandingPage from "../views/landingPAge/components/landingPageDetailPrperty.jsx";
+import Contact from "../views/landingPAge/Contact/Contact.jsx";
+import About from "../views/landingPAge/About/About.jsx";
 
 // halaman admin
 import Dashboard from "../views/admin/dashboard/index.jsx"
 
 // halaman user
-import HomeUsers from "../views/user/home/index.jsx"
-import AddProperty from "../views/getMyPeopery/AddNewProperty.jsx"
+import HomeUsers from "../views/user/HomeUser.jsx"
+import AddProperty from "../views/user/propertyManagement/addProperty/index.jsx"
 
 export default function AppRoutes() {
     const { isAuthenticated, userRole } = useContext(AuthContext);
@@ -19,6 +22,8 @@ export default function AppRoutes() {
             {/* landing page */}
             <Route path="/" element={<Home />} />
             <Route path="/detail/:id" element={<DetailPropertyLandingPage />} />
+            <Route path="/about" element={ <About />} />
+            <Route path="/contact" element={<Contact />} />
 
             {/* admin */}
             <Route path="/admin/home" element={
