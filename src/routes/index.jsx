@@ -53,8 +53,6 @@ export default function AppRoutes() {
             <Route path="/user/saved/property" element={
                 isAuthenticated && userRole === 'user' ? <GetSavedProperty /> : <Navigate to="/" replace />
             } />
-
-            {/* admin */}
         </Routes>
     );
 }
