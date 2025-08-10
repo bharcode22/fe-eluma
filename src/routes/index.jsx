@@ -15,6 +15,7 @@ import Dashboard from "../views/admin/dashboard/index.jsx"
 import HomeUsers from "../views/user/HomeUser.jsx"
 import AddProperty from "../views/user/propertyManagement/addProperty/index.jsx"
 import UpdateProperty from "../views/user/propertyManagement/updateProperty/index.jsx"
+import UpdateImageOnly from "../views/user/propertyManagement/updateProperty/UpdateImagesOnly.jsx";
 import GetAllPropertyByUsers from "../views/user/propertyManagement/getAllProperty/index.jsx"
 import GetPrivateProperty from "../views/user/propertyManagement/getPrivateProperty/index.jsx"
 import GetSavedProperty from "../views/user/propertyManagement/savedProperty/index.jsx"
@@ -52,6 +53,9 @@ export default function AppRoutes() {
             } />
             <Route path="/user/saved/property" element={
                 isAuthenticated && userRole === 'user' ? <GetSavedProperty /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/update/image/property/:id" element={
+                isAuthenticated && userRole === 'user' ? <UpdateImageOnly /> : <Navigate to="/" replace />
             } />
         </Routes>
     );

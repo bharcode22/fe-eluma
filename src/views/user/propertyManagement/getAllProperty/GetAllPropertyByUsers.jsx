@@ -241,14 +241,14 @@ function GetAllPropertyByUsers() {
                     </div>
                     </div>
 
-                                    <div className='flex justify-end text-accent mt-5'>
-                                        <Link to={`/detail/${property.id}`} className="font-bold">
-                    <div className='flex gap-3'>
-                        <p>Detail</p>
-                        <p>❯</p>
+                    <div className='flex justify-end text-accent mt-5'>
+                        <Link to={`/detail/${property.id}`} className="font-bold">
+                            <div className='flex gap-3'>
+                                <p>Detail</p>
+                                <p>❯</p>
+                            </div>
+                        </Link>
                     </div>
-                                        </Link>
-                                    </div>
                 </div>
                 </div>
             );

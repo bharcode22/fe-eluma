@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../../../../service/api.js";
 import Cookies from "js-cookie";
+import { Link } from 'react-router-dom';
 
 function UpdatePropertyForm() {
+  const [property, setProperty] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const baseUrl = Api.defaults.baseURL;
   const [loading, setLoading] = useState(true);
   const [typeOptions, setTypeOptions] = useState([]);
   const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [message, setMessage] = useState("");
   const [generalAreas, setGeneralAreas] = useState([]);
-  const API_URL = "http://localhost:3002";
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
+  const API_URL = "http://localhost:3002";
   const [formData, setFormData] = useState({
     type_id: "",
     property_tittle: "",
@@ -69,28 +72,48 @@ function UpdatePropertyForm() {
     }
   });
 
-  // Fungsi untuk menangani upload file dengan drag and drop
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const res = await Api.get(`/property/${id}`);
+        setProperty(res.data.data[0]);
+      } catch (error) {
+        console.error('Gagal memuat data properti:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperty();
+  }, [id]);
+
+  useEffect(() => {
+    let isMounted = true;
+  
+    const sanitize = async () => {
+      if (property && property.description) {
+        try {
+          const module = await import("dompurify");
+          const clean = module.default.sanitize(property.description);
+          if (isMounted) setSanitizedHTML(clean);
+        } catch (err) {
+          console.error("Gagal import DOMPurify:", err);
+        }
+      }
+    };
+  
+    sanitize();
+    return () => {
+      isMounted = false;
+    };
+  }, [property]);
+
   const handleDrop = (e) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     setNewImages(prev => [...prev, ...files]);
   };
 
-  // Fungsi untuk menghapus gambar
-  const handleRemoveImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Fungsi untuk mengatur ulang urutan gambar
-  const handleReorderImages = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(images);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setImages(items);
-  };
-
-  // GET: Ambil semua type property
   useEffect(() => {
     Api.get("/type-property")
       .then((res) => {
@@ -99,14 +122,12 @@ function UpdatePropertyForm() {
       .catch((err) => console.error("Failed to fetch type property:", err));
   }, []);
 
-  // GET: Ambil data property berdasarkan id
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         const res = await Api.get(`/property/${id}`);
         const property = res.data.data[0];
 
-        // Ekstrak data dari array ke object
         const locationData = property.location?.[0] || {};
         const availabilityData = property.availability?.[0] || {};
         const facilitiesData = property.facilities?.[0] || {};
@@ -164,9 +185,7 @@ function UpdatePropertyForm() {
           }
         });
 
-        // Set existing images
         if (property.images && property.images.length > 0) {
-          // Format URL gambar dengan baseUrl jika diperlukan
           const formattedImages = property.images.map(img => 
             img.imagesUrl.startsWith('http') ? img.imagesUrl : `${API_URL}${img.imagesUrl}`
           );
@@ -182,7 +201,6 @@ function UpdatePropertyForm() {
     fetchProperty();
   }, [id]);
 
-  // Handle perubahan input form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -197,14 +215,6 @@ function UpdatePropertyForm() {
       .catch(err => console.error('Failed to fetch general areas:', err));
   }, []);
 
-  // Handle image upload
-  const handleImageChange = (e) => {
-    if (e.target.files) {
-      setNewImages(Array.from(e.target.files));
-    }
-  };
-
-  // PATCH: Simpan perubahan
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -216,7 +226,6 @@ function UpdatePropertyForm() {
       return;
     }
     
-    // Append basic fields
     formDataToSend.append("type_id", formData.type_id);
     formDataToSend.append("property_tittle", formData.property_tittle);
     formDataToSend.append("description", formData.description);
@@ -227,14 +236,10 @@ function UpdatePropertyForm() {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("monthly_price", formData.monthly_price);
     formDataToSend.append("yearly_price", formData.yearly_price);
-    
-    // Append JSON fields
     formDataToSend.append("location", JSON.stringify(formData.location));
     formDataToSend.append("availability", JSON.stringify(formData.availability));
     formDataToSend.append("facilities", JSON.stringify(formData.facilities));
     formDataToSend.append("propertiesOwner", JSON.stringify(formData.propertiesOwner));
-    
-    // Append new images
     newImages.forEach((file) => {
       formDataToSend.append("images", file);
     });
@@ -269,134 +274,83 @@ function UpdatePropertyForm() {
       <h1 className="text-2xl font-bold mb-4">Update Property</h1>
       {message && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{message}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {property.images.map((img, index) => (
+          <img
+            key={img.id}
+            src={`${baseUrl}${img.imagesUrl}`}
+            alt={img.imageName}
+            onClick={() => setSelectedImageIndex(index)}
+            className="w-full h-64 object-cover rounded-md cursor-pointer hover:scale-105 transition-transform duration-200"
+          />
+        ))}
+      </div>
 
-        {/* Upload & Edit Gambar */}
-        <div className="mb-6">
-          <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
-            Unggah Gambar
-            <span className="text-red-500 ml-1">*</span>
-            <span className="text-sm text-gray-500 ml-2">(Minimal satu gambar diperlukan)</span>
-          </label>
-
-          <div
-            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-amber-500 transition-colors"
-            onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-          >
-            <div className="space-y-1 text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                stroke="currentColor" strokeWidth="2" className="mx-auto h-12 w-12 text-gray-400"
-                viewBox="0 0 24 24"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                <circle cx="9" cy="9" r="2"/>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-              </svg>
-              <div className="flex text-sm text-gray-600 justify-center">
-                <label
-                  htmlFor="images"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-amber-600 hover:text-amber-500 
-                  focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-amber-500 px-2"
+      {selectedImageIndex !== null && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="relative w-full max-w-4xl mx-auto">
+            <button
+              onClick={() => setSelectedImageIndex(null)}
+              className="absolute top-2 right-2 z-50 bg-white text-black rounded-full p-2 hover:bg-gray-300"
+            >
+              ✕
+            </button>
+            <div className="carousel w-full rounded-lg overflow-hidden">
+              {property.images.map((img, index) => (
+                <div
+                  key={img.id}
+                  id={`slide${index}`}
+                  className={`carousel-item relative w-full transition-opacity duration-300 ${
+                    index === selectedImageIndex ? 'opacity-100' : 'hidden opacity-0'
+                  }`}
                 >
-                  <span>Unggah file atau seret dan lepas</span>
-                  <input
-                    id="images"
-                    name="images"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={handleImageChange}
-                  />
-                </label>
-              </div>
-              <p className="text-xs text-gray-500">PNG, JPG, GIF maksimal 10MB per file</p>
-            </div>
-          </div>
-
-          {/* Existing Images */}
-          {images && images.length > 0 && (
-            <DragDropContext onDragEnd={handleReorderImages}>
-              <Droppable droppableId="images-droppable" direction="horizontal">
-                {(provided) => (
-                  <div
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mt-4"
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    {images.map((img, idx) => (
-                      <Draggable key={idx} draggableId={`img-${idx}`} index={idx}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`relative aspect-square select-none border ${idx === 0 ? 'border-amber-400 ring-2 ring-amber-400 shadow-lg' : 'border-gray-200'} cursor-move bg-white`}
-                            style={{
-                              ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1,
-                              zIndex: snapshot.isDragging ? 50 : 1,
-                              transition: 'box-shadow 0.2s, opacity 0.2s'
-                            }}
-                          >
-                            {idx === 0 && (
-                              <div className="absolute top-2 left-2 z-20 bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                                Main Image
-                              </div>
-                            )}
-                            <img
-                              alt={`Uploaded image ${idx + 1}`}
-                              src={
-                                typeof img === 'string'
-                                  ? img.startsWith('http')
-                                    ? img
-                                    : `${API_URL}/${img}`
-                                  : URL.createObjectURL(img)
-                              }
-                              className="rounded-md object-cover w-full h-full"
-                              draggable={false}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(idx)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                                stroke="currentColor" strokeWidth="2"
-                                className="lucide lucide-x" viewBox="0 0 24 24"
-                              >
-                                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                              </svg>
-                            </button>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-
-          {/* Preview Gambar Baru */}
-          {newImages.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {newImages.map((file, idx) => (
-                <div key={idx} className="relative aspect-square border border-gray-200 rounded-md">
                   <img
-                    src={URL.createObjectURL(file)}
-                    alt={`New upload ${idx + 1}`}
-                    className="w-full h-full object-cover rounded-md"
+                    src={`${baseUrl}${img.imagesUrl}`}
+                    alt={img.imageName}
+                    className="w-full max-h-[80vh] object-contain"
                   />
+                  <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                    <button
+                      onClick={() =>
+                        setSelectedImageIndex(
+                          selectedImageIndex === 0
+                            ? property.images.length - 1
+                            : selectedImageIndex - 1
+                        )
+                      }
+                      className="btn btn-circle"
+                    >
+                      ❮
+                    </button>
+                    <button
+                      onClick={() =>
+                        setSelectedImageIndex(
+                          selectedImageIndex === property.images.length - 1
+                            ? 0
+                            : selectedImageIndex + 1
+                        )
+                      }
+                      className="btn btn-circle"
+                    >
+                      ❯
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className='flex justify-end text-accent mt-5'>
+          <Link to={`/user/update/image/property/${id}`} className="font-bold">
+            <div className='flex gap-3'>
+              <p>edit image</p>
+            </div>
+          </Link>
         </div>
 
-        {/* Pilih Type Property */}
         <div className="flex flex-wrap gap-2 mb-2 justify-center p-2 border rounded">
           {typeOptions.map((type) => (
             <button
@@ -412,7 +366,6 @@ function UpdatePropertyForm() {
           ))}
         </div>
 
-        {/* Judul */}
         <div>
           <label className="block font-medium">Judul Properti</label>
           <input
@@ -424,7 +377,6 @@ function UpdatePropertyForm() {
           />
         </div>
 
-        {/* Deskripsi */}
         <div className="bg-secondary rounded-2xl p-4 shadow-md mb-5">
           <label className="block text-lg font-semibold mb-2 text-white">
             Deskripsi Properti
@@ -453,7 +405,6 @@ function UpdatePropertyForm() {
           />
         </div>
 
-        {/* Detail */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
           <p>Detail</p>
           <div className='flex gap-5'>
@@ -493,7 +444,6 @@ function UpdatePropertyForm() {
           </div>
         </div>
 
-        {/* Pricing */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
           <p>Pricing</p>
           <input
@@ -521,7 +471,6 @@ function UpdatePropertyForm() {
           />
         </div>
 
-        {/* Location Group */}
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Lokasi</div>
 
