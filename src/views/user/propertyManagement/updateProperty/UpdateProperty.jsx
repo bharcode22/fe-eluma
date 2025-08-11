@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Api from "../../../../service/api.js";
 import Cookies from "js-cookie";
-import { Link } from 'react-router-dom';
 
 function UpdatePropertyForm() {
   const [property, setProperty] = useState(null);
@@ -19,7 +18,6 @@ function UpdatePropertyForm() {
   const [generalAreas, setGeneralAreas] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
-  const API_URL = "http://localhost:3002";
   const [formData, setFormData] = useState({
     type_id: "",
     property_tittle: "",
@@ -37,10 +35,10 @@ function UpdatePropertyForm() {
       longitude: "",
       latitude: ""
     },
-    availability: {
+    availability: [{
       available_from: "",
       available_to: ""
-    },
+    }],
     facilities: {
       wifi: false,
       washing_machine: false,
@@ -72,56 +70,41 @@ function UpdatePropertyForm() {
     }
   });
 
-  useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        const res = await Api.get(`/property/${id}`);
-        setProperty(res.data.data[0]);
-      } catch (error) {
-        console.error('Gagal memuat data properti:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperty();
-  }, [id]);
-
-  useEffect(() => {
-    let isMounted = true;
-  
-    const sanitize = async () => {
-      if (property && property.description) {
-        try {
-          const module = await import("dompurify");
-          const clean = module.default.sanitize(property.description);
-          if (isMounted) setSanitizedHTML(clean);
-        } catch (err) {
-          console.error("Gagal import DOMPurify:", err);
-        }
-      }
-    };
-  
-    sanitize();
-    return () => {
-      isMounted = false;
-    };
-  }, [property]);
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    setNewImages(prev => [...prev, ...files]);
+  // Format date for datetime-local input
+  const formatDateTimeForInput = (dateString) => {
+    if (!dateString) return "";
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "";
+      
+      // Adjust for timezone offset
+      const timezoneOffset = date.getTimezoneOffset() * 60000;
+      const adjustedDate = new Date(date.getTime() - timezoneOffset);
+      
+      return adjustedDate.toISOString().slice(0, 16);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "";
+    }
   };
 
-  useEffect(() => {
-    Api.get("/type-property")
-      .then((res) => {
-        if (res.data.data) setTypeOptions(res.data.data);
-      })
-      .catch((err) => console.error("Failed to fetch type property:", err));
-  }, []);
+  // Handler for availability changes
+  const handleAvailabilityChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      availability: [{
+        ...prev.availability[0] || {},
+        [field]: value,
+        // If setting from date, ensure to date is not before it
+        ...(field === 'available_from' && value && (!prev.availability[0]?.available_to || value > prev.availability[0]?.available_to) 
+          ? { available_to: value }
+          : {})
+      }]
+    }));
+  };
 
+  // Fetch property data
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -150,10 +133,10 @@ function UpdatePropertyForm() {
             longitude: locationData.longitude || "",
             latitude: locationData.latitude || ""
           },
-          availability: {
+          availability: [{
             available_from: availabilityData.available_from || "",
             available_to: availabilityData.available_to || ""
-          },
+          }],
           facilities: {
             wifi: facilitiesData.wifi || false,
             washing_machine: facilitiesData.washing_machine || false,
@@ -185,12 +168,14 @@ function UpdatePropertyForm() {
           }
         });
 
-        if (property.images && property.images.length > 0) {
+        if (property.images?.length > 0) {
           const formattedImages = property.images.map(img => 
-            img.imagesUrl.startsWith('http') ? img.imagesUrl : `${API_URL}${img.imagesUrl}`
+            img.imagesUrl.startsWith('http') ? img.imagesUrl : `${baseUrl}${img.imagesUrl}`
           );
           setImages(formattedImages);
         }
+
+        setProperty(property);
       } catch (error) {
         console.error("Gagal memuat data properti:", error);
         setMessage("Gagal memuat data properti");
@@ -198,65 +183,101 @@ function UpdatePropertyForm() {
         setLoading(false);
       }
     };
+
     fetchProperty();
-  }, [id]);
+  }, [id, baseUrl]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
+  // Fetch property types
   useEffect(() => {
-    fetch(`${API_URL}/general-area`)
+    Api.get("/type-property")
+      .then((res) => {
+        if (res.data.data) setTypeOptions(res.data.data);
+      })
+      .catch((err) => console.error("Failed to fetch type property:", err));
+  }, []);
+
+  // Fetch general areas
+  useEffect(() => {
+    fetch(`${baseUrl}/general-area`)
       .then(res => res.json())
       .then(data => {
         setGeneralAreas(data.data || []);
       })
       .catch(err => console.error('Failed to fetch general areas:', err));
-  }, []);
+  }, [baseUrl]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const formDataToSend = new FormData();
-    const token = Cookies.get('token');
-    
-    if (!token) {
-      setMessage('Token tidak tersedia. Harap login terlebih dahulu.');
-      return;
-    }
-    
-    formDataToSend.append("type_id", formData.type_id);
-    formDataToSend.append("property_tittle", formData.property_tittle);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("number_of_bedrooms", formData.number_of_bedrooms);
-    formDataToSend.append("number_of_bathrooms", formData.number_of_bathrooms);
-    formDataToSend.append("maximum_guest", formData.maximum_guest);
-    formDataToSend.append("minimum_stay", formData.minimum_stay);
-    formDataToSend.append("price", formData.price);
-    formDataToSend.append("monthly_price", formData.monthly_price);
-    formDataToSend.append("yearly_price", formData.yearly_price);
-    formDataToSend.append("location", JSON.stringify(formData.location));
-    formDataToSend.append("availability", JSON.stringify(formData.availability));
-    formDataToSend.append("facilities", JSON.stringify(formData.facilities));
-    formDataToSend.append("propertiesOwner", JSON.stringify(formData.propertiesOwner));
-    newImages.forEach((file) => {
-      formDataToSend.append("images", file);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const formatDateToISO = (dateString) => {
+  if (!dateString) return "";
+  try {
+    return new Date(dateString).toISOString();
+  } catch (error) {
+    console.error("Error formatting date to ISO:", error);
+    return "";
+  }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  const formDataToSend = new FormData();
+  const token = Cookies.get('token');
+  
+  if (!token) {
+    setMessage('Token tidak tersedia. Harap login terlebih dahulu.');
+    return;
+  }
+
+  // Prepare data with properly formatted dates
+  const availabilityData = {
+    available_from: formatDateToISO(formData.availability[0]?.available_from),
+    available_to: formatDateToISO(formData.availability[0]?.available_to)
+  };
+
+  // Append all fields
+  formDataToSend.append('type_id', formData.type_id);
+  formDataToSend.append('property_tittle', formData.property_tittle);
+  formDataToSend.append('description', formData.description);
+  formDataToSend.append('number_of_bedrooms', formData.number_of_bedrooms);
+  formDataToSend.append('number_of_bathrooms', formData.number_of_bathrooms);
+  formDataToSend.append('maximum_guest', formData.maximum_guest);
+  formDataToSend.append('minimum_stay', formData.minimum_stay);
+  formDataToSend.append('price', formData.price);
+  formDataToSend.append('monthly_price', formData.monthly_price);
+  formDataToSend.append('yearly_price', formData.yearly_price);
+  
+  // Stringify nested objects with proper date formatting
+  formDataToSend.append('location', JSON.stringify(formData.location));
+  formDataToSend.append('availability', JSON.stringify(availabilityData));
+  formDataToSend.append('facilities', JSON.stringify(formData.facilities));
+  formDataToSend.append('propertiesOwner', JSON.stringify(formData.propertiesOwner));
+
+  // Append images
+  newImages.forEach(file => {
+    formDataToSend.append('images', file);
+  });
+
+  try {
+    setLoading(true);
+    await Api.patch(`/property/${id}`, formDataToSend, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      }
     });
 
-    try {
-      await Api.patch(`/property/${id}`, formDataToSend, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        }
-      });
-      navigate('/user/home');
-    } catch (error) {
-      console.error("Gagal update property:", error);
-      setMessage("Gagal update property: " + (error.response?.data?.message || error.message));
-    }
-  };
+    navigate('/user/home');
+  } catch (error) {
+    console.error("Update error:", error.response?.data || error.message);
+    setMessage(`Gagal update: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (
@@ -269,13 +290,24 @@ function UpdatePropertyForm() {
     );
   }
 
+  if (!property) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-500">Failed to load property data</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto p-6 rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4">Update Property</h1>
       {message && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{message}</div>}
 
+      {/* Image Gallery */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {property.images.map((img, index) => (
+        {property.images?.map((img, index) => (
           <img
             key={img.id}
             src={`${baseUrl}${img.imagesUrl}`}
@@ -286,6 +318,7 @@ function UpdatePropertyForm() {
         ))}
       </div>
 
+      {/* Image Modal */}
       {selectedImageIndex !== null && (
         <div className="fixed inset-0 bg-black/50 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="relative w-full max-w-4xl mx-auto">
@@ -296,10 +329,9 @@ function UpdatePropertyForm() {
               ✕
             </button>
             <div className="carousel w-full rounded-lg overflow-hidden">
-              {property.images.map((img, index) => (
+              {property.images?.map((img, index) => (
                 <div
                   key={img.id}
-                  id={`slide${index}`}
                   className={`carousel-item relative w-full transition-opacity duration-300 ${
                     index === selectedImageIndex ? 'opacity-100' : 'hidden opacity-0'
                   }`}
@@ -342,51 +374,53 @@ function UpdatePropertyForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className='flex justify-end text-accent mt-5'>
-          <Link to={`/user/update/image/property/${id}`} className="font-bold">
-            <div className='flex gap-3'>
-              <p>edit image</p>
-            </div>
-          </Link>
-        </div>
+      <div className='flex justify-end text-accent mt-5'>
+        <Link to={`/user/update/image/property/${id}`} className="font-bold">
+          <div className='flex gap-3'>
+            <p>edit image</p>
+          </div>
+        </Link>
+      </div>
 
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Property Type */}
         <div className="flex flex-wrap gap-2 mb-2 justify-center p-2 border rounded">
           {typeOptions.map((type) => (
-            <button
-              key={type.id}
-              type="button"
-              className={`px-4 py-2 rounded shadow ${
-                formData.type_id === type.id ? "bg-blue-600 text-white" : "bg-gray-200"
+            <button 
+              key={type.id} 
+              type="button" 
+              className={`btn shadow-2xl ${
+                formData.type_id === type.id ? "btn-primary" : "btn-secondary"
               }`}
-              onClick={() => setFormData((prev) => ({ ...prev, type_id: type.id }))}
+              onClick={() => setFormData(prev => ({ ...prev, type_id: type.id }))}
             >
               {type.type_name}
             </button>
           ))}
         </div>
 
+        {/* Property Title */}
         <div>
-          <label className="block font-medium">Judul Properti</label>
-          <input
-            type="text"
-            name="property_tittle"
-            value={formData.property_tittle}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+          <input 
+            type="text" 
+            name="property_tittle" 
+            placeholder="Judul Properti" 
+            value={formData.property_tittle} 
+            onChange={handleChange} 
+            className="input input-bordered w-full mb-2"
           />
         </div>
 
+        {/* Description */}
         <div className="bg-secondary rounded-2xl p-4 shadow-md mb-5">
           <label className="block text-lg font-semibold mb-2 text-white">
             Deskripsi Properti
           </label>
-
           <ReactQuill
             value={formData.description || ""}
-            onChange={(value) => setFormData((prev) => ({ ...prev, description: value }))}
+            onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
             placeholder="Tulis deskripsi properti di sini..."
-            className="custom-quill"
+            className="custom-quill bg-white rounded"
             modules={{
               toolbar: [
                 [{ header: [1, 2, false] }],
@@ -405,6 +439,7 @@ function UpdatePropertyForm() {
           />
         </div>
 
+        {/* Property Details */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
           <p>Detail</p>
           <div className='flex gap-5'>
@@ -414,6 +449,7 @@ function UpdatePropertyForm() {
               value={formData.number_of_bedrooms}
               onChange={e => setFormData({ ...formData, number_of_bedrooms: e.target.value })}
               className="input input-bordered w-full mb-2"
+              min="0"
             />
 
             <input
@@ -422,6 +458,7 @@ function UpdatePropertyForm() {
               value={formData.number_of_bathrooms}
               onChange={e => setFormData({ ...formData, number_of_bathrooms: e.target.value })}
               className="input input-bordered w-full mb-2"
+              min="0"
             />
           </div>
 
@@ -432,6 +469,7 @@ function UpdatePropertyForm() {
               value={formData.maximum_guest}
               onChange={e => setFormData({ ...formData, maximum_guest: e.target.value })}
               className="input input-bordered w-full mb-2"
+              min="0"
             />
 
             <input
@@ -440,10 +478,12 @@ function UpdatePropertyForm() {
               value={formData.minimum_stay}
               onChange={e => setFormData({ ...formData, minimum_stay: e.target.value })}
               className="input input-bordered w-full mb-2"
+              min="1"
             />
           </div>
         </div>
 
+        {/* Pricing */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
           <p>Pricing</p>
           <input
@@ -452,6 +492,7 @@ function UpdatePropertyForm() {
             value={formData.price}
             onChange={e => setFormData({ ...formData, price: e.target.value })}
             className="input input-bordered w-full mb-2"
+            min="0"
           />
 
           <input
@@ -460,6 +501,7 @@ function UpdatePropertyForm() {
             value={formData.monthly_price}
             onChange={e => setFormData({ ...formData, monthly_price: e.target.value })}
             className="input input-bordered w-full mb-2"
+            min="0"
           />
 
           <input
@@ -468,16 +510,46 @@ function UpdatePropertyForm() {
             value={formData.yearly_price}
             onChange={e => setFormData({ ...formData, yearly_price: e.target.value })}
             className="input input-bordered w-full mb-2"
+            min="0"
           />
         </div>
 
+        {/* Availability */}
+        <div className="mb-2 p-4 border rounded bg-base-100 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col items-start">
+              <label htmlFor="available_from" className="mb-1 font-medium">Tersedia Dari</label>
+              <input
+                id="available_from"
+                type="datetime-local"
+                value={formatDateTimeForInput(formData.availability[0]?.available_from)}
+                onChange={(e) => handleAvailabilityChange('available_from', e.target.value)}
+                className="input input-bordered w-full"
+              />
+            </div>
+
+            <div className="flex flex-col items-start">
+              <label htmlFor="available_to" className="mb-1 font-medium">Tersedia Sampai</label>
+              <input
+                id="available_to"
+                type="datetime-local"
+                value={formatDateTimeForInput(formData.availability[0]?.available_to)}
+                onChange={(e) => handleAvailabilityChange('available_to', e.target.value)}
+                className="input input-bordered w-full"
+                min={formData.availability[0]?.available_from}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Lokasi</div>
 
           <select
             value={formData.location.general_area}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 location: {
                   ...prev.location,
@@ -500,7 +572,7 @@ function UpdatePropertyForm() {
             placeholder="Map URL"
             value={formData.location.map_url}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 location: {
                   ...prev.location,
@@ -516,7 +588,7 @@ function UpdatePropertyForm() {
             placeholder="Longitude"
             value={formData.location.longitude}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 location: {
                   ...prev.location,
@@ -532,7 +604,7 @@ function UpdatePropertyForm() {
             placeholder="Latitude"
             value={formData.location.latitude}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 location: {
                   ...prev.location,
@@ -544,43 +616,41 @@ function UpdatePropertyForm() {
           />
         </div>
 
-{/* Facilities Group */}
-<div className="mb-2 p-2 border rounded">
-  <div className="font-bold mb-1">Fasilitas</div>
-  <div className="flex flex-wrap gap-3 justify-center">
-    {Object.keys(formData?.facilities ?? {}).map((key) => (
-      <button
-        key={key}
-        type="button"
-        className={`btn ${formData.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
-        onClick={() =>
-          setFormData((prev) => ({
-            ...prev,
-            facilities: {
-              ...prev.facilities,
-              [key]: !prev.facilities[key],
-            },
-          }))
-        }
-      >
-        {key.replace(/_/g, ' ')}
-      </button>
-    ))}
-  </div>
-</div>
+        {/* Facilities */}
+        <div className="mb-2 p-2 border rounded">
+          <div className="font-bold mb-1">Fasilitas</div>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {Object.keys(formData.facilities).map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={`btn ${formData.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() =>
+                  setFormData(prev => ({
+                    ...prev,
+                    facilities: {
+                      ...prev.facilities,
+                      [key]: !prev.facilities[key],
+                    },
+                  }))
+                }
+              >
+                {key.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
 
-
-        {/* Owner Group */}
+        {/* Property Owner */}
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Data Pemilik Properti</div>
 
-          {/* Nama Lengkap */}
-          <input
-            type="text"
-            placeholder="Nama Lengkap"
+          <input 
+            type="text" 
+            placeholder="Nama Lengkap" 
             value={formData.propertiesOwner.fullname}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -591,13 +661,12 @@ function UpdatePropertyForm() {
             className="input input-bordered w-full mb-1"
           />
 
-          {/* Nama */}
           <input
             type="text"
             placeholder="Nama"
             value={formData.propertiesOwner.name}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -608,13 +677,12 @@ function UpdatePropertyForm() {
             className="input input-bordered w-full mb-1"
           />
 
-          {/* No. Telepon */}
           <input
-            type="number"
+            type="tel"
             placeholder="No. Telepon"
             value={formData.propertiesOwner.phone}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -625,13 +693,12 @@ function UpdatePropertyForm() {
             className="input input-bordered w-full mb-1"
           />
 
-          {/* No. WhatsApp */}
           <input
-            type="number"
+            type="tel"
             placeholder="No. WhatsApp"
             value={formData.propertiesOwner.watsapp}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -642,13 +709,12 @@ function UpdatePropertyForm() {
             className="input input-bordered w-full mb-1"
           />
 
-          {/* Email */}
           <input
             type="email"
             placeholder="Email"
             value={formData.propertiesOwner.email}
             onChange={(e) =>
-              setFormData((prev) => ({
+              setFormData(prev => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -660,72 +726,12 @@ function UpdatePropertyForm() {
           />
         </div>
 
-        {/* Availability Group */}
-        <div className="mb-2 p-4 border rounded bg-base-100 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Tersedia Dari */}
-            <div className="flex flex-col items-start">
-              <label htmlFor="available_from" className="mb-1 font-medium">Tersedia Dari</label>
-              <input
-                id="available_from"
-                type="datetime-local"
-                value={
-                  formData.availability[0]?.available_from
-                    ? new Date(formData.availability[0].available_from)
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    availability: [
-                      {
-                        ...prev.availability[0],
-                        available_from: e.target.value,
-                      },
-                    ],
-                  }))
-                }
-                className="input input-bordered w-full"
-              />
-            </div>
-
-            {/* Tersedia Sampai */}
-            <div className="flex flex-col items-start">
-              <label htmlFor="available_to" className="mb-1 font-medium">Tersedia Sampai</label>
-              <input
-                id="available_to"
-                type="datetime-local"
-                value={
-                  formData.availability[0]?.available_to
-                    ? new Date(formData.availability[0].available_to)
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    availability: [
-                      {
-                        ...prev.availability[0],
-                        available_to: e.target.value,
-                      },
-                    ],
-                  }))
-                }
-                className="input input-bordered w-full"
-              />
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="submit"
+        <button 
+          type="submit" 
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+          disabled={loading}
         >
-          Simpan Perubahan
+          {loading ? 'Processing...' : 'Update'}
         </button>
       </form>
     </div>

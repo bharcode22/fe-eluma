@@ -8,28 +8,30 @@ import Cookies from 'js-cookie';
 import api from '../../../../service/api';
 
 const AddProperty = () => {
-  const [generalAreas, setGeneralAreas] = useState([]);
-  useEffect(() => {
-    fetch('http://localhost:3000/general-area')
-      .then(res => res.json())
-      .then(data => {
-        setGeneralAreas(data.data || []);
-      })
-      .catch(err => console.error('Failed to fetch general areas:', err));
-  }, []);
   const [message, setMessage] = useState('');
   const [images, setImages] = useState([]);
   const baseUrl = api.defaults.baseURL;
+  const [generalAreas, setGeneralAreas] = useState([]);
+  const [typeOptions, setTypeOptions] = useState([]);
 
-    const [typeOptions, setTypeOptions] = useState([]);
     useEffect(() => {
-        fetch(`${baseUrl}/type-property/`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.data) setTypeOptions(data.data);
-            })
-            .catch(err => console.error('Failed to fetch type property:', err));
-    });
+      fetch(`${baseUrl}/general-area`)
+        .then(res => res.json())
+        .then(data => {
+          setGeneralAreas(data.data || []);
+        })
+        .catch(err => console.error('Failed to fetch general areas:', err));
+    }, []); 
+
+    useEffect(() => {
+      fetch(`${baseUrl}/type-property/`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.data) setTypeOptions(data.data);
+        })
+        .catch(err => console.error('Failed to fetch type property:', err));
+    }, []);
+
     const navigate = useNavigate();
     const [formState, setFormState] = useState({
         type_id: '',
