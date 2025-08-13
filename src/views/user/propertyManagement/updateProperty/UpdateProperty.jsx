@@ -306,16 +306,26 @@ const handleSubmit = async (e) => {
       {message && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{message}</div>}
 
       {/* Image Gallery */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {property.images?.map((img, index) => (
-          <img
-            key={img.id}
-            src={`${baseUrl}${img.imagesUrl}`}
-            alt={img.imageName}
-            onClick={() => setSelectedImageIndex(index)}
-            className="w-full h-64 object-cover rounded-md cursor-pointer hover:scale-105 transition-transform duration-200"
-          />
-        ))}
+      <div className="bg-secondary px-5 py-5 rounded-3xl my-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {property.images?.map((img, index) => (
+            <img
+              key={img.id}
+              src={`${baseUrl}${img.imagesUrl}`}
+              alt={img.imageName}
+              onClick={() => setSelectedImageIndex(index)}
+              className="w-full h-64 object-cover rounded-md cursor-pointer hover:scale-105 transition-transform duration-200 shadow-2xl"
+            />
+          ))}
+        </div>
+
+        <div className="mx-80 flex justify-center mt-5">
+          <Link to={`/user/update/image/property/${id}`}>
+            <div className="flex justify-end px-5 py-5 btn btn-primary text-white shadow-2xl">
+              <p>Edit Image</p>
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Image Modal */}
@@ -373,14 +383,6 @@ const handleSubmit = async (e) => {
           </div>
         </div>
       )}
-
-      <div className='flex justify-end text-accent mt-5'>
-        <Link to={`/user/update/image/property/${id}`} className="font-bold">
-          <div className='flex gap-3'>
-            <p>edit image</p>
-          </div>
-        </Link>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Property Type */}

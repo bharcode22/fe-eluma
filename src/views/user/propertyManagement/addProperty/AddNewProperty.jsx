@@ -187,16 +187,6 @@ const AddProperty = () => {
       setImages(reordered);
     };
 
-    useEffect(() => {
-      fetch(`${baseUrl}/general-area`)
-        .then(res => res.json())
-        .then(data => {
-          // adjust based on your backend response structure
-          setGeneralAreas(data.data || []);
-        })
-        .catch(err => console.error('Failed to fetch general areas:', err));
-    });
-
   return (
     <div className="p-6 max-w-4xl mx-auto shadow-md rounded-md">
       <div className='flex justify-center'>

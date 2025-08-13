@@ -84,7 +84,7 @@ function LandingPageDetailProperty() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
 
 			{/* judul */}
-      <h1 className="text-3xl font-bold">{property.property_tittle}</h1>
+      <h1 className="text-3xl font-bold">{property.property_code}</h1>
 
       {/* Grid Gambar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

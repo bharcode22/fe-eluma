@@ -167,7 +167,7 @@ function GetAllProperty() {
 
               {/* Property Info */}
               <div className="p-4">
-                <h2 className="text-xl font-bold mb-2 text-primary">{property.property_tittle}</h2>
+                <h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
 								<hr className="border-t-2 border-accent pr-10" />
 
                 <div className="flex items-center justify-between mb-4">
