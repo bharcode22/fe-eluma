@@ -5,6 +5,8 @@ import Cookies from 'js-cookie';
 import { AuthContext } from '../../context/AuthContext.jsx';
 import show from '../../assets/svg/show.svg'
 import hide from '../../assets/svg/hide.svg'
+import AithGoogle from "./GoogleAuth.jsx";
+
 
 export default function Login() {
     const navigate = useNavigate();

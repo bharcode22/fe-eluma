@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { AuthContext } from '../../context/AuthContext.jsx';
 import show from '../../assets/svg/show.svg';
 import hide from '../../assets/svg/hide.svg';
+import AithGoogle from "./GoogleAuth.jsx";
 
 const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
     const navigate = useNavigate();
@@ -125,6 +126,9 @@ const LoginModal = ({ isOpen, onClose, onRegisterClick }) => {
                     </div>
                 </form>
 
+                <div className="mt-5">
+                    <AithGoogle />
+                </div>
 
                 <div className="mt-4 text-center">
                     <p className="text-sm">
