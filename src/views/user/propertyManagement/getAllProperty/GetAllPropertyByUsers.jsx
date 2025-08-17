@@ -11,6 +11,7 @@ import LoginModal from '../../../../../src/views/auth/LoginModal';
 import RegisterModal from '../../../../../src/views/auth/RegisterModal';
 import api from '../../../../service/api.js';
 import PropertyFilter from '../../../landingPAge/home/PropertyFilter.jsx'; 
+import Cookies from 'js-cookie';
 const baseUrl = api.defaults.baseURL;
 
 function GetAllPropertyByUsers() {
@@ -24,6 +25,7 @@ function GetAllPropertyByUsers() {
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
     const [priceView, setPriceView] = useState('monthly');
     const [filteredProperties, setFilteredProperties] = useState([]);
+    const token = Cookies.get('token');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -67,15 +69,29 @@ function GetAllPropertyByUsers() {
         }));
     };
 
-        const handleOpenLogin = () => {
-            setIsRegisterModalOpen(false);
-            setIsLoginModalOpen(true);
-        };
+    const SaveProperties = async (propertyId) => {
+        try {
+            console.log("ini adalah token dari get all prop", token);
+            await axios.post( `${baseUrl}/favorite-properties/${propertyId}`, {},
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
 
-        const handleOpenRegister = () => {
-            setIsLoginModalOpen(false);
-            setIsRegisterModalOpen(true);
-        };
+        } catch (err) {
+            setError(err.response?.data?.message || err.message);
+        }
+    };
+
+    const handleOpenLogin = () => {
+        setIsRegisterModalOpen(false);
+        setIsLoginModalOpen(true);
+    };
+
+    const handleOpenRegister = () => {
+        setIsLoginModalOpen(false);
+        setIsRegisterModalOpen(true);
+    };
 
     if (loading)
         return (
@@ -137,13 +153,8 @@ function GetAllPropertyByUsers() {
                                     {property.images.map((image) => ( <img key={image.id} src={`${baseUrl}/propertyImages/${image.imageName}`} alt={image.imageName} className="w-full h-64 object-cover flex-shrink-0" /> ))}
                                 </div>
 
-                                <button 
-                                onClick={() => {
-                                    setIsLoginModalOpen(true);
-                                    setIsMenuOpen(false);
-                                    }}
-                                >
-                                <img src={love} className="absolute top-3 right-3 w-7 h-7 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
+                                <button onClick={() => SaveProperties(property.id)} >
+                                    <img src={love} className="absolute top-3 right-3 w-7 h-7 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
                                 </button>
 
                             {/* Navigation Buttons */}
