@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { AuthContext } from '../context/AuthContext.jsx';
+import add from '../assets/svg/add.svg'
 
 function NavbarUsers() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,11 +18,11 @@ function NavbarUsers() {
     };
 
     const navItems = [
-        { path: '/user/all/property', label: 'All Public Property'},
+        { path: '/user/all/property', label: 'All Property'},
         { path: '/user/home', label: 'My Public Property' },
         { path: '/user/private/property', label: 'My Private Property' },
         { path: '/user/saved/property', label: 'Saved Property' },
-        { path: '/user/add/property', label: 'Tambah' },
+        { path: '/user/add/property', label: <img src={add} className="w-9 h-9 px-1 py-1 rounded-lg bg-secondary " /> },
     ];
 
     return (

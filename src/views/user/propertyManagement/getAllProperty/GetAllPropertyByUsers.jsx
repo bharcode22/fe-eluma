@@ -7,8 +7,6 @@ import guest from '../../../../assets/svg/guest.svg';
 import calender from '../../../../assets/svg/calender.svg';
 import duration from '../../../../assets/svg/duration.svg';
 import love from '../../../../assets/svg/love.svg';
-import LoginModal from '../../../../../src/views/auth/LoginModal';
-import RegisterModal from '../../../../../src/views/auth/RegisterModal';
 import api from '../../../../service/api.js';
 import PropertyFilter from '../../../landingPAge/home/PropertyFilter.jsx'; 
 import Cookies from 'js-cookie';
@@ -20,33 +18,67 @@ function GetAllPropertyByUsers() {
     const [error, setError] = useState(null);
     const [totalData, setTotalData] = useState(0);
     const [carouselIndexes, setCarouselIndexes] = useState({});
-    const [ setIsMenuOpen] = useState(false);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
     const [priceView, setPriceView] = useState('monthly');
     const [filteredProperties, setFilteredProperties] = useState([]);
+    const [favorites, setFavorites] = useState({});
     const token = Cookies.get('token');
 
     useEffect(() => {
         const fetchData = async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/property`);
-            setProperties(response.data.data);
-            setTotalData(response.data.totalData);
-            setFilteredProperties(response.data.data); // Set all data as default
+            try {
+                const response = await axios.get(`${baseUrl}/property`);
+                setProperties(response.data.data);
+                setTotalData(response.data.totalData);
+                setFilteredProperties(response.data.data); // Set all data as default
 
-            // Initialize carousel index for each property
-            const initialIndexes = {};
-            response.data.data.forEach((property) => {
-            initialIndexes[property.id] = 0;
-            });
-            setCarouselIndexes(initialIndexes);
+                // Initialize carousel index for each property
+                const initialIndexes = {};
+                response.data.data.forEach((property) => {
+                    initialIndexes[property.id] = 0;
+                });
+                setCarouselIndexes(initialIndexes);
 
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${baseUrl}/property`);
+                const props = response.data.data;
+                setProperties(props);
+
+                const favStatuses = {};
+                for (const prop of props) {
+                    try {
+                        const favRes = await axios.get( `${baseUrl}/favorite-properties/${prop.id}`, 
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
+
+                        
+                        favStatuses[prop.id] = favRes.data.status;
+                        console.log("favorite status: ", {
+                            status: favRes.data.status, 
+                            propId: prop.id
+                        });
+                    } catch (err) {
+                        favStatuses[prop.id] = false;
+                    }
+                }
+
+                setFavorites(favStatuses);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchData();
@@ -71,26 +103,19 @@ function GetAllPropertyByUsers() {
 
     const SaveProperties = async (propertyId) => {
         try {
-            console.log("ini adalah token dari get all prop", token);
-            await axios.post( `${baseUrl}/favorite-properties/${propertyId}`, {},
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
+            await axios.post(
+            `${baseUrl}/favorite-properties/${propertyId}`,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } }
             );
 
+            setFavorites((prev) => ({
+                ...prev,
+                [propertyId]: !prev[propertyId],
+            }));
         } catch (err) {
             setError(err.response?.data?.message || err.message);
         }
-    };
-
-    const handleOpenLogin = () => {
-        setIsRegisterModalOpen(false);
-        setIsLoginModalOpen(true);
-    };
-
-    const handleOpenRegister = () => {
-        setIsLoginModalOpen(false);
-        setIsRegisterModalOpen(true);
     };
 
     if (loading)
@@ -141,7 +166,6 @@ function GetAllPropertyByUsers() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* {properties.map((property) => { */}
                 {filteredProperties.map((property) => {
                 const currentIndex = carouselIndexes[property.id] || 0;
 
@@ -149,13 +173,14 @@ function GetAllPropertyByUsers() {
                     <div key={property.id} className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
                         {/* Carousel */}
                         <div className="relative w-full h-64 overflow-hidden">
-                                <div className="flex transition-transform duration-700 ease-in-out h-full" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                                    {property.images.map((image) => ( <img key={image.id} src={`${baseUrl}/propertyImages/${image.imageName}`} alt={image.imageName} className="w-full h-64 object-cover flex-shrink-0" /> ))}
-                                </div>
+                            <div className="flex transition-transform duration-700 ease-in-out h-full" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+                                {property.images.map((image) => ( <img key={image.id} src={`${baseUrl}/propertyImages/${image.imageName}`} alt={image.imageName} className="w-full h-64 object-cover flex-shrink-0" /> ))}
+                            </div>
 
-                                <button onClick={() => SaveProperties(property.id)} >
-                                    <img src={love} className="absolute top-3 right-3 w-7 h-7 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
-                                </button>
+                            <button onClick={() => SaveProperties(property.id)}>
+                                <img src={love} className={`absolute top-3 right-3 w-9 h-9 px-1 py-1 rounded-full backdrop-blur-lg shadow-3xl ${favorites[property.id] ? "bg-red-500/80" : "bg-accent/20 hover:bg-accent/50"}`}
+                                    alt="favorite" />
+                            </button>
 
                             {/* Navigation Buttons */}
                             <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between z-10">
@@ -247,13 +272,12 @@ function GetAllPropertyByUsers() {
                                     </div>
                                 </Link>
                             </div>
+
                         </div>
                     </div>
                 );
                 })}
             </div>
-            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} onRegisterClick={handleOpenRegister} />
-            <RegisterModal  isOpen={isRegisterModalOpen} onClose={() => setIsRegisterModalOpen(false)} onLoginClick={handleOpenLogin} />
         </div>
     );
 }

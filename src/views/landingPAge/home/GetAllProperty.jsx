@@ -145,7 +145,7 @@ function GetAllProperty() {
                       setIsMenuOpen(false);
                     }}
                   >
-                  <img src={love} className="absolute top-3 right-3 w-7 h-7 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
+                  <img src={love} className="absolute top-3 right-3 w-9 h-9 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
                 </button>
 
 								{/* Navigation Buttons */}
