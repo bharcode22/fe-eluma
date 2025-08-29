@@ -22,7 +22,7 @@ function NavbarUsers() {
         { path: '/user/home', label: 'My Public Property' },
         { path: '/user/private/property', label: 'My Private Property' },
         { path: '/user/saved/property', label: 'Saved Property' },
-        { path: '/user/add/property', label: <img src={add} className="w-9 h-9 px-1 py-1 rounded-lg bg-secondary " /> },
+        { path: '/user/add/property', label: <img src={add} className="w-7 h-7" /> },
     ];
 
     return (
