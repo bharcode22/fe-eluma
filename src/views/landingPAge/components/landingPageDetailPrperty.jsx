@@ -223,7 +223,7 @@ function LandingPageDetailProperty() {
       </div>
 
       {/* Lokasi */}
-      <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
+      {/* <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
         <h2 className="text-xl font-semibold">Lokasi</h2>
         {property.location.map((loc) => (
           <div key={loc.id}>
@@ -233,7 +233,7 @@ function LandingPageDetailProperty() {
             </a>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
