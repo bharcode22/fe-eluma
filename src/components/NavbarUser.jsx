@@ -2,16 +2,19 @@ import React, { useState, useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AuthContext } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
 import add from "../assets/svg/add.svg";
+import { useLanguage } from "../context/LanguageContext";
 
 function NavbarUsers() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
 
-    // ambil state & fungsi dari LanguageContext
-    const { targetLang, setTargetLang } = useLanguage();
+    const { lang, setLang } = useLanguage();
+
+    const handleChange = (e) => {
+        setLang(e.target.value);
+    };
 
     const logout = () => {
         Cookies.remove("token");
@@ -61,17 +64,12 @@ function NavbarUsers() {
                     </NavLink>
                     ))}
 
-                    {/* 🔹 Dropdown Pilih Bahasa */}
-                    <select
-                    value={targetLang}
-                    onChange={(e) => setTargetLang(e.target.value)}
-                    className="hidden md:flex px-2 py-1 rounded bg-gray-700 text-white"
-                    >
-                    <option value="id">Indonesian</option>
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
+                    <select value={lang} onChange={handleChange}>
+                        <option value="en">English</option>
+                        <option value="id">Indonesian</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="es">Spanish</option>
                     </select>
 
                     {/* Logout Button - Desktop */}
@@ -85,17 +83,12 @@ function NavbarUsers() {
 
                 {/* Mobile menu button */}
                 <div className="md:hidden flex items-center gap-2">
-                    {/* 🔹 Dropdown bahasa di mobile */}
-                    <select
-                    value={targetLang}
-                    onChange={(e) => setTargetLang(e.target.value)}
-                    className="px-2 py-1 rounded bg-gray-700 text-white"
-                    >
-                    <option value="id">Indonesian</option>
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
+                    <select value={lang} onChange={handleChange}>
+                        <option value="en">English</option>
+                        <option value="id">Indonesian</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="es">Spanish</option>
                     </select>
 
                     <button

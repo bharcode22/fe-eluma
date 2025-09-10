@@ -1,8 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
+
+import { useLanguage } from "../../../context/LanguageContext.jsx";
+import { translateNodes } from "../../../utils/translator.js";
 
 import location from '../../../assets/svg/location.svg';
 import bedroom from '../../../assets/svg/bedroom.svg';
@@ -19,7 +22,15 @@ const GetMyProperty = () => {
   const [error, setError] = useState(null);
   const [carouselIndexes, setCarouselIndexes] = useState({});
   const [priceView, setPriceView] = useState('monthly');
-    const token = Cookies.get('token');
+  const token = Cookies.get('token');
+  const divRef = useRef(null);
+  const { lang } = useLanguage();
+
+  useEffect(() => {
+    if (divRef.current) {
+      translateNodes(divRef.current, lang);
+    }
+  }, [lang]);
 
 const fetchData = async () => {
     try {
@@ -119,7 +130,7 @@ const fetchData = async () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div ref={divRef} className="container mx-auto p-4">
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-accent mb-2">Properti Saya</h2>
         <p className="text-gray-600">Daftar properti milik Anda</p>

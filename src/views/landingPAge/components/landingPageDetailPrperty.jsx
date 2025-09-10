@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Api from '../../../service/api.js';
+import { useLanguage } from "../../../context/LanguageContext.jsx";
+import { translateNodes } from "../../../utils/translator.js";
+import NavbarUsers from "../../../components/NavbarUser.jsx";
 
 function LandingPageDetailProperty() {
   const { id } = useParams();
@@ -9,6 +12,15 @@ function LandingPageDetailProperty() {
   const [loading, setLoading] = useState(true);
   const [sanitizedHTML, setSanitizedHTML] = useState('');
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+
+  const divRef = useRef(null);
+  const { lang } = useLanguage();
+
+  useEffect(() => {
+    if (divRef.current) {
+      translateNodes(divRef.current, lang);
+    }
+  }, [lang]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -81,7 +93,8 @@ function LandingPageDetailProperty() {
     );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div ref={divRef} className="p-6 max-w-5xl mx-auto space-y-6">
+      <NavbarUsers />
 
 			{/* judul */}
       <div className='flex gap-2'>
