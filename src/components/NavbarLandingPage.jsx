@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import LoginModal from '../../src/views/auth/LoginModal';
 import RegisterModal from '../../src/views/auth/RegisterModal';
+import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 function NavbarLandingPage() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const { lang, setLang } = useLanguage();
+    const { currency, setCurrency } = useCurrency();
+
+    const handleLanguageChange = (e) => {
+        setLang(e.target.value);
+    };
+
+    const handleCurrencyChange = (e) => {
+        setCurrency(e.target.value);
+    };
 
     const handleOpenRegister = () => {
         setIsLoginModalOpen(false);
@@ -52,6 +65,20 @@ function NavbarLandingPage() {
                                 {item.label}
                             </NavLink>
                         ))}
+
+                        <select value={lang} onChange={handleLanguageChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                            <option value="en">English</option>
+                            <option value="id">Indonesian</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="es">Spanish</option>
+                        </select>
+
+                        <select value={currency} onChange={handleCurrencyChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                            <option value="IDR">IDR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
                     </div>
 
                     {/* Auth Buttons - Desktop */}
@@ -65,7 +92,21 @@ function NavbarLandingPage() {
                     </div>
 
                     {/* Mobile menu button */}
-                    <div className="md:hidden flex items-center">
+                    <div className="md:hidden flex items-center gap-2">
+                        <select value={lang} onChange={handleLanguageChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                            <option value="en">English</option>
+                            <option value="id">Indonesian</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="es">Spanish</option>
+                        </select>
+
+                        <select value={currency} onChange={handleCurrencyChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                            <option value="IDR">IDR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-accent hover:bg-secondary focus:outline-none transition-colors"
@@ -105,6 +146,20 @@ function NavbarLandingPage() {
                         ))}
 
                         <div className="flex flex-col space-y-2 mt-2">
+                            <select value={lang} onChange={handleLanguageChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option value="en">English</option>
+                                <option value="id">Indonesian</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="es">Spanish</option>
+                            </select>
+
+                            <select value={currency} onChange={handleCurrencyChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                                <option value="IDR">IDR</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+
                             <button 
                                 onClick={() => {
                                     setIsLoginModalOpen(true);

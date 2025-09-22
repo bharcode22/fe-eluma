@@ -30,9 +30,10 @@ export const translateNodes = async (node, targetLang) => {
       node.nodeValue = cached;
     } else {
       try {
+        console.log("Attempting to translate:", node.nodeValue, "to", targetLang);
         const res = await axios.post(VITE_LIBER_TRANSLATE_URL, {
           q: node.nodeValue,
-          source: "auto",
+          source: "en", // Mengubah 'auto' menjadi 'en' (English) sebagai bahasa sumber eksplisit.
           target: targetLang,
           format: "text",
         });
@@ -41,7 +42,7 @@ export const translateNodes = async (node, targetLang) => {
         node.nodeValue = translated;
         setCache(cacheKey, translated);
       } catch (err) {
-        console.error("Error translate:", err);
+        console.error("Error translating text:", err.response ? err.response.data : err.message);
       }
     }
   } else {

@@ -94,7 +94,7 @@ function LandingPageDetailProperty() {
 
   return (
     <div ref={divRef} className="p-6 max-w-5xl mx-auto space-y-6">
-      <NavbarUsers />
+      {/* <NavbarUsers /> */}
 
 			{/* judul */}
       <div className='flex gap-2'>

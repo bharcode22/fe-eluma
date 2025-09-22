@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { AuthContext } from "../context/AuthContext";
 import add from "../assets/svg/add.svg";
 import { useLanguage } from "../context/LanguageContext";
+import { useCurrency } from "../context/CurrencyContext";
 
 function NavbarUsers() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,9 +12,14 @@ function NavbarUsers() {
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
 
     const { lang, setLang } = useLanguage();
+    const { currency, setCurrency } = useCurrency();
 
-    const handleChange = (e) => {
+    const handleLanguageChange = (e) => {
         setLang(e.target.value);
+    };
+
+    const handleCurrencyChange = (e) => {
+        setCurrency(e.target.value);
     };
 
     const logout = () => {
@@ -64,7 +70,7 @@ function NavbarUsers() {
                     </NavLink>
                     ))}
 
-                    <select value={lang} onChange={handleChange}>
+                    <select value={lang} onChange={handleLanguageChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
                         <option value="en">English</option>
                         <option value="id">Indonesian</option>
                         <option value="fr">French</option>
@@ -72,10 +78,16 @@ function NavbarUsers() {
                         <option value="es">Spanish</option>
                     </select>
 
+                    <select value={currency} onChange={handleCurrencyChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                        <option value="IDR">IDR</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+
                     {/* Logout Button - Desktop */}
                     <button
                     onClick={logout}
-                    className="hidden md:flex items-center px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+                    className="hidden md:flex items-center px-3 py-2 rounded-md text-sm font-medium text-error-content bg-error bg-opacity-70 hover:bg-red-700 transition-colors"
                     >
                     Logout
                     </button>
@@ -83,7 +95,7 @@ function NavbarUsers() {
 
                 {/* Mobile menu button */}
                 <div className="md:hidden flex items-center gap-2">
-                    <select value={lang} onChange={handleChange}>
+                    <select value={lang} onChange={handleLanguageChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
                         <option value="en">English</option>
                         <option value="id">Indonesian</option>
                         <option value="fr">French</option>
@@ -91,9 +103,15 @@ function NavbarUsers() {
                         <option value="es">Spanish</option>
                     </select>
 
+                    <select value={currency} onChange={handleCurrencyChange} className="bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent">
+                        <option value="IDR">IDR</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+
                     <button
                     onClick={logout}
-                    className="md:hidden p-2 rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
+                    className="md:hidden p-2 rounded-md text-error-content bg-error bg-opacity-70 hover:bg-red-700 transition-colors"
                     >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +186,7 @@ function NavbarUsers() {
                                 logout();
                                 setIsMenuOpen(false);
                             }}
-                            className="block w-full px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700 transition-colors text-center"
+                            className="block w-full px-3 py-2 rounded-md text-base font-medium text-error-content bg-error bg-opacity-70 hover:bg-red-700 transition-colors text-center"
                             >
                             Logout
                         </button>

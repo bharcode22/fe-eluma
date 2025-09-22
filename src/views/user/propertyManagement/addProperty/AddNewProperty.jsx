@@ -336,49 +336,63 @@ const AddProperty = () => {
         </div>
 
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-          <p>Detail</p>
-          <div className='flex gap-5'>
-                <input type="number" placeholder="Jumlah Kamar Tidur" value={formState.number_of_bedrooms}
-                  onChange={e => setFormState({ ...formState, number_of_bedrooms: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
-
-                <input type="number" placeholder="Jumlah Kamar Mandi" value={formState.number_of_bathrooms}
-                  onChange={e => setFormState({ ...formState, number_of_bathrooms: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
-          </div>
-
-          <div className='flex gap-5'>
-                <input type="number" placeholder="Tamu Maksimal" value={formState.maximum_guest}
-                  onChange={e => setFormState({ ...formState, maximum_guest: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
-
-                <input type="number" placeholder="Minimal Menginap" value={formState.minimum_stay}
-                  onChange={e => setFormState({ ...formState, minimum_stay: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
+          <p className="text-lg font-semibold mb-4 text-white">Detail Properti</p>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <label htmlFor="number_of_bedrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Tidur</label>
+              <input type="number" id="number_of_bedrooms" placeholder="Jumlah Kamar Tidur" value={formState.number_of_bedrooms}
+                onChange={e => setFormState({ ...formState, number_of_bedrooms: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="number_of_bathrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Mandi</label>
+              <input type="number" id="number_of_bathrooms" placeholder="Jumlah Kamar Mandi" value={formState.number_of_bathrooms}
+                onChange={e => setFormState({ ...formState, number_of_bathrooms: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="maximum_guest" className="block text-sm font-medium text-white mb-1">Tamu Maksimal</label>
+              <input type="number" id="maximum_guest" placeholder="Tamu Maksimal" value={formState.maximum_guest}
+                onChange={e => setFormState({ ...formState, maximum_guest: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="minimum_stay" className="block text-sm font-medium text-white mb-1">Minimal Menginap</label>
+              <input type="number" id="minimum_stay" placeholder="Minimal Menginap" value={formState.minimum_stay}
+                onChange={e => setFormState({ ...formState, minimum_stay: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
           </div>
         </div>
 
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-          <div className='bg-secondary'>
-            <p>Pricing</p>
-                <input type="number" placeholder="Harga Harian" value={formState.price}
-                  onChange={e => setFormState({ ...formState, price: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
-
-                <input type="number" placeholder="Harga Bulanan" value={formState.monthly_price}
-                  onChange={e => setFormState({ ...formState, monthly_price: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
-
-                <input type="number" placeholder="Harga Tahunan" value={formState.yearly_price}
-                  onChange={e => setFormState({ ...formState, yearly_price: e.target.value })}
-                  className="input input-bordered w-full mb-2"
-                />
+          <p className="text-lg font-semibold mb-4 text-white">Pricing</p>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-white mb-1">Harga Harian</label>
+              <input type="number" id="price" placeholder="Harga Harian" value={formState.price}
+                onChange={e => setFormState({ ...formState, price: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="monthly_price" className="block text-sm font-medium text-white mb-1">Harga Bulanan</label>
+              <input type="number" id="monthly_price" placeholder="Harga Bulanan" value={formState.monthly_price}
+                onChange={e => setFormState({ ...formState, monthly_price: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="yearly_price" className="block text-sm font-medium text-white mb-1">Harga Tahunan</label>
+              <input type="number" id="yearly_price" placeholder="Harga Tahunan" value={formState.yearly_price}
+                onChange={e => setFormState({ ...formState, yearly_price: e.target.value })}
+                className="input input-bordered w-full"
+              />
+            </div>
           </div>
         </div>
 
