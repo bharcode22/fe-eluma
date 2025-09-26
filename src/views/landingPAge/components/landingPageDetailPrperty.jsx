@@ -3,7 +3,12 @@ import { useParams } from 'react-router-dom';
 import Api from '../../../service/api.js';
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 import { translateNodes } from "../../../utils/translator.js";
+import { useCurrency } from "../../../context/CurrencyContext.jsx";
 import NavbarUsers from "../../../components/NavbarUser.jsx";
+import Calender from "../../../assets/svg/calender.svg";
+import Bedroom from "../../../assets/svg/bedroom.svg";
+import Duration from "../../../assets/svg/duration.svg";
+import Add from "../../../assets/svg/add.svg";
 
 function LandingPageDetailProperty() {
   const { id } = useParams();
@@ -15,6 +20,7 @@ function LandingPageDetailProperty() {
 
   const divRef = useRef(null);
   const { lang } = useLanguage();
+  const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
 
   useEffect(() => {
     if (divRef.current) {
@@ -204,23 +210,41 @@ function LandingPageDetailProperty() {
       {/* Ketersediaan */}
       <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
         <h2 className="text-xl font-semibold">Ketersediaan</h2>
-        {property.availability.map((a) => (
-          <p key={a.id}>
-            Tersedia dari <strong>{new Date(a.available_from).toLocaleDateString()}</strong> hingga{' '}
-            <strong>{new Date(a.available_to).toLocaleDateString()}</strong>
-          </p>
-        ))}
+        <div className="space-y-3 mt-3">
+          {property.availability.map((a) => (
+            <div key={a.id} className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+              <img src={Calender} alt="calendar icon" className="w-6 h-6 text-primary" />
+              <p className="text-lg">
+                Tersedia dari <strong className="text-primary">{new Date(a.available_from).toLocaleDateString()}</strong> hingga{' '}
+                <strong className="text-primary">{new Date(a.available_to).toLocaleDateString()}</strong>
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Harga */}
       <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
         <h2 className="text-xl font-semibold">Harga</h2>
-        <p className="">number of bedrooms: {property.number_of_bedrooms}</p>
-        <p className="">number of bathrooms: {property.number_of_bathrooms}</p>
-        <p className="">minimum stay: {property.minimum_stay}</p>
-        <p className="">price: {property.price}</p>
-        <p className="">monthly price: {property.monthly_price}</p>
-        <p className="">yearly price: {property.yearly_price}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+          <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+            <img src={Bedroom} alt="bedroom icon" className="w-6 h-6 text-primary" />
+            <p className="text-lg">number of bedrooms: <strong className="text-primary">{property.number_of_bedrooms}</strong></p>
+          </div>
+          <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+            <img src={Bedroom} alt="bathroom icon" className="w-6 h-6 text-primary" />
+            <p className="text-lg">number of bathrooms: <strong className="text-primary">{property.number_of_bathrooms}</strong></p>
+          </div>
+          <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+            <img src={Duration} alt="minimum stay icon" className="w-6 h-6 text-primary" />
+            <p className="text-lg">minimum stay: <strong className="text-primary">{property.minimum_stay}</strong></p>
+          </div>
+        </div>
+        <div className="mt-5 space-y-2">
+          <p className="text-2xl font-bold text-primary">price: {getCurrencySymbol()}{convertPrice(property.price, currency, exchangeRates)}</p>
+          <p className="text-xl text-primary">monthly price: {getCurrencySymbol()}{convertPrice(property.monthly_price, currency, exchangeRates)}</p>
+          <p className="text-xl text-primary">yearly price: {getCurrencySymbol()}{convertPrice(property.yearly_price, currency, exchangeRates)}</p>
+        </div>
       </div>
 
       {/* Pemilik */}
@@ -239,36 +263,66 @@ function LandingPageDetailProperty() {
       <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
         <h2 className="text-xl font-semibold">Detail Tambahan</h2>
         {property.additionalDetails.map((detail) => (
-          <div key={detail.id} className="space-y-2">
-            {detail.allow_path && <p>Izinkan Hewan Peliharaan</p>}
-            {detail.construction_nearby && <p>Konstruksi di Dekatnya</p>}
-            {detail.cleaning_requency && <p>Frekuensi Pembersihan: {detail.cleaning_requency}</p>}
-            {detail.linen_chaneg && <p>Penggantian Linen: {detail.linen_chaneg}</p>}
+          <div key={detail.id} className="space-y-2 mt-3">
+            {detail.allow_path && (
+              <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+                <img src={Add} alt="pet icon" className="w-6 h-6 text-primary" />
+                <p className="text-lg">Izinkan Hewan Peliharaan</p>
+              </div>
+            )}
+            {detail.construction_nearby && (
+              <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+                <img src={Add} alt="construction icon" className="w-6 h-6 text-primary" />
+                <p className="text-lg">Konstruksi di Dekatnya</p>
+              </div>
+            )}
+            {detail.cleaning_requency && (
+              <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+                <img src={Add} alt="cleaning icon" className="w-6 h-6 text-primary" />
+                <p className="text-lg">Frekuensi Pembersihan: <strong className="text-primary">{detail.cleaning_requency}</strong></p>
+              </div>
+            )}
+            {detail.linen_chaneg && (
+              <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
+                <img src={Add} alt="linen change icon" className="w-6 h-6 text-primary" />
+                <p className="text-lg">Penggantian Linen: <strong className="text-primary">{detail.linen_chaneg}</strong></p>
+              </div>
+            )}
 
             {/* Parking Details */}
             {detail.parking && (
-              <div>
-                <h3 className="font-semibold mt-2">Parkir:</h3>
-                {detail.parking.car_parking && <p>Parkir Mobil</p>}
-                {detail.parking.bike_parking && <p>Parkir Motor</p>}
-                {detail.parking.both_car_and_bike && <p>Parkir Mobil & Motor</p>}
+              <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
+                <h3 className="font-semibold mt-2 flex items-center gap-2">
+                  <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
+                  Parkir:
+                </h3>
+                <div className="ml-8 space-y-1">
+                  {detail.parking.car_parking && <p className="text-lg">Parkir Mobil</p>}
+                  {detail.parking.bike_parking && <p className="text-lg">Parkir Motor</p>}
+                  {detail.parking.both_car_and_bike && <p className="text-lg">Parkir Mobil & Motor</p>}
+                </div>
               </div>
             )}
 
             {/* View Details */}
             {detail.view && (
-              <div>
-                <h3 className="font-semibold mt-2">Pemandangan:</h3>
-                {detail.view.ocean_view && <p>Pemandangan Laut</p>}
-                {detail.view.sunset_view && <p>Pemandangan Matahari Terbenam</p>}
-                {detail.view.garden_view && <p>Pemandangan Taman</p>}
-                {detail.view.beach_view && <p>Pemandangan Pantai</p>}
-                {detail.view.jungle_view && <p>Pemandangan Hutan</p>}
-                {detail.view.montain_view && <p>Pemandangan Gunung</p>}
-                {detail.view.pool_view && <p>Pemandangan Kolam Renang</p>}
-                {detail.view.rice_field && <p>Pemandangan Sawah</p>}
-                {detail.view.sunrise_view && <p>Pemandangan Matahari Terbit</p>}
-                {detail.view.volcano_view && <p>Pemandangan Gunung Berapi</p>}
+              <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
+                <h3 className="font-semibold mt-2 flex items-center gap-2">
+                  <img src={Add} alt="view icon" className="w-6 h-6 text-primary" />
+                  Pemandangan:
+                </h3>
+                <div className="ml-8 space-y-1">
+                  {detail.view.ocean_view && <p className="text-lg">Pemandangan Laut</p>}
+                  {detail.view.sunset_view && <p className="text-lg">Pemandangan Matahari Terbenam</p>}
+                  {detail.view.garden_view && <p className="text-lg">Pemandangan Taman</p>}
+                  {detail.view.beach_view && <p className="text-lg">Pemandangan Pantai</p>}
+                  {detail.view.jungle_view && <p className="text-lg">Pemandangan Hutan</p>}
+                  {detail.view.montain_view && <p className="text-lg">Pemandangan Gunung</p>}
+                  {detail.view.pool_view && <p className="text-lg">Pemandangan Kolam Renang</p>}
+                  {detail.view.rice_field && <p className="text-lg">Pemandangan Sawah</p>}
+                  {detail.view.sunrise_view && <p className="text-lg">Pemandangan Matahari Terbit</p>}
+                  {detail.view.volcano_view && <p className="text-lg">Pemandangan Gunung Berapi</p>}
+                </div>
               </div>
             )}
           </div>

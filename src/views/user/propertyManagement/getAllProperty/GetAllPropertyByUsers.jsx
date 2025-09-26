@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import location from '../../../../assets/svg/location.svg';
@@ -10,6 +10,10 @@ import love from '../../../../assets/svg/love.svg';
 import api from '../../../../service/api.js';
 import PropertyFilter from '../../../landingPAge/home/PropertyFilter.jsx'; 
 import Cookies from 'js-cookie';
+import { useLanguage } from '../../../../context/LanguageContext';
+import { useCurrency } from '../../../../context/CurrencyContext';
+import { translateNodes } from '../../../../utils/translator';
+
 const baseUrl = api.defaults.baseURL;
 
 function GetAllPropertyByUsers() {
@@ -23,13 +27,23 @@ function GetAllPropertyByUsers() {
     const [favorites, setFavorites] = useState({});
     const token = Cookies.get('token');
 
+    const divRef = useRef(null);
+    const { lang } = useLanguage();
+    const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
+
+    useEffect(() => {
+        if (divRef.current) {
+            translateNodes(divRef.current, lang);
+        }
+    }, [lang]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`${baseUrl}/property`);
                 setProperties(response.data.data);
                 setTotalData(response.data.totalData);
-                setFilteredProperties(response.data.data); // Set all data as default
+                setFilteredProperties(response.data.data);
 
                 // Initialize carousel index for each property
                 const initialIndexes = {};
@@ -153,7 +167,7 @@ function GetAllPropertyByUsers() {
         );
 
     return (
-        <div className="container mx-auto p-4">
+        <div ref={divRef} className="container mx-auto p-4">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-accent mb-2">
                 Property List ({totalData} properties)
@@ -194,12 +208,12 @@ function GetAllPropertyByUsers() {
                             <h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
                             <hr className="border-t-2 border-accent pr-10" />
 
-                            <div className="flex items-center justify-between mb-4">
-                                <div className='mt-5'>
+                            <div className="flex items-center justify-between mb-4 mt-4">
+                                <div>
 
                                     <div className="flex items-center gap-3 mb-2">
                                         <img src={location} alt="Location" className='w-5 h-5' />
-                                        <p className="text-primary font-bold">{property.location[0]?.general_area}</p>
+                                        <p className="text-primary font-bold">{property.location[0]?.general_area || '-'}</p>
                                     </div>
 
                                     <div className="flex items-center gap-3 mb-2">
@@ -230,20 +244,20 @@ function GetAllPropertyByUsers() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-row md:flex-row lg:justify-between items-center md:items-center md:justify-center gap-4 text-800 p-4 bg-secondary/65 rounded-2xl shadow-2xl">
+                            <div className="flex flex-row justify-between items-center bg-secondary/65 p-4 rounded-2xl shadow-xl">
                                 {/* Price Display */}
-                                <div className="px- md:w-auto border-2 border-accent p-4 flex gap-2 rounded-lg items-center shadow-lg justify-start">
-                                    <p className="md:text-xl text-sm font-bold text-primary">
-                                    ${priceView === 'monthly' ? property.monthly_price : property.yearly_price} mil
+                                <div className="border-2 border-accent p-4 rounded-lg shadow-md">
+                                    <p className="font-bold text-primary text-xl">
+                                    {getCurrencySymbol()} {convertPrice(priceView === 'monthly' ? property.monthly_price : property.yearly_price)}
                                     </p>
-                                    <p className="md:text-xl text-sm font-bold text-primary">
+                                    <p className="text-sm text-primary">
                                     / {priceView === 'monthly' ? 'Bulan' : 'Tahun'}
                                     </p>
                                 </div>
 
                                 {/* Toggle Button */}
-                                <div className="md:w-auto flex justify-start md:justify-end">
-                                    <div className="shadow-lg">
+                                <div>
+                                    <div>
                                     <button
                                         onClick={() => setPriceView('monthly')}
                                         className={`px-2 py-1 rounded-l-lg border border-accent ${
@@ -264,12 +278,10 @@ function GetAllPropertyByUsers() {
                                 </div>
                             </div>
 
-                            <div className='flex justify-end text-accent mt-5'>
-                                <Link to={`/detail/${property.id}`} className="font-bold">
-                                    <div className='flex gap-3'>
-                                        <p>Detail</p>
-                                        <p>❯</p>
-                                    </div>
+                            <div className='flex justify-end text-accent mt-5 gap-5'>
+                                <Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
+                                    <span>Detail</span>
+                                    <span>❯</span>
                                 </Link>
                             </div>
 

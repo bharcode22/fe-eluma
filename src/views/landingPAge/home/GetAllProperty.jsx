@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import location from '../../../assets/svg/location.svg';
@@ -11,6 +11,9 @@ import LoginModal from '../../../../src/views/auth/LoginModal';
 import RegisterModal from '../../../../src/views/auth/RegisterModal';
 import api from '../../../service/api.js';
 import PropertyFilter from './PropertyFilter.jsx'; 
+import { useLanguage } from '../../../context/LanguageContext';
+import { useCurrency } from '../../../context/CurrencyContext';
+import { translateNodes } from '../../../utils/translator';
 const baseUrl = api.defaults.baseURL;
 
 function GetAllProperty() {
@@ -19,11 +22,20 @@ function GetAllProperty() {
   const [error, setError] = useState(null);
   const [totalData, setTotalData] = useState(0);
   const [carouselIndexes, setCarouselIndexes] = useState({});
-  const [ setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [priceView, setPriceView] = useState('monthly');
   const [filteredProperties, setFilteredProperties] = useState([]);
+
+  const divRef = useRef(null);
+  const { lang } = useLanguage();
+  const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
+
+  useEffect(() => {
+    if (divRef.current) {
+      translateNodes(divRef.current, lang);
+    }
+  }, [lang]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,7 +124,7 @@ function GetAllProperty() {
     );
 
   return (
-    <div className="container mx-auto p-4">
+    <div ref={divRef} className="container mx-auto p-4">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-accent mb-2">
           Property List ({totalData} properties)
@@ -139,10 +151,9 @@ function GetAllProperty() {
 									))}
 								</div>
 
-                <button 
+                <button
                   onClick={() => {
                       setIsLoginModalOpen(true);
-                      setIsMenuOpen(false);
                     }}
                   >
                   <img src={love} className="absolute top-3 right-3 w-9 h-9 px-1 py-1 rounded-full backdrop-blur-lg bg-accent/20 hover:bg-accent/50 shadow-2xl" />
@@ -170,27 +181,27 @@ function GetAllProperty() {
                 <h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
 								<hr className="border-t-2 border-accent pr-10" />
 
-                <div className="flex items-center justify-between mb-4">
-                  <div className='mt-5'>
+                <div className="flex items-center justify-between mb-4 mt-4">
+                  <div>
 
                     <div className="flex items-center gap-3 mb-2">
 											<img src={location} alt="Location" className='w-5 h-5' />
-                      <p className="text-primary font-bold">{property.location[0]?.general_area}</p>
+                      <p className="text-primary font-bold">{property.location[0]?.general_area || '-'}</p>
 										</div>
 
 										<div className="flex items-center gap-3 mb-2">
 											<img src={bedroom} alt="Location" className='w-5 h-5' />
-                      <p className="text-primary font-bold">{property.number_of_bedrooms} kamar tidur</p>
+                      <p className="text-primary font-bold" data-lang-key="bedrooms_count">{property.number_of_bedrooms} kamar tidur</p>
 										</div>
 
 										<div className="flex items-center gap-3 mb-2">
 											<img src={guest} alt="Location" className='w-5 h-5' />
-                      <p className="text-primary font-bold">Max Guests: {property.maximum_guest}</p>
+                      <p className="text-primary font-bold" data-lang-key="max_guests">Max Guests: {property.maximum_guest}</p>
 										</div>
 
                     <div className="flex items-center gap-3 mb-2">
                       <img src={calender} alt="Location" className='w-5 h-5' />
-                      <p className="text-primary font-bold">
+                      <p className="text-primary font-bold" data-lang-key="available_from">
                         Tersedia dari: {new Date(property.availability[0]?.available_from).toLocaleDateString('id-ID', {
                           day: 'numeric',
                           month: 'long',
@@ -201,33 +212,33 @@ function GetAllProperty() {
 
                     <div className="flex items-center gap-3 mb-2">
                       <img src={duration} alt="Location" className='w-5 h-5' />
-                      <p className="text-primary font-bold">Masa tinggal minimum {property.minimum_stay} bulan</p>
+                      <p className="text-primary font-bold" data-lang-key="minimum_stay">Masa tinggal minimum {property.minimum_stay} bulan</p>
                     </div>
 
                   </div>
                 </div>
 
-                <div className="flex flex-row md:flex-row lg:justify-between items-center md:items-center md:justify-center gap-4 text-800 p-4 bg-secondary/65 rounded-2xl shadow-2xl">
+                <div className="flex flex-row justify-between items-center bg-secondary/65 p-4 rounded-2xl shadow-xl">
                   {/* Price Display */}
-                  <div className="px- md:w-auto border-2 border-accent p-4 flex gap-2 rounded-lg items-center shadow-lg justify-start">
-                    <p className="md:text-xl text-sm font-bold text-primary">
-                      ${priceView === 'monthly' ? property.monthly_price : property.yearly_price} mil
+                  <div className="border-2 border-accent p-4 rounded-lg shadow-md">
+                    <p className="font-bold text-primary text-xl">
+                      {getCurrencySymbol()} {convertPrice(priceView === 'monthly' ? property.monthly_price : property.yearly_price)}
                     </p>
-                    <p className="md:text-xl text-sm font-bold text-primary">
-                      / {priceView === 'monthly' ? 'Bulan' : 'Tahun'}
+                    <p className="text-sm text-primary">
+                      / <span data-lang-key={priceView === 'monthly' ? 'month' : 'year'}>{priceView === 'monthly' ? 'Bulan' : 'Tahun'}</span>
                     </p>
                   </div>
 
                   {/* Toggle Button */}
-                  <div className="md:w-auto flex justify-start md:justify-end">
-                    <div className="shadow-lg">
+                  <div>
+                    <div>
                       <button
                         onClick={() => setPriceView('monthly')}
                         className={`px-2 py-1 rounded-l-lg border border-accent ${
                           priceView === 'monthly' ? 'bg-accent text-white' : 'bg-white text-accent'
                         }`}
                       >
-                        Bulan
+                        <span data-lang-key="monthly">Bulan</span>
                       </button>
                       <button
                         onClick={() => setPriceView('yearly')}
@@ -235,18 +246,16 @@ function GetAllProperty() {
                           priceView === 'yearly' ? 'bg-accent text-white' : 'bg-white text-accent'
                         }`}
                       >
-                        Tahun
+                        <span data-lang-key="yearly">Tahun</span>
                       </button>
                     </div>
                   </div>
                 </div>
 
 								<div className='flex justify-end text-accent mt-5'>
-									<Link to={`/detail/${property.id}`} className="font-bold">
-                  <div className='flex gap-3'>
-                    <p>Detail</p>
-                    <p>❯</p>
-                  </div>
+									<Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
+                    <span data-lang-key="detail">Detail</span>
+                    <span>❯</span>
 									</Link>
 								</div>
               </div>
@@ -254,14 +263,14 @@ function GetAllProperty() {
           );
         })}
       </div>
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
         onRegisterClick={handleOpenRegister}
         />
 
-      <RegisterModal 
-        isOpen={isRegisterModalOpen} 
+      <RegisterModal
+        isOpen={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
         onLoginClick={handleOpenLogin}
       />
