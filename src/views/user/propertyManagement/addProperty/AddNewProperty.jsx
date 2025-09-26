@@ -82,12 +82,25 @@ const AddProperty = () => {
             phone: '',
             watsapp: '',
             email: ''
+        },
+        additionalDetails: {
+            allow_pets: false,
+            construction_nearby: false,
+            cleaning_frequency: '',
+            linen_change: '',
+            view: {
+                ocean_view: false,
+                sunset_view: false,
+                garden_view: false,
+                beach_view: false,
+                jungle_view: false,
+                montain_view: false,
+                pool_view: false,
+                rice_field: false,
+                sunrise_view: false,
+                volcano_view: false,
+            }
         }
-        // additionalDetails: {
-        //     // Tambahkan field sesuai kebutuhan backend, contoh:
-        //     notes: '',
-        //     // tambahkan field lain jika perlu
-        // }
     });
 
     const handleSubmit = async (e) => {
@@ -114,7 +127,8 @@ const AddProperty = () => {
             location,
             availability,
             facilities,
-            propertiesOwner
+            propertiesOwner,
+            additionalDetails
         } = formState;
 
         formData.append('type_id', type_id);
@@ -142,6 +156,7 @@ const AddProperty = () => {
             watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp) : null,
         };
         formData.append('propertiesOwner', JSON.stringify(propertiesOwnerForBackend));
+        formData.append('additionalDetails', JSON.stringify(additionalDetails));
 
         images.forEach((file) => {
             formData.append('images', file);
@@ -496,6 +511,104 @@ const AddProperty = () => {
             onChange={e => setFormState({ ...formState, propertiesOwner: { ...formState.propertiesOwner, email: e.target.value } })}
             className="input input-bordered w-full mb-1"
           />
+        </div>
+
+        {/* Additional Details Group */}
+        <div className="mb-2 p-2 border rounded">
+          <div className="font-bold mb-1">Detail Tambahan</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="allow_pets" checked={formState.additionalDetails.allow_pets}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, allow_pets: e.target.checked } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="allow_pets" className="ml-2">Izinkan Hewan Peliharaan</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="construction_nearby" checked={formState.additionalDetails.construction_nearby}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, construction_nearby: e.target.checked } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="construction_nearby" className="ml-2">Konstruksi di Dekatnya</label>
+          </div>
+          <input type="text" placeholder="Frekuensi Pembersihan" value={formState.additionalDetails.cleaning_frequency}
+            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, cleaning_frequency: e.target.value } })}
+            className="input input-bordered w-full mb-1"
+          />
+          <input type="text" placeholder="Penggantian Linen" value={formState.additionalDetails.linen_change}
+            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, linen_change: e.target.value } })}
+            className="input input-bordered w-full mb-1"
+          />
+          <div className="font-bold mt-2 mb-1">Pemandangan</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="ocean_view" checked={formState.additionalDetails.view.ocean_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, ocean_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="ocean_view" className="ml-2">Pemandangan Laut</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="sunset_view" checked={formState.additionalDetails.view.sunset_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, sunset_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="sunset_view" className="ml-2">Pemandangan Matahari Terbenam</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="garden_view" checked={formState.additionalDetails.view.garden_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, garden_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="garden_view" className="ml-2">Pemandangan Taman</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="beach_view" checked={formState.additionalDetails.view.beach_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, beach_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="beach_view" className="ml-2">Pemandangan Pantai</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="jungle_view" checked={formState.additionalDetails.view.jungle_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, jungle_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="jungle_view" className="ml-2">Pemandangan Hutan</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="montain_view" checked={formState.additionalDetails.view.montain_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, montain_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="montain_view" className="ml-2">Pemandangan Gunung</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="pool_view" checked={formState.additionalDetails.view.pool_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, pool_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="pool_view" className="ml-2">Pemandangan Kolam Renang</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="rice_field" checked={formState.additionalDetails.view.rice_field}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, rice_field: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="rice_field" className="ml-2">Pemandangan Sawah</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="sunrise_view" checked={formState.additionalDetails.view.sunrise_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, sunrise_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="sunrise_view" className="ml-2">Pemandangan Matahari Terbit</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="volcano_view" checked={formState.additionalDetails.view.volcano_view}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, view: { ...formState.additionalDetails.view, volcano_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="volcano_view" className="ml-2">Pemandangan Gunung Berapi</label>
+          </div>
         </div>
 
         {/* Tombol Submit */}

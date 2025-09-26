@@ -140,23 +140,27 @@ function UpdateImagesOnly() {
   };
 
   return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">Update Images Only</h1>
-      {message && <p className="text-red-500">{message}</p>}
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-lg mt-8 mb-8">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Update Images Only</h1>
+      {message && <p className="text-red-500 text-center mb-4">{message}</p>}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
-          <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="images" className="block text-lg font-medium text-gray-700 mb-3 text-center">
             Unggah Gambar<span className="text-red-500 ml-1">*</span>
-            <span className="text-sm text-gray-500 ml-2">(Minimal satu gambar diperlukan)</span>
+            <span className="block text-sm text-gray-500 mt-1">(Minimal satu gambar diperlukan, maksimal 10MB per file)</span>
           </label>
 
           <div
-            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-amber-500 transition-colors"
+            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-amber-500 transition-colors duration-200 ease-in-out cursor-pointer"
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
+            onClick={() => document.getElementById('images').click()}
           >
             <div className="space-y-1 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
               <input
                 id="images"
                 name="images"
@@ -166,13 +170,10 @@ function UpdateImagesOnly() {
                 className="hidden"
                 onChange={handleImageChange}
               />
-              <label
-                htmlFor="images"
-                className="cursor-pointer bg-white rounded-md font-medium text-amber-600 hover:text-amber-500 px-2"
-              >
-                Unggah file atau seret dan lepas
-              </label>
-              <p className="text-xs text-gray-500">PNG, JPG, GIF maksimal 10MB per file</p>
+              <p className="text-sm text-gray-600">
+                <span className="font-medium text-amber-600 hover:text-amber-500">Unggah file</span> atau seret dan lepas
+              </p>
+              <p className="text-xs text-gray-500">PNG, JPG, GIF hingga 10MB</p>
             </div>
           </div>
 
@@ -182,44 +183,45 @@ function UpdateImagesOnly() {
               <Droppable droppableId="images-droppable" direction="horizontal">
                 {(provided) => (
                   <div
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4 mt-4"
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6"
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                   >
                     {images.map((img, idx) => (
-                      <Draggable key={idx} draggableId={`img-${idx}`} index={idx}>
+                      <Draggable key={img} draggableId={img} index={idx}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`relative aspect-square select-none border ${
+                            className={`relative aspect-square rounded-lg overflow-hidden shadow-md transition-all duration-200 ease-in-out ${
                               idx === 0
-                                ? 'border-amber-400 ring-2 ring-amber-400 shadow-lg'
-                                : 'border-gray-200'
-                            } bg-white`}
+                                ? 'border-4 border-amber-500 ring-2 ring-amber-300' // Highlight main image
+                                : 'border border-gray-200'
+                            } ${snapshot.isDragging ? 'scale-105 rotate-2 shadow-lg' : ''}`}
                             style={{
                               ...provided.draggableProps.style,
-                              opacity: snapshot.isDragging ? 0.8 : 1,
-                              zIndex: snapshot.isDragging ? 50 : 1,
+                              zIndex: snapshot.isDragging ? 5000 : 'auto',
                             }}
                           >
                             {idx === 0 && (
-                              <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-1 rounded-full">
-                                Main Image
+                              <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full z-10">
+                                Gambar Utama
                               </div>
                             )}
                             <img
                               alt={`Uploaded image ${idx + 1}`}
                               src={img}
-                              className="rounded-md object-cover w-full h-full"
+                              className="w-full h-full object-cover"
                             />
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(idx)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 transition-colors duration-200 z-10"
                             >
-                              ✕
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
                             </button>
                           </div>
                         )}
@@ -234,13 +236,13 @@ function UpdateImagesOnly() {
 
           {/* Preview new images */}
           {newImages.length > 0 && (
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {newImages.map((file, idx) => (
-                <div key={idx} className="relative aspect-square border border-gray-200 rounded-md">
+                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden shadow-md border border-gray-200">
                   <img
                     src={URL.createObjectURL(file)}
                     alt={`New upload ${idx + 1}`}
-                    className="w-full h-full object-cover rounded-md"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ))}
@@ -250,7 +252,7 @@ function UpdateImagesOnly() {
 
         <button
           type="submit"
-          className="mt-4 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+          className="w-full mt-8 px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-75 transition-colors duration-200"
         >
           Update Images
         </button>

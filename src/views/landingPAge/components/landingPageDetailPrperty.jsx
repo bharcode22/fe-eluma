@@ -235,6 +235,46 @@ function LandingPageDetailProperty() {
         ))}
       </div>
 
+      {/* Additional Details */}
+      <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
+        <h2 className="text-xl font-semibold">Detail Tambahan</h2>
+        {property.additionalDetails.map((detail) => (
+          <div key={detail.id} className="space-y-2">
+            {detail.allow_path && <p>Izinkan Hewan Peliharaan</p>}
+            {detail.construction_nearby && <p>Konstruksi di Dekatnya</p>}
+            {detail.cleaning_requency && <p>Frekuensi Pembersihan: {detail.cleaning_requency}</p>}
+            {detail.linen_chaneg && <p>Penggantian Linen: {detail.linen_chaneg}</p>}
+
+            {/* Parking Details */}
+            {detail.parking && (
+              <div>
+                <h3 className="font-semibold mt-2">Parkir:</h3>
+                {detail.parking.car_parking && <p>Parkir Mobil</p>}
+                {detail.parking.bike_parking && <p>Parkir Motor</p>}
+                {detail.parking.both_car_and_bike && <p>Parkir Mobil & Motor</p>}
+              </div>
+            )}
+
+            {/* View Details */}
+            {detail.view && (
+              <div>
+                <h3 className="font-semibold mt-2">Pemandangan:</h3>
+                {detail.view.ocean_view && <p>Pemandangan Laut</p>}
+                {detail.view.sunset_view && <p>Pemandangan Matahari Terbenam</p>}
+                {detail.view.garden_view && <p>Pemandangan Taman</p>}
+                {detail.view.beach_view && <p>Pemandangan Pantai</p>}
+                {detail.view.jungle_view && <p>Pemandangan Hutan</p>}
+                {detail.view.montain_view && <p>Pemandangan Gunung</p>}
+                {detail.view.pool_view && <p>Pemandangan Kolam Renang</p>}
+                {detail.view.rice_field && <p>Pemandangan Sawah</p>}
+                {detail.view.sunrise_view && <p>Pemandangan Matahari Terbit</p>}
+                {detail.view.volcano_view && <p>Pemandangan Gunung Berapi</p>}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
       {/* Lokasi */}
       {/* <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
         <h2 className="text-xl font-semibold">Lokasi</h2>

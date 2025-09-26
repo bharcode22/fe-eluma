@@ -67,6 +67,29 @@ function UpdatePropertyForm() {
       phone: "",
       watsapp: "",
       email: ""
+    },
+    additionalDetails: {
+      allow_pets: false,
+      construction_nearby: false,
+      cleaning_frequency: "",
+      linen_change: "",
+      parking: {
+        car_parking: false,
+        bike_parking: false,
+        both_car_and_bike: false
+      },
+      view: {
+        ocean_view: false,
+        sunset_view: false,
+        garden_view: false,
+        beach_view: false,
+        jungle_view: false,
+        montain_view: false,
+        pool_view: false,
+        rice_field: false,
+        sunrise_view: false,
+        volcano_view: false,
+      }
     }
   });
 
@@ -115,6 +138,7 @@ function UpdatePropertyForm() {
         const availabilityData = property.availability?.[0] || {};
         const facilitiesData = property.facilities?.[0] || {};
         const ownerData = property.propertiesOwner?.[0] || {};
+        const additionalDetailsData = property.additionalDetails?.[0] || {};
 
         setFormData({
           type_id: property.type_id || "",
@@ -165,6 +189,29 @@ function UpdatePropertyForm() {
             phone: ownerData.phone || "",
             watsapp: ownerData.watsapp || "",
             email: ownerData.email || ""
+          },
+          additionalDetails: {
+            allow_pets: additionalDetailsData.allow_pets || false,
+            construction_nearby: additionalDetailsData.construction_nearby || false,
+            cleaning_frequency: additionalDetailsData.cleaning_frequency || "",
+            linen_change: additionalDetailsData.linen_change || "",
+            parking: {
+              car_parking: additionalDetailsData.parking?.car_parking || false,
+              bike_parking: additionalDetailsData.parking?.bike_parking || false,
+              both_car_and_bike: additionalDetailsData.parking?.both_car_and_bike || false
+            },
+            view: {
+              ocean_view: additionalDetailsData.view?.ocean_view || false,
+              sunset_view: additionalDetailsData.view?.sunset_view || false,
+              garden_view: additionalDetailsData.view?.garden_view || false,
+              beach_view: additionalDetailsData.view?.beach_view || false,
+              jungle_view: additionalDetailsData.view?.jungle_view || false,
+              montain_view: additionalDetailsData.view?.montain_view || false,
+              pool_view: additionalDetailsData.view?.pool_view || false,
+              rice_field: additionalDetailsData.view?.rice_field || false,
+              sunrise_view: additionalDetailsData.view?.sunrise_view || false,
+              volcano_view: additionalDetailsData.view?.volcano_view || false,
+            }
           }
         });
 
@@ -255,6 +302,7 @@ const handleSubmit = async (e) => {
   formDataToSend.append('availability', JSON.stringify(availabilityData));
   formDataToSend.append('facilities', JSON.stringify(formData.facilities));
   formDataToSend.append('propertiesOwner', JSON.stringify(formData.propertiesOwner));
+  formDataToSend.append('additionalDetails', JSON.stringify(formData.additionalDetails));
 
   // Append images
   newImages.forEach(file => {
@@ -402,14 +450,16 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Property Title */}
-        <div>
+        <div className="mb-4">
+          <label htmlFor="property_tittle" className="block text-sm font-medium text-white mb-1">Judul Properti</label>
           <input 
             type="text" 
             name="property_tittle" 
+            id="property_tittle"
             placeholder="Judul Properti" 
             value={formData.property_tittle} 
             onChange={handleChange} 
-            className="input input-bordered w-full mb-2"
+            className="input input-bordered w-full"
           />
         </div>
 
@@ -443,77 +493,100 @@ const handleSubmit = async (e) => {
 
         {/* Property Details */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-          <p>Detail</p>
-          <div className='flex gap-5'>
-            <input
-              type="number"
-              placeholder="Jumlah Kamar Tidur"
-              value={formData.number_of_bedrooms}
-              onChange={e => setFormData({ ...formData, number_of_bedrooms: e.target.value })}
-              className="input input-bordered w-full mb-2"
-              min="0"
-            />
-
-            <input
-              type="number"
-              placeholder="Jumlah Kamar Mandi"
-              value={formData.number_of_bathrooms}
-              onChange={e => setFormData({ ...formData, number_of_bathrooms: e.target.value })}
-              className="input input-bordered w-full mb-2"
-              min="0"
-            />
-          </div>
-
-          <div className='flex gap-5'>
-            <input
-              type="number"
-              placeholder="Tamu Maksimal"
-              value={formData.maximum_guest}
-              onChange={e => setFormData({ ...formData, maximum_guest: e.target.value })}
-              className="input input-bordered w-full mb-2"
-              min="0"
-            />
-
-            <input
-              type="number"
-              placeholder="Minimal Menginap"
-              value={formData.minimum_stay}
-              onChange={e => setFormData({ ...formData, minimum_stay: e.target.value })}
-              className="input input-bordered w-full mb-2"
-              min="1"
-            />
+          <p className="text-lg font-semibold mb-4 text-white">Detail Properti</p>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <label htmlFor="number_of_bedrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Tidur</label>
+              <input
+                type="number"
+                id="number_of_bedrooms"
+                placeholder="Jumlah Kamar Tidur"
+                value={formData.number_of_bedrooms}
+                onChange={e => setFormData({ ...formData, number_of_bedrooms: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <label htmlFor="number_of_bathrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Mandi</label>
+              <input
+                type="number"
+                id="number_of_bathrooms"
+                placeholder="Jumlah Kamar Mandi"
+                value={formData.number_of_bathrooms}
+                onChange={e => setFormData({ ...formData, number_of_bathrooms: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <label htmlFor="maximum_guest" className="block text-sm font-medium text-white mb-1">Tamu Maksimal</label>
+              <input
+                type="number"
+                id="maximum_guest"
+                placeholder="Tamu Maksimal"
+                value={formData.maximum_guest}
+                onChange={e => setFormData({ ...formData, maximum_guest: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <label htmlFor="minimum_stay" className="block text-sm font-medium text-white mb-1">Minimal Menginap</label>
+              <input
+                type="number"
+                id="minimum_stay"
+                placeholder="Minimal Menginap"
+                value={formData.minimum_stay}
+                onChange={e => setFormData({ ...formData, minimum_stay: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
           </div>
         </div>
 
         {/* Pricing */}
         <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-          <p>Pricing</p>
-          <input
-            type="number"
-            placeholder="Harga Harian"
-            value={formData.price}
-            onChange={e => setFormData({ ...formData, price: e.target.value })}
-            className="input input-bordered w-full mb-2"
-            min="0"
-          />
-
-          <input
-            type="number"
-            placeholder="Harga Bulanan"
-            value={formData.monthly_price}
-            onChange={e => setFormData({ ...formData, monthly_price: e.target.value })}
-            className="input input-bordered w-full mb-2"
-            min="0"
-          />
-
-          <input
-            type="number"
-            placeholder="Harga Tahunan"
-            value={formData.yearly_price}
-            onChange={e => setFormData({ ...formData, yearly_price: e.target.value })}
-            className="input input-bordered w-full mb-2"
-            min="0"
-          />
+          <p className="text-lg font-semibold mb-4 text-white">Pricing</p>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-white mb-1">Harga Harian</label>
+              <input
+                type="number"
+                id="price"
+                placeholder="Harga Harian"
+                value={formData.price}
+                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <label htmlFor="monthly_price" className="block text-sm font-medium text-white mb-1">Harga Bulanan</label>
+              <input
+                type="number"
+                id="monthly_price"
+                placeholder="Harga Bulanan"
+                value={formData.monthly_price}
+                onChange={e => setFormData({ ...formData, monthly_price: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <label htmlFor="yearly_price" className="block text-sm font-medium text-white mb-1">Harga Tahunan</label>
+              <input
+                type="number"
+                id="yearly_price"
+                placeholder="Harga Tahunan"
+                value={formData.yearly_price}
+                onChange={e => setFormData({ ...formData, yearly_price: e.target.value })}
+                className="input input-bordered w-full"
+                min="0"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Availability */}
@@ -529,7 +602,6 @@ const handleSubmit = async (e) => {
                 className="input input-bordered w-full"
               />
             </div>
-
             <div className="flex flex-col items-start">
               <label htmlFor="available_to" className="mb-1 font-medium">Tersedia Sampai</label>
               <input
@@ -538,16 +610,137 @@ const handleSubmit = async (e) => {
                 value={formatDateTimeForInput(formData.availability[0]?.available_to)}
                 onChange={(e) => handleAvailabilityChange('available_to', e.target.value)}
                 className="input input-bordered w-full"
-                min={formData.availability[0]?.available_from}
               />
             </div>
           </div>
         </div>
 
-        {/* Location */}
+        {/* Facilities Group */}
+        <div className="mb-2 p-2 border rounded">
+          <div className="font-bold mb-1">Fasilitas</div>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {Object.keys(formData.facilities).map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={`btn ${formData.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    facilities: {
+                      ...prev.facilities,
+                      [key]: !prev.facilities[key],
+                    },
+                  }))
+                }
+              >
+                {key.replace(/_/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Additional Details Group */}
+        <div className="mb-2 p-2 border rounded">
+          <div className="font-bold mb-1">Detail Tambahan</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="allow_pets" checked={formData.additionalDetails.allow_pets}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, allow_pets: e.target.checked } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="allow_pets" className="ml-2">Izinkan Hewan Peliharaan</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="construction_nearby" checked={formData.additionalDetails.construction_nearby}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, construction_nearby: e.target.checked } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="construction_nearby" className="ml-2">Konstruksi di Dekatnya</label>
+          </div>
+          <input type="text" placeholder="Frekuensi Pembersihan" value={formData.additionalDetails.cleaning_frequency}
+            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, cleaning_frequency: e.target.value } })}
+            className="input input-bordered w-full mb-1"
+          />
+          <input type="text" placeholder="Penggantian Linen" value={formData.additionalDetails.linen_change}
+            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, linen_change: e.target.value } })}
+            className="input input-bordered w-full mb-1"
+          />
+          <div className="font-bold mt-2 mb-1">Pemandangan</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="ocean_view" checked={formData.additionalDetails.view.ocean_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, ocean_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="ocean_view" className="ml-2">Pemandangan Laut</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="sunset_view" checked={formData.additionalDetails.view.sunset_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunset_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="sunset_view" className="ml-2">Pemandangan Matahari Terbenam</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="garden_view" checked={formData.additionalDetails.view.garden_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, garden_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="garden_view" className="ml-2">Pemandangan Taman</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="beach_view" checked={formData.additionalDetails.view.beach_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, beach_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="beach_view" className="ml-2">Pemandangan Pantai</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="jungle_view" checked={formData.additionalDetails.view.jungle_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, jungle_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="jungle_view" className="ml-2">Pemandangan Hutan</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="montain_view" checked={formData.additionalDetails.view.montain_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, montain_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="montain_view" className="ml-2">Pemandangan Gunung</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="pool_view" checked={formData.additionalDetails.view.pool_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, pool_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="pool_view" className="ml-2">Pemandangan Kolam Renang</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="rice_field" checked={formData.additionalDetails.view.rice_field}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, rice_field: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="rice_field" className="ml-2">Pemandangan Sawah</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="sunrise_view" checked={formData.additionalDetails.view.sunrise_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunrise_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="sunrise_view" className="ml-2">Pemandangan Matahari Terbit</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="volcano_view" checked={formData.additionalDetails.view.volcano_view}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, volcano_view: e.target.checked } } })}
+              className="checkbox checkbox-primary"
+            />
+            <label htmlFor="volcano_view" className="ml-2">Pemandangan Gunung Berapi</label>
+          </div>
+        </div>
+
+        {/* Location Group */}
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Lokasi</div>
-
           <select
             value={formData.location.general_area}
             onChange={(e) =>
@@ -618,41 +811,15 @@ const handleSubmit = async (e) => {
           />
         </div>
 
-        {/* Facilities */}
-        <div className="mb-2 p-2 border rounded">
-          <div className="font-bold mb-1">Fasilitas</div>
-          <div className="flex flex-wrap gap-3 justify-center">
-            {Object.keys(formData.facilities).map((key) => (
-              <button
-                key={key}
-                type="button"
-                className={`btn ${formData.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() =>
-                  setFormData(prev => ({
-                    ...prev,
-                    facilities: {
-                      ...prev.facilities,
-                      [key]: !prev.facilities[key],
-                    },
-                  }))
-                }
-              >
-                {key.replace(/_/g, ' ')}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Property Owner */}
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Data Pemilik Properti</div>
-
-          <input 
-            type="text" 
-            placeholder="Nama Lengkap" 
+          <input
+            type="text"
+            placeholder="Nama Lengkap"
             value={formData.propertiesOwner.fullname}
             onChange={(e) =>
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -662,13 +829,12 @@ const handleSubmit = async (e) => {
             }
             className="input input-bordered w-full mb-1"
           />
-
           <input
             type="text"
             placeholder="Nama"
             value={formData.propertiesOwner.name}
             onChange={(e) =>
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -678,13 +844,12 @@ const handleSubmit = async (e) => {
             }
             className="input input-bordered w-full mb-1"
           />
-
           <input
-            type="tel"
+            type="number"
             placeholder="No. Telepon"
             value={formData.propertiesOwner.phone}
             onChange={(e) =>
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -694,13 +859,12 @@ const handleSubmit = async (e) => {
             }
             className="input input-bordered w-full mb-1"
           />
-
           <input
-            type="tel"
+            type="number"
             placeholder="No. WhatsApp"
             value={formData.propertiesOwner.watsapp}
             onChange={(e) =>
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -710,13 +874,12 @@ const handleSubmit = async (e) => {
             }
             className="input input-bordered w-full mb-1"
           />
-
           <input
             type="email"
             placeholder="Email"
             value={formData.propertiesOwner.email}
             onChange={(e) =>
-              setFormData(prev => ({
+              setFormData((prev) => ({
                 ...prev,
                 propertiesOwner: {
                   ...prev.propertiesOwner,
@@ -728,6 +891,7 @@ const handleSubmit = async (e) => {
           />
         </div>
 
+        {/* Submit Button */}
         <button 
           type="submit" 
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
