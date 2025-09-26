@@ -26,6 +26,16 @@ function GetAllProperty() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [priceView, setPriceView] = useState('monthly');
   const [filteredProperties, setFilteredProperties] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3); // Based on the curl example
+  const [paginationInfo, setPaginationInfo] = useState({
+    currentPage: 1,
+    itemsPerPage: 3,
+    totalItems: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
   const divRef = useRef(null);
   const { lang } = useLanguage();
@@ -40,14 +50,15 @@ function GetAllProperty() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${baseUrl}/property`);
-        setProperties(response.data.data);
+        const response = await axios.get(`${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`);
+        setProperties(response.data.data.properties);
         setTotalData(response.data.totalData);
-        setFilteredProperties(response.data.data); // Set all data as default
+        setFilteredProperties(response.data.data.properties);
+        setPaginationInfo(response.data.data.pagination);
 
         // Initialize carousel index for each property
         const initialIndexes = {};
-        response.data.data.forEach((property) => {
+        response.data.data.properties.forEach((property) => {
           initialIndexes[property.id] = 0;
         });
         setCarouselIndexes(initialIndexes);
@@ -60,7 +71,7 @@ function GetAllProperty() {
     };
 
     fetchData();
-  }, []);
+  }, [currentPage, itemsPerPage]);
 
   const handlePrev = (propertyId, totalImages) => {
     setCarouselIndexes((prevIndexes) => ({
@@ -262,6 +273,34 @@ function GetAllProperty() {
             </div>
           );
         })}
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={!paginationInfo.hasPreviousPage}
+          className="px-4 py-2 mx-1 rounded-lg bg-accent text-white disabled:opacity-50"
+        >
+          Previous
+        </button>
+        {Array.from({ length: paginationInfo.totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-4 py-2 mx-1 rounded-lg ${
+              paginationInfo.currentPage === i + 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationInfo.totalPages))}
+          disabled={!paginationInfo.hasNextPage}
+          className="px-4 py-2 mx-1 rounded-lg bg-accent text-white disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
       <LoginModal
         isOpen={isLoginModalOpen}
