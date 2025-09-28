@@ -33,7 +33,7 @@ export const translateNodes = async (node, targetLang) => {
         console.log("Attempting to translate:", node.nodeValue, "to", targetLang);
         const res = await axios.post(VITE_LIBER_TRANSLATE_URL, {
           q: node.nodeValue,
-          source: "en", // Mengubah 'auto' menjadi 'en' (English) sebagai bahasa sumber eksplisit.
+          source: "id",
           target: targetLang,
           format: "text",
         });
