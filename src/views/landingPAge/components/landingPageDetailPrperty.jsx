@@ -4,12 +4,12 @@ import Api from '../../../service/api.js';
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 import { translateNodes } from "../../../utils/translator.js";
 import { useCurrency } from "../../../context/CurrencyContext.jsx";
-import NavbarUsers from "../../../components/NavbarUser.jsx";
 import Calender from "../../../assets/svg/calender.svg";
-import Bedroom from "../../../assets/svg/bedroom.svg";
-import Duration from "../../../assets/svg/duration.svg";
 import Add from "../../../assets/svg/add.svg";
 import ContactUs from "./ContactUs.jsx";
+import NavbarUsers from "../../../components/NavbarUser.jsx";
+import Bedroom from "../../../assets/svg/bedroom.svg";
+import Duration from "../../../assets/svg/duration.svg";
 
 function LandingPageDetailProperty() {
   const { id } = useParams();
@@ -186,23 +186,34 @@ function LandingPageDetailProperty() {
             </div>
           )}
 
+          {/* Harga */}
+          <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
+            <h2 className="text-xl font-semibold mb-4">Price</h2>
+            <hr />
+            <div className="mt-5 space-y-2 bg-secondary/80 rounded-xl px-5 py-5">
+              <p className="font-bold">{getCurrencySymbol()}{convertPrice(property.price, currency, exchangeRates)}</p>
+            </div>
+          </div>
+
           {/* deskripsi */}
           <div className="bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl">
-            <h2 className="text-xl font-semibold mb-2">Deskripsi</h2>
+            <h2 className="text-xl font-semibold mb-4">Description</h2>
+            <hr className='mb-4'/>
             <div
-              className="prose prose-sm max-w-none text-white"
+              className="prose prose-sm max-w-none text-white font-semibold text-justify"
               dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
             />
           </div>
 
           {/* Fasilitas */}
           <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
-            <h2 className="text-xl font-semibold">Fasilitas</h2>
+            <h2 className="text-xl font-semibold mb-4">Facilities</h2>
+            <hr className='mb-4'/>
             <div className="flex flex-wrap gap-2">
               {Object.entries(property.facilities[0])
                 .filter(([key]) => typeof property.facilities[0][key] === 'boolean' && property.facilities[0][key])
                 .map(([key]) => (
-                  <span key={key} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span key={key} className="bg-secondary/80 rounded-xl px-4 py-4 shadow-2xl font-bold">
                     {key.replace(/_/g, ' ')}
                   </span>
                 ))}
@@ -211,25 +222,36 @@ function LandingPageDetailProperty() {
 
           {/* Ketersediaan */}
           <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
-            <h2 className="text-xl font-semibold">Ketersediaan</h2>
-            <div className="space-y-3 mt-3">
+            <h2 className="text-xl font-semibold mb-4">Availability</h2>
+            <hr className='mb-4'/>
+            <div className="space-y-4">
               {property.availability.map((a) => (
-                <div key={a.id} className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
-                  <img src={Calender} alt="calendar icon" className="w-6 h-6 text-primary" />
-                  <p className="text-lg">
-                    Tersedia dari <strong className="text-primary">{new Date(a.available_from).toLocaleDateString()}</strong> hingga{' '}
-                    <strong className="text-primary">{new Date(a.available_to).toLocaleDateString()}</strong>
-                  </p>
+                <div key={a.id} className="flex gap-4">
+                  {/* Card From */}
+                  <div className="flex items-center gap-2 p-4 bg-secondary/80 rounded-lg shadow-md flex-1">
+                    <img
+                      src={Calender}
+                      alt="calendar icon"
+                      className="w-6 h-6 text-primary"
+                    />
+                    <p className="text-lg">
+                      From: <strong>{new Date(a.available_from).toLocaleDateString()}</strong>
+                    </p>
+                  </div>
+
+                  {/* Card To */}
+                  <div className="flex items-center gap-2 p-4 bg-secondary/80 rounded-lg shadow-md flex-1">
+                    <img
+                      src={Calender}
+                      alt="calendar icon"
+                      className="w-6 h-6 text-primary"
+                    />
+                    <p className="text-lg">
+                      To: <strong>{new Date(a.available_to).toLocaleDateString()}</strong>
+                    </p>
+                  </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Harga */}
-          <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
-            <h2 className="text-xl font-semibold">Harga</h2>
-            <div className="mt-5 space-y-2">
-              <p className="text-2xl font-bold">price: {getCurrencySymbol()}{convertPrice(property.price, currency, exchangeRates)}</p>
             </div>
           </div>
 
@@ -247,45 +269,64 @@ function LandingPageDetailProperty() {
 
           {/* Additional Details */}
           <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
-            <h2 className="text-xl font-semibold">Detail Tambahan</h2>
+            <h2 className="text-xl font-semibold mb-4">Additional Details</h2>
+            <hr className='mb-4'/>
             {property.additionalDetails.map((detail) => (
               <div key={detail.id} className="space-y-2 mt-3">
+
                 {detail.allow_path && (
                   <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <img src={Add} alt="pet icon" className="w-6 h-6 text-primary" />
-                    <p className="text-lg">Izinkan Hewan Peliharaan</p>
+                    <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
+                    <p className="text-lg">Allow Path</p>
                   </div>
                 )}
+
                 {detail.construction_nearby && (
                   <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <img src={Add} alt="construction icon" className="w-6 h-6 text-primary" />
-                    <p className="text-lg">Konstruksi di Dekatnya</p>
+                    <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
+                    <p className="text-lg">Construction Nearby</p>
                   </div>
                 )}
-                {detail.cleaning_requency && (
-                  <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <img src={Add} alt="cleaning icon" className="w-6 h-6 text-primary" />
-                    <p className="text-lg">Frekuensi Pembersihan: <strong className="text-primary">{detail.cleaning_requency}</strong></p>
-                  </div>
-                )}
-                {detail.linen_chaneg && (
-                  <div className="flex items-center gap-2 p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <img src={Add} alt="linen change icon" className="w-6 h-6 text-primary" />
-                    <p className="text-lg">Penggantian Linen: <strong className="text-primary">{detail.linen_chaneg}</strong></p>
+
+                {(detail.cleaning_requency || detail.linen_chaneg) && (
+                  <div className="flex flex-col gap-3 p-3 bg-secondary/80 rounded-lg shadow-md">
+                    <h3 className="font-semibold mt-2 flex items-center gap-2">
+                      <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
+                      Cleaning Info :
+                    </h3>
+                    <hr className=''/>
+
+                    {detail.cleaning_requency && (
+                      <p className="text-lg">
+                        Cleaning Frequency : <br /> 
+                        <ul className='ml-8 space-y-1 list-disc list-inside'>
+                          <li >{detail.cleaning_requency}</li>
+                        </ul>
+                      </p>
+                    )}
+                    {detail.linen_chaneg && (
+                      <p className="text-lg">
+                        Linen Change Frequency : <br />
+                        <ul className='ml-8 space-y-1 list-disc list-inside'>
+                          <li >{detail.linen_chaneg}</li>
+                        </ul>
+                      </p>
+                    )}
                   </div>
                 )}
 
                 {/* Parking Details */}
                 {detail.parking && (
                   <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <h3 className="font-semibold mt-2 flex items-center gap-2">
+                    <h3 className="font-semibold mt-2 flex items-center gap-2 mb-4">
                       <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
-                      Parkir:
+                      Park :
                     </h3>
-                    <div className="ml-8 space-y-1">
-                      {detail.parking.car_parking && <p className="text-lg">Parkir Mobil</p>}
-                      {detail.parking.bike_parking && <p className="text-lg">Parkir Motor</p>}
-                      {detail.parking.both_car_and_bike && <p className="text-lg">Parkir Mobil & Motor</p>}
+                    <hr className='mb-4'/>
+                    <div className="ml-8 space-y-1 list-disc list-inside">
+                      {detail.parking.car_parking && <li className="text-lg">Car Park</li>}
+                      {detail.parking.bike_parking && <li className="text-lg">Motor Cycle Park</li>}
+                      {detail.parking.both_car_and_bike && <li className="text-lg">Car & Motor Park</li>}
                     </div>
                   </div>
                 )}
@@ -293,22 +334,23 @@ function LandingPageDetailProperty() {
                 {/* View Details */}
                 {detail.view && (
                   <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
-                    <h3 className="font-semibold mt-2 flex items-center gap-2">
+                    <h3 className="font-semibold mt-2 flex items-center gap-2 mb-4">
                       <img src={Add} alt="view icon" className="w-6 h-6 text-primary" />
-                      Pemandangan:
+                      View :
                     </h3>
-                    <div className="ml-8 space-y-1">
-                      {detail.view.ocean_view && <p className="text-lg">Pemandangan Laut</p>}
-                      {detail.view.sunset_view && <p className="text-lg">Pemandangan Matahari Terbenam</p>}
-                      {detail.view.garden_view && <p className="text-lg">Pemandangan Taman</p>}
-                      {detail.view.beach_view && <p className="text-lg">Pemandangan Pantai</p>}
-                      {detail.view.jungle_view && <p className="text-lg">Pemandangan Hutan</p>}
-                      {detail.view.montain_view && <p className="text-lg">Pemandangan Gunung</p>}
-                      {detail.view.pool_view && <p className="text-lg">Pemandangan Kolam Renang</p>}
-                      {detail.view.rice_field && <p className="text-lg">Pemandangan Sawah</p>}
-                      {detail.view.sunrise_view && <p className="text-lg">Pemandangan Matahari Terbit</p>}
-                      {detail.view.volcano_view && <p className="text-lg">Pemandangan Gunung Berapi</p>}
-                    </div>
+                    <hr className='mb-4'/>
+                    <ul className="ml-8 space-y-1 list-disc list-inside">
+                      {detail.view.ocean_view && <li className="text-lg">Ocean view</li>}
+                      {detail.view.sunset_view && <li className="text-lg">Sunset View</li>}
+                      {detail.view.garden_view && <li className="text-lg">Garden View</li>}
+                      {detail.view.beach_view && <li className="text-lg">Beach View</li>}
+                      {detail.view.jungle_view && <li className="text-lg">Jungle View</li>}
+                      {detail.view.montain_view && <li className="text-lg">Montain View</li>}
+                      {detail.view.pool_view && <li className="text-lg">Pool View</li>}
+                      {detail.view.rice_field && <li className="text-lg">Rice Field View</li>}
+                      {detail.view.sunrise_view && <li className="text-lg">Sun Rise View</li>}
+                      {detail.view.volcano_view && <li className="text-lg">Volcano View</li>}
+                    </ul>
                   </div>
                 )}
               </div>
@@ -327,6 +369,7 @@ function LandingPageDetailProperty() {
                 </div>
               ))}
             </div> */}
+
         </div>
         <div className="md:w-1/4 mt-16 fixed ml-240">
           <ContactUs id={id} />

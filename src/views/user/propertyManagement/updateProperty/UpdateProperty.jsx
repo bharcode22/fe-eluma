@@ -69,10 +69,10 @@ function UpdatePropertyForm() {
       email: ""
     },
     additionalDetails: {
-      allow_pets: false,
+      allow_path: false,
       construction_nearby: false,
-      cleaning_frequency: "",
-      linen_change: "",
+      cleaning_requency: "",
+      linen_chaneg: "",
       parking: {
         car_parking: false,
         bike_parking: false,
@@ -191,10 +191,10 @@ function UpdatePropertyForm() {
             email: ownerData.email || ""
           },
           additionalDetails: {
-            allow_pets: additionalDetailsData.allow_pets || false,
+            allow_path: additionalDetailsData.allow_path || false,
             construction_nearby: additionalDetailsData.construction_nearby || false,
-            cleaning_frequency: additionalDetailsData.cleaning_frequency || "",
-            linen_change: additionalDetailsData.linen_change || "",
+            cleaning_requency: additionalDetailsData.cleaning_requency || "",
+            linen_chaneg: additionalDetailsData.linen_chaneg || "",
             parking: {
               car_parking: additionalDetailsData.parking?.car_parking || false,
               bike_parking: additionalDetailsData.parking?.bike_parking || false,
@@ -644,96 +644,103 @@ const handleSubmit = async (e) => {
         <div className="mb-2 p-2 border rounded">
           <div className="font-bold mb-1">Detail Tambahan</div>
           <div className="flex items-center mb-1">
-            <input type="checkbox" id="allow_pets" checked={formData.additionalDetails.allow_pets}
-              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, allow_pets: e.target.checked } })}
-              className="checkbox checkbox-primary"
-            />
-            <label htmlFor="allow_pets" className="ml-2">Izinkan Hewan Peliharaan</label>
+            <input type="checkbox" id="allow_path" checked={formData.additionalDetails.allow_path}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, allow_path: e.target.checked } })}
+              className="checkbox checkbox-primary" />
+            <label htmlFor="allow_path" className="ml-2">Izinkan Hewan Peliharaan</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="construction_nearby" checked={formData.additionalDetails.construction_nearby}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, construction_nearby: e.target.checked } })}
-              className="checkbox checkbox-primary"
-            />
-            <label htmlFor="construction_nearby" className="ml-2">Konstruksi di Dekatnya</label>
+              className="checkbox checkbox-primary" />
+            <label htmlFor="construction_nearby" className="ml-2">Konstruksi Terdekat</label>
           </div>
-          <input type="text" placeholder="Frekuensi Pembersihan" value={formData.additionalDetails.cleaning_frequency}
-            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, cleaning_frequency: e.target.value } })}
+          <input type="text" placeholder="Frekuensi Pembersihan" value={formData.additionalDetails.cleaning_requency}
+            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, cleaning_requency: e.target.value } })}
             className="input input-bordered w-full mb-1"
           />
-          <input type="text" placeholder="Penggantian Linen" value={formData.additionalDetails.linen_change}
-            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, linen_change: e.target.value } })}
+          <input type="text" placeholder="Penggantian Linen" value={formData.additionalDetails.linen_chaneg}
+            onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, linen_chaneg: e.target.value } })}
             className="input input-bordered w-full mb-1"
           />
-          <div className="font-bold mt-2 mb-1">Pemandangan</div>
+          <div className="font-bold mb-1">Detail Parkir</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="car_parking" checked={formData.additionalDetails.parking.car_parking}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, car_parking: e.target.checked } } })}
+              className="checkbox checkbox-primary" />
+            <label htmlFor="car_parking" className="ml-2">Parkir Mobil</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="bike_parking" checked={formData.additionalDetails.parking.bike_parking}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, bike_parking: e.target.checked } } })}
+              className="checkbox checkbox-primary" />
+            <label htmlFor="bike_parking" className="ml-2">Parkir Motor</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="both_car_and_bike" checked={formData.additionalDetails.parking.both_car_and_bike}
+              onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, both_car_and_bike: e.target.checked } } })}
+              className="checkbox checkbox-primary" />
+            <label htmlFor="both_car_and_bike" className="ml-2">Parkir Mobil dan Motor</label>
+          </div>
+          <div className="font-bold mb-1">Detail Pemandangan</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="ocean_view" checked={formData.additionalDetails.view.ocean_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, ocean_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="ocean_view" className="ml-2">Pemandangan Laut</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="sunset_view" checked={formData.additionalDetails.view.sunset_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunset_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="sunset_view" className="ml-2">Pemandangan Matahari Terbenam</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="garden_view" checked={formData.additionalDetails.view.garden_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, garden_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="garden_view" className="ml-2">Pemandangan Taman</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="beach_view" checked={formData.additionalDetails.view.beach_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, beach_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="beach_view" className="ml-2">Pemandangan Pantai</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="jungle_view" checked={formData.additionalDetails.view.jungle_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, jungle_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="jungle_view" className="ml-2">Pemandangan Hutan</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="montain_view" checked={formData.additionalDetails.view.montain_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, montain_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="montain_view" className="ml-2">Pemandangan Gunung</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="pool_view" checked={formData.additionalDetails.view.pool_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, pool_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="pool_view" className="ml-2">Pemandangan Kolam Renang</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="rice_field" checked={formData.additionalDetails.view.rice_field}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, rice_field: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="rice_field" className="ml-2">Pemandangan Sawah</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="sunrise_view" checked={formData.additionalDetails.view.sunrise_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunrise_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="sunrise_view" className="ml-2">Pemandangan Matahari Terbit</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="volcano_view" checked={formData.additionalDetails.view.volcano_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, volcano_view: e.target.checked } } })}
-              className="checkbox checkbox-primary"
-            />
+              className="checkbox checkbox-primary" />
             <label htmlFor="volcano_view" className="ml-2">Pemandangan Gunung Berapi</label>
           </div>
         </div>

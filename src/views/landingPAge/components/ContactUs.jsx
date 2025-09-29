@@ -56,7 +56,6 @@ const ContactUs = ({id}) => {
         {/* kontak */}
         <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl mt-5'>
           <h2 className="text-xl font-semibold">Kontak</h2>
-
         </div>
 
       </div>
