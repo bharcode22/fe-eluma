@@ -86,8 +86,13 @@ const AddProperty = () => {
         additionalDetails: {
             allow_pets: false,
             construction_nearby: false,
-            cleaning_frequency: '',
-            linen_change: '',
+            cleaning_requency: '',
+            linen_chaneg: '',
+            parking: {
+                car_parking: false,
+                bike_parking: false,
+                both_car_and_bike: false,
+            },
             view: {
                 ocean_view: false,
                 sunset_view: false,
@@ -570,14 +575,36 @@ const AddProperty = () => {
             />
             <label htmlFor="construction_nearby" className="ml-2">Construction Nearby</label>
           </div>
-          <input type="text" placeholder="Cleaning Frequency" value={formState.additionalDetails.cleaning_frequency}
-            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, cleaning_frequency: e.target.value } })}
+          <input type="text" placeholder="Cleaning Frequency" value={formState.additionalDetails.cleaning_requency}
+            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, cleaning_requency: e.target.value } })}
             className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-2"
           />
-          <input type="text" placeholder="Linen Change" value={formState.additionalDetails.linen_change}
-            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, linen_change: e.target.value } })}
+          <input type="text" placeholder="Linen Change" value={formState.additionalDetails.linen_chaneg}
+            onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, linen_chaneg: e.target.value } })}
             className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-2"
           />
+          <div className="font-bold mt-2 mb-1">Parking</div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="car_parking" checked={formState.additionalDetails.parking.car_parking}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, parking: { ...formState.additionalDetails.parking, car_parking: e.target.checked } } })}
+              className="checkbox checkbox-secondary"
+            />
+            <label htmlFor="car_parking" className="ml-2">Car Parking</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="bike_parking" checked={formState.additionalDetails.parking.bike_parking}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, parking: { ...formState.additionalDetails.parking, bike_parking: e.target.checked } } })}
+              className="checkbox checkbox-secondary"
+            />
+            <label htmlFor="bike_parking" className="ml-2">Bike Parking</label>
+          </div>
+          <div className="flex items-center mb-1">
+            <input type="checkbox" id="both_car_and_bike" checked={formState.additionalDetails.parking.both_car_and_bike}
+              onChange={e => setFormState({ ...formState, additionalDetails: { ...formState.additionalDetails, parking: { ...formState.additionalDetails.parking, both_car_and_bike: e.target.checked } } })}
+              className="checkbox checkbox-secondary"
+            />
+            <label htmlFor="both_car_and_bike" className="ml-2">Both Car and Bike Parking</label>
+          </div>
           <div className="font-bold mt-2 mb-1">View</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="ocean_view" checked={formState.additionalDetails.view.ocean_view}
