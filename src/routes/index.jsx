@@ -10,6 +10,11 @@ import About from "../views/landingPAge/About/About.jsx";
 
 // halaman admin
 import Dashboard from "../views/admin/dashboard/index.jsx"
+import PropertyManagement from "../views/admin/propertyManagement/index.jsx"
+import UsersManagement from "../views/admin/usersManagement/index.jsx"
+import AdditionalManagement from "../views/admin/additional-management/index.jsx"
+import PropertyOwnerManagement from "../views/admin/property-owner-management/index.jsx"
+import ServiceManagement from "../views/admin/service-managemenet/index.jsx"
 
 // halaman user
 import HomeUsers from "../views/user/HomeUser.jsx"
@@ -31,8 +36,23 @@ export default function AppRoutes() {
             <Route path="/contact" element={<Contact />} />
 
             {/* admin */}
-            <Route path="/admin/home" element={
+            <Route path="/admin/dashboard" element={
                 isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/property-management" element={
+                isAuthenticated && userRole === 'admin' ? <PropertyManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/users-management" element={
+                isAuthenticated && userRole === 'admin' ? <UsersManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/additional-management" element={
+                isAuthenticated && userRole === 'admin' ? <AdditionalManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/property-owner-management" element={
+                isAuthenticated && userRole === 'admin' ? <PropertyOwnerManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/service-management" element={
+                isAuthenticated && userRole === 'admin' ? <ServiceManagement /> : <Navigate to="/" replace />
             } />
 
             {/* user */}

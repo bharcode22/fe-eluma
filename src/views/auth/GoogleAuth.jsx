@@ -42,7 +42,7 @@ export default function AithGoogle() {
 
                     // Redirect sesuai role
                     if (user.role === 'admin') {
-                        navigate("/admin/home", { replace: true });
+                        navigate("/admin/dashboard", { replace: true });
                     } else if (user.role === 'user') {
                         navigate("/user/home", { replace: true });
                     }
