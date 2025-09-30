@@ -354,7 +354,7 @@ const handleSubmit = async (e) => {
       {message && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{message}</div>}
 
       {/* Image Gallery */}
-      <div className="bg-secondary px-5 py-5 rounded-3xl my-10">
+      <div className="bg-secondary/50 backdrop-blur-lg px-5 py-5 rounded-lg mb-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {property.images?.map((img, index) => (
             <img
@@ -433,8 +433,9 @@ const handleSubmit = async (e) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+
         {/* Property Type */}
-        <div className="flex flex-wrap gap-2 mb-2 justify-center p-2 border rounded">
+        <div className="flex mb-5 flex-wrap gap-2 justify-center p-5 bg-secondary/50 backdrop-blur-lg rounded-lg">
           {typeOptions.map((type) => (
             <button 
               key={type.id} 
@@ -450,8 +451,7 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Property Title */}
-        <div className="mb-4">
-          <label htmlFor="property_tittle" className="block text-sm font-medium text-white mb-1">Judul Properti</label>
+        <div className="mb-4 bg-secondary/50 backdrop-blur-lg p-5 rounded-lg">
           <input 
             type="text" 
             name="property_tittle" 
@@ -459,14 +459,14 @@ const handleSubmit = async (e) => {
             placeholder="Judul Properti" 
             value={formData.property_tittle} 
             onChange={handleChange} 
-            className="input input-bordered w-full"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
           />
         </div>
 
         {/* Description */}
-        <div className="bg-secondary rounded-2xl p-4 shadow-md mb-5">
+        <div className="bg-secondary/50 backdrop-blur-lg p-5 rounded-lg mb-5">
           <label className="block text-lg font-semibold mb-2 text-white">
-            Deskripsi Properti
+            Description
           </label>
           <ReactQuill
             value={formData.description || ""}
@@ -492,54 +492,54 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Property Details */}
-        <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
-          <p className="text-lg font-semibold mb-4 text-white">Detail Properti</p>
+        <div className='bg-secondary/50 backdrop-blur-lg p-5 rounded-lg mb-5'>
+          <p className="text-lg font-semibold mb-4 text-white">Detail Property</p>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
-              <label htmlFor="number_of_bedrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Tidur</label>
+              <label htmlFor="number_of_bedrooms" className="block text-sm font-medium text-white mb-1">Number of Bedrooms</label>
               <input
                 type="number"
                 id="number_of_bedrooms"
-                placeholder="Jumlah Kamar Tidur"
+                placeholder="Number of Bedrooms"
                 value={formData.number_of_bedrooms}
                 onChange={e => setFormData({ ...formData, number_of_bedrooms: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
             <div>
-              <label htmlFor="number_of_bathrooms" className="block text-sm font-medium text-white mb-1">Jumlah Kamar Mandi</label>
+              <label htmlFor="number_of_bathrooms" className="block text-sm font-medium text-white mb-1">Number of Bathrooms</label>
               <input
                 type="number"
                 id="number_of_bathrooms"
-                placeholder="Jumlah Kamar Mandi"
+                placeholder="Number of Bathrooms"
                 value={formData.number_of_bathrooms}
                 onChange={e => setFormData({ ...formData, number_of_bathrooms: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
             <div>
-              <label htmlFor="maximum_guest" className="block text-sm font-medium text-white mb-1">Tamu Maksimal</label>
+              <label htmlFor="maximum_guest" className="block text-sm font-medium text-white mb-1">Maximum Guest</label>
               <input
                 type="number"
                 id="maximum_guest"
-                placeholder="Tamu Maksimal"
+                placeholder="Maximum Guest"
                 value={formData.maximum_guest}
                 onChange={e => setFormData({ ...formData, maximum_guest: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
             <div>
-              <label htmlFor="minimum_stay" className="block text-sm font-medium text-white mb-1">Minimal Menginap</label>
+              <label htmlFor="minimum_stay" className="block text-sm font-medium text-white mb-1">Minimum Stay</label>
               <input
                 type="number"
                 id="minimum_stay"
                 placeholder="Minimal Menginap"
                 value={formData.minimum_stay}
                 onChange={e => setFormData({ ...formData, minimum_stay: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
@@ -547,42 +547,42 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Pricing */}
-        <div className='bg-secondary mb-8 px-4 py-4 rounded-lg'>
+        <div className='bg-secondary/50 backdrop-blur-lg mb-5 px-4 py-4 rounded-lg'>
           <p className="text-lg font-semibold mb-4 text-white">Pricing</p>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-white mb-1">Harga Harian</label>
+              <label htmlFor="price" className="block text-sm font-medium text-white mb-1">Price per Day</label>
               <input
                 type="number"
                 id="price"
-                placeholder="Harga Harian"
+                placeholder="Price per Day"
                 value={formData.price}
                 onChange={e => setFormData({ ...formData, price: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
             <div>
-              <label htmlFor="monthly_price" className="block text-sm font-medium text-white mb-1">Harga Bulanan</label>
+              <label htmlFor="monthly_price" className="block text-sm font-medium text-white mb-1">Monthly Price</label>
               <input
                 type="number"
                 id="monthly_price"
                 placeholder="Harga Bulanan"
                 value={formData.monthly_price}
                 onChange={e => setFormData({ ...formData, monthly_price: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
             <div>
-              <label htmlFor="yearly_price" className="block text-sm font-medium text-white mb-1">Harga Tahunan</label>
+              <label htmlFor="yearly_price" className="block text-sm font-medium text-white mb-1">Yearly Price</label>
               <input
                 type="number"
                 id="yearly_price"
                 placeholder="Harga Tahunan"
                 value={formData.yearly_price}
                 onChange={e => setFormData({ ...formData, yearly_price: e.target.value })}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
                 min="0"
               />
             </div>
@@ -590,40 +590,40 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Availability */}
-        <div className="mb-2 p-4 border rounded bg-base-100 shadow-sm">
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col items-start">
-              <label htmlFor="available_from" className="mb-1 font-medium">Tersedia Dari</label>
+              <label htmlFor="available_from" className="text-lg mb-2 font-semibold">available from</label>
               <input
                 id="available_from"
                 type="datetime-local"
                 value={formatDateTimeForInput(formData.availability[0]?.available_from)}
                 onChange={(e) => handleAvailabilityChange('available_from', e.target.value)}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
               />
             </div>
             <div className="flex flex-col items-start">
-              <label htmlFor="available_to" className="mb-1 font-medium">Tersedia Sampai</label>
+              <label htmlFor="available_to" className="text-lg mb-2 font-semibold">available to</label>
               <input
                 id="available_to"
                 type="datetime-local"
                 value={formatDateTimeForInput(formData.availability[0]?.available_to)}
                 onChange={(e) => handleAvailabilityChange('available_to', e.target.value)}
-                className="input input-bordered w-full"
+                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
               />
             </div>
           </div>
         </div>
 
         {/* Facilities Group */}
-        <div className="mb-2 p-2 border rounded">
-          <div className="font-bold mb-1">Fasilitas</div>
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-5">
+          <div className="mb-2 text-lg">Facilities</div>
           <div className="flex flex-wrap gap-3 justify-center">
             {Object.keys(formData.facilities).map((key) => (
               <button
                 key={key}
                 type="button"
-                className={`btn ${formData.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn ${formData.facilities[key] ? 'btn-primary shadow-lg' : 'btn-secondary shadow-lg'}`}
                 onClick={() =>
                   setFormData((prev) => ({
                     ...prev,
@@ -641,113 +641,113 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Additional Details Group */}
-        <div className="mb-2 p-2 border rounded">
-          <div className="font-bold mb-1">Detail Tambahan</div>
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-5">
+          <div className="font-bold mb-2 text-lg">Additional Detail</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="allow_path" checked={formData.additionalDetails.allow_path}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, allow_path: e.target.checked } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="allow_path" className="ml-2">Izinkan Hewan Peliharaan</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="allow_path" className="ml-2 text-lg">Allow Pet</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="construction_nearby" checked={formData.additionalDetails.construction_nearby}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, construction_nearby: e.target.checked } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="construction_nearby" className="ml-2">Konstruksi Terdekat</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="construction_nearby" className="ml-2 text-lg">Construction Nearby</label>
           </div>
-          <input type="text" placeholder="Frekuensi Pembersihan" value={formData.additionalDetails.cleaning_requency}
+          <input type="text" placeholder="Cleaning Frequency" value={formData.additionalDetails.cleaning_requency}
             onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, cleaning_requency: e.target.value } })}
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg my-3"
           />
           <input type="text" placeholder="Penggantian Linen" value={formData.additionalDetails.linen_chaneg}
             onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, linen_chaneg: e.target.value } })}
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
-          <div className="font-bold mb-1">Detail Parkir</div>
+          <div className="text-lg font-bold mb-1">Parking</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="car_parking" checked={formData.additionalDetails.parking.car_parking}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, car_parking: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="car_parking" className="ml-2">Parkir Mobil</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="car_parking" className="ml-2 text-lg">Parkir Mobil</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="bike_parking" checked={formData.additionalDetails.parking.bike_parking}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, bike_parking: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="bike_parking" className="ml-2">Parkir Motor</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="bike_parking" className="ml-2 text-lg">Parkir Motor</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="both_car_and_bike" checked={formData.additionalDetails.parking.both_car_and_bike}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, parking: { ...formData.additionalDetails.parking, both_car_and_bike: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="both_car_and_bike" className="ml-2">Parkir Mobil dan Motor</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="both_car_and_bike" className="ml-2 text-lg">Parkir Mobil dan Motor</label>
           </div>
-          <div className="font-bold mb-1">Detail Pemandangan</div>
+          <div className="text-lg font-bold mb-1">View</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="ocean_view" checked={formData.additionalDetails.view.ocean_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, ocean_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="ocean_view" className="ml-2">Pemandangan Laut</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="ocean_view" className="ml-2 text-lg">Ocean View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="sunset_view" checked={formData.additionalDetails.view.sunset_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunset_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="sunset_view" className="ml-2">Pemandangan Matahari Terbenam</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="sunset_view" className="ml-2 text-lg">Sunset View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="garden_view" checked={formData.additionalDetails.view.garden_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, garden_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="garden_view" className="ml-2">Pemandangan Taman</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="garden_view" className="ml-2 text-lg">Garden View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="beach_view" checked={formData.additionalDetails.view.beach_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, beach_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="beach_view" className="ml-2">Pemandangan Pantai</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="beach_view" className="ml-2 text-lg">Beach View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="jungle_view" checked={formData.additionalDetails.view.jungle_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, jungle_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="jungle_view" className="ml-2">Pemandangan Hutan</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="jungle_view" className="ml-2 text-lg">Jungle View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="montain_view" checked={formData.additionalDetails.view.montain_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, montain_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="montain_view" className="ml-2">Pemandangan Gunung</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="montain_view" className="ml-2 text-lg">Mountain View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="pool_view" checked={formData.additionalDetails.view.pool_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, pool_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="pool_view" className="ml-2">Pemandangan Kolam Renang</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="pool_view" className="ml-2 text-lg">Pool View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="rice_field" checked={formData.additionalDetails.view.rice_field}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, rice_field: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="rice_field" className="ml-2">Pemandangan Sawah</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="rice_field" className="ml-2 text-lg">Rice Field View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="sunrise_view" checked={formData.additionalDetails.view.sunrise_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, sunrise_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="sunrise_view" className="ml-2">Pemandangan Matahari Terbit</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="sunrise_view" className="ml-2 text-lg">Sunrise View</label>
           </div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="volcano_view" checked={formData.additionalDetails.view.volcano_view}
               onChange={e => setFormData({ ...formData, additionalDetails: { ...formData.additionalDetails, view: { ...formData.additionalDetails.view, volcano_view: e.target.checked } } })}
-              className="checkbox checkbox-primary" />
-            <label htmlFor="volcano_view" className="ml-2">Pemandangan Gunung Berapi</label>
+              className="checkbox checkbox-secondary" />
+            <label htmlFor="volcano_view" className="ml-2 text-lg">Volcano View</label>
           </div>
         </div>
 
         {/* Location Group */}
-        <div className="mb-2 p-2 border rounded">
-          <div className="font-bold mb-1">Lokasi</div>
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-5">
+          <div className="font-bold mb-1 text-lg">Location</div>
           <select
             value={formData.location.general_area}
             onChange={(e) =>
@@ -759,7 +759,7 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           >
             <option value="">Pilih General Area</option>
             {generalAreas.map((area, idx) => (
@@ -769,7 +769,7 @@ const handleSubmit = async (e) => {
             ))}
           </select>
 
-          <input
+          {/* <input
             type="text"
             placeholder="Map URL"
             value={formData.location.map_url}
@@ -815,12 +815,12 @@ const handleSubmit = async (e) => {
               }))
             }
             className="input input-bordered w-full mb-1"
-          />
+          /> */}
         </div>
 
         {/* Property Owner */}
-        <div className="mb-2 p-2 border rounded">
-          <div className="font-bold mb-1">Data Pemilik Properti</div>
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-3">
+          <div className="font-bold mb-1 text-lg">Data Pemilik Properti</div>
           <input
             type="text"
             placeholder="Nama Lengkap"
@@ -834,7 +834,7 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
           <input
             type="text"
@@ -849,7 +849,7 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
           <input
             type="number"
@@ -864,7 +864,7 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
           <input
             type="number"
@@ -879,7 +879,7 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
           <input
             type="email"
@@ -894,14 +894,14 @@ const handleSubmit = async (e) => {
                 },
               }))
             }
-            className="input input-bordered w-full mb-1"
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-3"
           />
         </div>
 
         {/* Submit Button */}
         <button 
           type="submit" 
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+          className="btn btn-primary w-full rounded-lg shadow-lg"
           disabled={loading}
         >
           {loading ? 'Processing...' : 'Update'}

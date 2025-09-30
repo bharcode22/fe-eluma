@@ -215,7 +215,7 @@ const AddProperty = () => {
       <form onSubmit={handleSubmit} encType="multipart/form-data">
 
         {/* tipe property */}
-        <div className="flex flex-wrap gap-2 mb-5 justify-center p-2 rounded-lg bg-primary py-5">
+        <div className="flex flex-wrap gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
           {typeOptions.map(type => (
             <button key={type.id} type="button"
               className={`btn shadow-2xl ${formState.type_id === type.id ? 'btn-primary' : 'btn-secondary'}`}
@@ -227,7 +227,7 @@ const AddProperty = () => {
         </div>
 
       {/* judul property */}
-      <div className="w-full py-5 px-4 rounded-lg bg-primary mb-5">
+      <div className="flex flex-wrap gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
         <input
           type="text"
           placeholder="Property Name"
@@ -239,7 +239,8 @@ const AddProperty = () => {
         />
       </div>
 
-      <div className="w-full py-5 px-4 rounded-lg bg-primary mb-5">
+      {/* Upload image */}
+      <div className="gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
         <label
           htmlFor="images"
           className="block text-sm font-medium text-gray-100 mb-4"
@@ -274,7 +275,7 @@ const AddProperty = () => {
 
           <label
             htmlFor="images"
-            className="cursor-pointer text-amber-400 hover:text-amber-300 font-medium"
+            className="cursor-pointer text-amber-400 hover:text-amber- font-medium"
           >
             <span>Upload or drag image here</span>
             <input
@@ -365,7 +366,7 @@ const AddProperty = () => {
       </div>
 
         {/* deskripsi */}
-        <div className="bg-primary rounded-2xl p-4 shadow-md mb-5">
+        <div className="bg-secondary/50 backdrop-blur-lg rounded-2xl p-4 shadow-md mb-5">
           <label className="block text-lg font-semibold mb-2 text-white">
             Deskripsi Properti
           </label>
@@ -394,7 +395,7 @@ const AddProperty = () => {
         </div>
 
         {/* detail property */}
-        <div className='bg-primary mb-8 px-4 py-4 rounded-lg'>
+        <div className='bg-secondary/50 backdrop-blur-lg mb-8 px-4 py-4 rounded-lg'>
           <p className="text-lg font-semibold mb-4 text-white">Detail Properti</p>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
@@ -429,7 +430,7 @@ const AddProperty = () => {
         </div>
 
         {/* pricing */}
-        <div className='bg-primary mb-5 px-4 py-4 rounded-lg'>
+        <div className='bg-secondary/50 backdrop-blur-lg mb-5 px-4 py-4 rounded-lg'>
           <p className="text-lg font-semibold mb-4 text-white">Pricing</p>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <div>
@@ -457,7 +458,7 @@ const AddProperty = () => {
         </div>
 
         {/* Availability Group */}
-        <div className="p-4 shadow-sm bg-primary rounded-lg mb-5">
+        <div className="p-4 shadow-sm bg-secondary/50 backdrop-blur-lg rounded-lg mb-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col items-start">
               <label htmlFor="available_from" className="mb-1 font-medium">available from</label>
@@ -485,14 +486,14 @@ const AddProperty = () => {
         </div>
 
         {/* Facilities Group */}
-        <div className="mb-5 p-6 bg-primary rounded-lg">
+        <div className="mb-5 p-6 bg-secondary/50 backdrop-blur-lg rounded-lg">
           <div className="font-bold mb-1">Facilities</div>
           <div className="flex flex-wrap gap-3 justify-center">
             {Object.keys(formState.facilities).map((key) => (
               <button
                 key={key}
                 type="button"
-                className={`btn ${formState.facilities[key] ? 'btn-primary' : 'btn-secondary'}`}
+                className={`btn ${formState.facilities[key] ? 'btn-primary shadow-lg' : 'btn-secondary shadow-lg'}`}
                 onClick={() =>
                   setFormState({
                     ...formState,
@@ -510,9 +511,9 @@ const AddProperty = () => {
         </div>
 
         {/* Location Group */}
-        <div className="mb-5 p-5 bg-primary rounded-lg">
+        <div className="mb-5 p-5 bg-secondary/50 backdrop-blur-lg rounded-lg">
           <div className="font-bold mb-1">Location</div>
-          <select value={formState.location.general_area} onChange={e => setFormState({ ...formState, location: { ...formState.location, general_area: e.target.value } })} className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg mb-2">
+          <select value={formState.location.general_area} onChange={e => setFormState({ ...formState, location: { ...formState.location, general_area: e.target.value } })} className="input input-primary w-full rounded-lg bg-secondary backdrop-blur-lg shadow-lg mb-2">
             <option>General Area</option>
             {generalAreas.map((area, idx) => (
               <option key={idx} value={area.area}>{area.area}</option>
@@ -534,7 +535,7 @@ const AddProperty = () => {
         </div>
 
         {/* Owner Group */}
-        <div className="mb-5 p-5 bg-primary rounded-lg">
+        <div className="mb-5 p-5 bg-secondary/50 backdrop-blur-lg rounded-lg">
           <div className="font-bold mb-1">Property Owner</div>
           <input type="text" placeholder="Full Name" value={formState.propertiesOwner.fullname}
             onChange={e => setFormState({ ...formState, propertiesOwner: { ...formState.propertiesOwner, fullname: e.target.value } })}
@@ -559,7 +560,7 @@ const AddProperty = () => {
         </div>
 
         {/* Additional Details Group */}
-        <div className="mb-5 p-5 bg-primary rounded-lg">
+        <div className="mb-5 p-5 bg-secondary/50 backdrop-blur-lg rounded-lg">
           <div className="font-bold mb-1">Additional Details</div>
           <div className="flex items-center mb-1">
             <input type="checkbox" id="allow_pets" checked={formState.additionalDetails.allow_pets}
