@@ -1,6 +1,7 @@
 import NavbarAdmin from '../../../components/NavbarAdmin.jsx';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie'
+import PropertyList from './PropertyList.jsx';
 
 export default function PropertyManagement() {
     const [username, setUsername] = useState([]);
@@ -13,14 +14,12 @@ export default function PropertyManagement() {
     }, []);
 
     return (
-        <div>
+        <div className="flex h-screen">
             <div>
                 <NavbarAdmin />
             </div>
-            <div>
-                <h1 className='mt-20 text-4xl font-bold text-center text-primary'>
-                    Property Management Comming Soon
-                </h1>
+            <div className='flex-1'>
+                <PropertyList />
             </div>
         </div>
     )

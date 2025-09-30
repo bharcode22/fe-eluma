@@ -2,24 +2,11 @@ import React, { useState, useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AuthContext } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
-import { useCurrency } from "../context/CurrencyContext";
 
 export default function NavbarAdmin() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
-
-    const { lang, setLang } = useLanguage();
-    const { currency, setCurrency } = useCurrency();
-
-    const handleLanguageChange = (e) => {
-        setLang(e.target.value);
-    };
-
-    const handleCurrencyChange = (e) => {
-        setCurrency(e.target.value);
-    };
 
     const logout = () => {
         Cookies.remove("token");
@@ -31,10 +18,10 @@ export default function NavbarAdmin() {
 
     const navItems = [
         { path: "/admin/dashboard", label: "Dashboard" },
-        { path: "/admin/users-management", label: "Users Management" },
         { path: "/admin/property-management", label: "Properti Management" },
-        { path: "/admin/additional-management", label: "Additional Management" },
+        { path: "/admin/users-management", label: "Users Management" },
         { path: "/admin/property-owner-management", label: "Property Owner Management" },
+        { path: "/admin/additional-management", label: "Additional Management" },
         { path: "/admin/service-management", label: "Service Management" },
     ];
 
@@ -73,7 +60,7 @@ export default function NavbarAdmin() {
                     </div>
                 </div>
 
-                {/* Language and Currency Selectors */}
+                {/* logout button */}
                 <div className="p-4 border-t border-primary-focus">
                     <div className="space-y-3">
                         {/* Logout Button */}
@@ -174,32 +161,9 @@ export default function NavbarAdmin() {
                         ))}
                     </div>
 
-                    {/* Language and Currency Selectors */}
+                    {/* Logout Button */}
                     <div className="p-4 border-t border-primary-focus">
                         <div className="space-y-3">
-                            <select 
-                                value={lang} 
-                                onChange={handleLanguageChange} 
-                                className="w-full bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent"
-                            >
-                                <option value="en">English</option>
-                                <option value="id">Indonesian</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="es">Spanish</option>
-                            </select>
-
-                            <select 
-                                value={currency} 
-                                onChange={handleCurrencyChange} 
-                                className="w-full bg-secondary text-white px-3 py-2 rounded-md text-sm font-medium border border-secondary-content focus:outline-none focus:ring-2 focus:ring-accent"
-                            >
-                                <option value="IDR">IDR</option>
-                                <option value="USD">USD</option>
-                                <option value="EUR">EUR</option>
-                            </select>
-
-                            {/* Logout Button */}
                             <button
                                 onClick={() => {
                                     logout();

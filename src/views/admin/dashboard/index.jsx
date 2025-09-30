@@ -3,7 +3,7 @@ import DashboardPage from './dashboardPage.jsx';
 
 export default function Dashboard() {
     return (
-        <div className="flex h-screen">
+        <div className="flex flex-col h-screen">
             <NavbarAdmin />
             <DashboardPage />
         </div>
