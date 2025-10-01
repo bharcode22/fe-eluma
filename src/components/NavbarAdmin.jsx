@@ -28,7 +28,7 @@ export default function NavbarAdmin() {
     return (
         <div className="flex h-screen">
             {/* Sidebar Navigation */}
-            <nav className="bg-primary shadow-lg fixed left-0 top-0 h-full z-50 w-64 flex flex-col">
+            <nav className="bg-primary/50 shadow-lg fixed left-0 top-0 h-full z-50 w-64 flex flex-col">
                 {/* Logo */}
                 <div className="p-4 border-b border-primary-focus">
                     <Link
