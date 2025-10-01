@@ -9,11 +9,20 @@ import Contact from "../views/landingPAge/Contact/Contact.jsx";
 import About from "../views/landingPAge/About/About.jsx";
 
 // halaman admin
+// dashboard
 import Dashboard from "../views/admin/dashboard/index.jsx"
+
+// property management
 import PropertyManagement from "../views/admin/propertyManagement/index.jsx"
+import UpdatePropertyPage from "../views/admin/propertyManagement/updatePropertyPage.jsx"
+
+// users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
+// additional management
 import AdditionalManagement from "../views/admin/additional-management/index.jsx"
+// property owner management
 import PropertyOwnerManagement from "../views/admin/property-owner-management/index.jsx"
+// service management
 import ServiceManagement from "../views/admin/service-managemenet/index.jsx"
 
 // halaman user
@@ -36,21 +45,31 @@ export default function AppRoutes() {
             <Route path="/contact" element={<Contact />} />
 
             {/* admin */}
+            {/* dashboard */}
             <Route path="/admin/dashboard" element={
                 isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/" replace />
             } />
+            {/* property management */}
             <Route path="/admin/property-management" element={
                 isAuthenticated && userRole === 'admin' ? <PropertyManagement /> : <Navigate to="/" replace />
             } />
+            {/* update property management */}
+            <Route path="/admin/update-property-management/:id" element={
+                isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
+            } />
+            {/* users management */}
             <Route path="/admin/users-management" element={
                 isAuthenticated && userRole === 'admin' ? <UsersManagement /> : <Navigate to="/" replace />
             } />
+            {/* additional management */}
             <Route path="/admin/additional-management" element={
                 isAuthenticated && userRole === 'admin' ? <AdditionalManagement /> : <Navigate to="/" replace />
             } />
+            {/* property owner management */}
             <Route path="/admin/property-owner-management" element={
                 isAuthenticated && userRole === 'admin' ? <PropertyOwnerManagement /> : <Navigate to="/" replace />
             } />
+            {/* service management */}
             <Route path="/admin/service-management" element={
                 isAuthenticated && userRole === 'admin' ? <ServiceManagement /> : <Navigate to="/" replace />
             } />

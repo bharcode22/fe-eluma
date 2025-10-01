@@ -10,6 +10,9 @@ export default function PropertyList() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [propertyToDelete, setPropertyToDelete] = useState(null);
 
     useEffect(() => {
         const fetchProperties = async () => {
@@ -21,7 +24,7 @@ export default function PropertyList() {
                     return;
                 }
 
-                const response = await axios.get(`${baseUrl}/property-management?page=${currentPage}&limit=10`, {
+                const response = await axios.get(`${baseUrl}/property-management?page=${currentPage}&limit=10&search=${searchQuery}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -39,12 +42,42 @@ export default function PropertyList() {
         };
 
         fetchProperties();
-    }, [currentPage]);
+    }, [currentPage, searchQuery]);
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
         }
+    };
+
+    const handleSearch = (event) => {
+        setSearchQuery(event.target.value);
+        setCurrentPage(1);
+    };
+
+    const DeleteData = (propertyId) => {
+        setPropertyToDelete(propertyId);
+        setShowDeleteConfirm(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            await axios.delete(`${baseUrl}/property/${propertyToDelete}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            fetchData();
+            setShowDeleteConfirm(false);
+            setPropertyToDelete(null);
+        } catch (err) {
+            setError(err.response?.data?.message || err.message);
+            setShowDeleteConfirm(false);
+            setPropertyToDelete(null);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteConfirm(false);
+        setPropertyToDelete(null);
     };
 
     if (loading) {
@@ -71,6 +104,23 @@ export default function PropertyList() {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold text-center text-primary mb-6">All Property List</h1>
+
+            <div className="mb-5 flex justify-between items-center">
+                <input
+                    type="text"
+                    className="input input-primary w-[50%] rounded-lg bg-secondary/20 backdrop-blur-lg shadow-lg"
+                    placeholder="Search properties..."
+                    value={searchQuery}
+                    onChange={handleSearch}
+                />
+                <button
+                    className="btn btn-primary rounded-lg shadow-lg"
+                    onClick={() => console.log('Add Property button clicked')}
+                >
+                    Add Property
+                </button>
+            </div>
+
             <div className="overflow-x-auto">
                 <table className="table bg-secondary/30">
                     <thead className="bg-primary text-white sticky top-0 z-10">
@@ -111,13 +161,22 @@ export default function PropertyList() {
                                 </td>
                                 <td className="font-normal text-center">{new Date(property.created_at).toLocaleDateString()}</td>
                                 <td className="px-4 py-2 mt-3 flex justify-center items-center gap-2">
-                                    <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                                    <button
+                                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                                        onClick={() => window.location.href = `/detail/${property.id}`}
+                                    >
                                         Detail
                                     </button>
-                                    <button className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition">
+                                    <button
+                                        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition"
+                                        onClick={() => window.location.href = `/admin/update-property-management/${property.id}`}
+                                    >
                                         Edit
                                     </button>
-                                    <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition">
+                                    <button
+                                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
+                                        onClick={() => DeleteData(property.id)}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -143,6 +202,28 @@ export default function PropertyList() {
                     Next
                 </button>
             </div>
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-slate-800/15 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-secondary/50 backdrop-blur-2xl rounded-lg p-6 w-full max-w-md text-center">
+                        <h3 className="text-lg font-bold mb-4">Konfirmasi Hapus</h3>
+                        <p className="mb-6">Apakah Anda yakin ingin menghapus properti ini?</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={handleCancelDelete}
+                                className="btn bg-gray-300 hover:bg-gray-400 text-gray-800"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                className="btn bg-error hover:bg-red-700 text-white"
+                            >
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
