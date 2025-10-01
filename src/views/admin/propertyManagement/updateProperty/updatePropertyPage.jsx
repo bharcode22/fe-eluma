@@ -1,5 +1,5 @@
 import React from 'react'
-import NavbarAdmin from '../../../components/NavbarAdmin.jsx'
+import NavbarAdmin from '../../../../components/NavbarAdmin.jsx'
 import UpdatePropertyForm from './updatePropertyManagement.jsx'
 
 export default  function updatePropertyPage({id}) {

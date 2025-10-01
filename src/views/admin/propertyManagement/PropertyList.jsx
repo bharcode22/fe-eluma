@@ -114,12 +114,12 @@ export default function PropertyList() {
                     value={searchQuery}
                     onChange={handleSearch}
                 />
-                <button
+                <a
                     className="btn btn-primary rounded-lg shadow-lg"
-                    onClick={() => console.log('Add Property button clicked')}
+                    href="/admin/add-property-management"
                 >
                     Add Property
-                </button>
+                </a>
             </div>
 
             <div className="overflow-x-auto">

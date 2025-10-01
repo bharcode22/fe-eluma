@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import Api from "../../../service/api.js";
+import Api from "../../../../service/api.js";
 import Cookies from "js-cookie";
 
 function UpdatePropertyForm() {

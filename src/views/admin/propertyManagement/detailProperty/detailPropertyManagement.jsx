@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import Api from '../../../service/api.js';
-import { useLanguage } from "../../../context/LanguageContext.jsx";
-import { translateNodes } from "../../../utils/translator.js";
-import { useCurrency } from "../../../context/CurrencyContext.jsx";
-import Calender from "../../../assets/svg/calender.svg";
-import Add from "../../../assets/svg/add.svg";
-import NavbarUsers from "../../../components/NavbarUser.jsx";
-import Bedroom from "../../../assets/svg/bedroom.svg";
-import Duration from "../../../assets/svg/duration.svg";
+import Api from '../../../../service/api.js';
+import { useLanguage } from "../../../../context/LanguageContext.jsx";
+import { translateNodes } from "../../../../utils/translator.js";
+import { useCurrency } from "../../../../context/CurrencyContext.jsx";
+import Calender from "../../../../assets/svg/calender.svg";
+import Add from "../../../../assets/svg/add.svg";
+import NavbarUsers from "../../../../components/NavbarUser.jsx";
+import Bedroom from "../../../../assets/svg/bedroom.svg";
+import Duration from "../../../../assets/svg/duration.svg";
 
 function DetailPropertyManagement() {
   const { id } = useParams();

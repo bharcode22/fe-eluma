@@ -14,8 +14,9 @@ import Dashboard from "../views/admin/dashboard/index.jsx"
 
 // property management
 import PropertyManagement from "../views/admin/propertyManagement/index.jsx"
-import UpdatePropertyPage from "../views/admin/propertyManagement/updatePropertyPage.jsx"
-import DetailPropertyPage from "../views/admin/propertyManagement/detailPropertyPage.jsx"
+import UpdatePropertyPage from "../views/admin/propertyManagement/updateProperty/updatePropertyPage.jsx"
+import DetailPropertyPage from "../views/admin/propertyManagement/detailProperty/detailPropertyPage.jsx"
+import AddPropertyPage from "../views/admin/propertyManagement/addProperty/addPropertyPage.jsx"
 
 // users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
@@ -59,6 +60,9 @@ export default function AppRoutes() {
             } />
             <Route path="/admin/detail-property-management/:id" element={
                 isAuthenticated && userRole === 'admin' ? <DetailPropertyPage /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/add-property-management" element={
+                isAuthenticated && userRole === 'admin' ? <AddPropertyPage /> : <Navigate to="/" replace />
             } />
 
             {/* users management */}
