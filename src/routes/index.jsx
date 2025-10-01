@@ -15,6 +15,7 @@ import Dashboard from "../views/admin/dashboard/index.jsx"
 // property management
 import PropertyManagement from "../views/admin/propertyManagement/index.jsx"
 import UpdatePropertyPage from "../views/admin/propertyManagement/updatePropertyPage.jsx"
+import DetailPropertyPage from "../views/admin/propertyManagement/detailPropertyPage.jsx"
 
 // users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
@@ -53,10 +54,13 @@ export default function AppRoutes() {
             <Route path="/admin/property-management" element={
                 isAuthenticated && userRole === 'admin' ? <PropertyManagement /> : <Navigate to="/" replace />
             } />
-            {/* update property management */}
             <Route path="/admin/update-property-management/:id" element={
                 isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
             } />
+            <Route path="/admin/detail-property-management/:id" element={
+                isAuthenticated && userRole === 'admin' ? <DetailPropertyPage /> : <Navigate to="/" replace />
+            } />
+
             {/* users management */}
             <Route path="/admin/users-management" element={
                 isAuthenticated && userRole === 'admin' ? <UsersManagement /> : <Navigate to="/" replace />

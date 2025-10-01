@@ -14,33 +14,34 @@ export default function PropertyList() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState(null);
 
-    useEffect(() => {
-        const fetchProperties = async () => {
-            try {
-                const token = Cookies.get('token');
-                if (!token) {
-                    setError('Token tidak ditemukan. Harap login terlebih dahulu.');
-                    setLoading(false);
-                    return;
-                }
+    const token = Cookies.get('token');
 
-                const response = await axios.get(`${baseUrl}/property-management?page=${currentPage}&limit=10&search=${searchQuery}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (response.data.meta) {
-                    setProperties(response.data.data);
-                    setTotalPages(response.data.meta.totalPages);
-                }
-            } catch (err) {
-                setError(err.response?.data?.message || err.message);
-            } finally {
+    const fetchProperties = async () => {
+        try {
+            if (!token) {
+                setError('Token tidak ditemukan. Harap login terlebih dahulu.');
                 setLoading(false);
+                return;
             }
-        };
 
+            const response = await axios.get(`${baseUrl}/property-management?page=${currentPage}&limit=10&search=${searchQuery}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.data.meta) {
+                setProperties(response.data.data);
+                setTotalPages(response.data.meta.totalPages);
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchProperties();
     }, [currentPage, searchQuery]);
 
@@ -65,7 +66,7 @@ export default function PropertyList() {
             await axios.delete(`${baseUrl}/property/${propertyToDelete}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            fetchData();
+            fetchProperties();
             setShowDeleteConfirm(false);
             setPropertyToDelete(null);
         } catch (err) {
@@ -163,7 +164,7 @@ export default function PropertyList() {
                                 <td className="px-4 py-2 mt-3 flex justify-center items-center gap-2">
                                     <button
                                         className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                                        onClick={() => window.location.href = `/detail/${property.id}`}
+                                        onClick={() => window.location.href = `/admin/detail-property-management/${property.id}`}
                                     >
                                         Detail
                                     </button>
