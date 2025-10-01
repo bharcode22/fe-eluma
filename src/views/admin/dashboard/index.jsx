@@ -3,9 +3,13 @@ import DashboardPage from './dashboardPage.jsx';
 
 export default function Dashboard() {
     return (
-        <div className="flex flex-col h-screen">
-            <NavbarAdmin />
-            <DashboardPage />
+        <div className="flex">
+            <div>
+                <NavbarAdmin />
+            </div>
+            <div className='w-full'>
+                <DashboardPage />
+            </div>
         </div>
     );
 }

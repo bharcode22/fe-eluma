@@ -16,8 +16,7 @@ export default function DashboardPage() {
 
     return (
         <div>
-            {/* Main Content */}
-            <div className="flex-1 ml-64 p-8">
+            <div className="flex-1 p-20">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
                     <p className="text-gray-600">Welcome, {username.name}!</p>

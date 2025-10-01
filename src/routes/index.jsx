@@ -21,10 +21,10 @@ import UpdateImagesOnly from "../views/admin/propertyManagement/updateProperty/U
 
 // users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
-// additional management
-import AdditionalManagement from "../views/admin/additional-management/index.jsx"
 // property owner management
 import PropertyOwnerManagement from "../views/admin/property-owner-management/index.jsx"
+// additional management
+import AdditionalManagement from "../views/admin/additional-management/index.jsx"
 // service management
 import ServiceManagement from "../views/admin/service-managemenet/index.jsx"
 

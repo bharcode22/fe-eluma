@@ -60,44 +60,42 @@ export default function LatestPropertyList() {
     }
 
     return (
-        <div>
-            {/* Latest Property List */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Latest Property List</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property Code</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number of Bathrooms</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number of Bedrooms</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maximum Guest</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Price</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yearly Price</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <div className="container mx-auto mb-10">
+            <h1 className="text-xl font-bold text-left text-primary mb-3">Latest Property List</h1>
+
+            <div className="overflow-x-auto">
+                <table className="table bg-secondary/30">
+                    <thead className="bg-primary text-white sticky top-0 z-10">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Property Code</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Number of Bathrooms</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Number of Bedrooms</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Maximum Guest</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Monthly Price</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Yearly Price</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Created At</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {properties.map((property, index) => (
+                            <tr key={property.property_code} className="hover:bg-primary/40">
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.property_code}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.number_of_bedrooms}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.number_of_bathrooms}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.maximum_guest}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">Rp {property.monthly_price.toLocaleString()}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">Rp {property.yearly_price.toLocaleString()}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{new Date(property.created_at).toLocaleDateString()}</td>
+                                <td className="font-normal px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${property.isPublic ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                        {property.isPublic ? 'Publik' : 'Privat'}
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {properties.map((property) => (
-                                <tr key={property.property_code}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.property_code}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.number_of_bedrooms}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.number_of_bathrooms}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.maximum_guest}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp {property.monthly_price.toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp {property.yearly_price.toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(property.created_at).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${property.isPublic ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                            {property.isPublic ? 'Publik' : 'Privat'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
