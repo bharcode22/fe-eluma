@@ -368,7 +368,7 @@ const handleSubmit = async (e) => {
         </div>
 
         <div className="mx-80 flex justify-center mt-5">
-          <Link to={`/user/update/image/property/${id}`}>
+          <Link to={`/admin/update-images-only/${id}`}>
             <div className="flex justify-end px-5 py-5 btn btn-primary text-white shadow-2xl">
               <p>Edit Image</p>
             </div>

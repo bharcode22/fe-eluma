@@ -100,7 +100,6 @@ function DetailPropertyManagement() {
 
   return (
     <div ref={divRef} className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* <NavbarUsers /> */}
       <div className="flex flex-col md:flex-row justify-between gap-6 w-full">
         <div className="md:w-3/4 space-y-6">
           {/* judul */}

@@ -17,6 +17,7 @@ import PropertyManagement from "../views/admin/propertyManagement/index.jsx"
 import UpdatePropertyPage from "../views/admin/propertyManagement/updateProperty/updatePropertyPage.jsx"
 import DetailPropertyPage from "../views/admin/propertyManagement/detailProperty/detailPropertyPage.jsx"
 import AddPropertyPage from "../views/admin/propertyManagement/addProperty/addPropertyPage.jsx"
+import UpdateImagesOnly from "../views/admin/propertyManagement/updateProperty/UpdateImagesOnly.jsx"
 
 // users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
@@ -63,6 +64,9 @@ export default function AppRoutes() {
             } />
             <Route path="/admin/add-property-management" element={
                 isAuthenticated && userRole === 'admin' ? <AddPropertyPage /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/update-images-only/:id" element={
+                isAuthenticated && userRole === 'admin' ? <UpdateImagesOnly /> : <Navigate to="/" replace />
             } />
 
             {/* users management */}
