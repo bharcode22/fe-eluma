@@ -316,7 +316,7 @@ function LandingPageDetailProperty() {
                 )}
 
                 {/* Parking Details */}
-                {detail.parking && (
+                {(detail.parking || detail.Parking) && (
                   <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
                     <h3 className="font-semibold mt-2 flex items-center gap-2 mb-4">
                       <img src={Add} alt="parking icon" className="w-6 h-6 text-primary" />
@@ -324,15 +324,15 @@ function LandingPageDetailProperty() {
                     </h3>
                     <hr className='mb-4'/>
                     <div className="ml-8 space-y-1 list-disc list-inside">
-                      {detail.parking.car_parking && <li className="text-lg">Car Park</li>}
-                      {detail.parking.bike_parking && <li className="text-lg">Motor Cycle Park</li>}
-                      {detail.parking.both_car_and_bike && <li className="text-lg">Car & Motor Park</li>}
+                      {(detail.parking || detail.Parking).car_parking && <li className="text-lg">Car Park</li>}
+                      {(detail.parking || detail.Parking).bike_parking && <li className="text-lg">Motor Cycle Park</li>}
+                      {(detail.parking || detail.Parking).both_car_and_bike && <li className="text-lg">Car & Motor Park</li>}
                     </div>
                   </div>
                 )}
 
                 {/* View Details */}
-                {detail.view && (
+                {(detail.view || detail.View) && (
                   <div className="p-3 bg-secondary/80 rounded-lg shadow-md">
                     <h3 className="font-semibold mt-2 flex items-center gap-2 mb-4">
                       <img src={Add} alt="view icon" className="w-6 h-6 text-primary" />
@@ -340,16 +340,16 @@ function LandingPageDetailProperty() {
                     </h3>
                     <hr className='mb-4'/>
                     <ul className="ml-8 space-y-1 list-disc list-inside">
-                      {detail.view.ocean_view && <li className="text-lg">Ocean view</li>}
-                      {detail.view.sunset_view && <li className="text-lg">Sunset View</li>}
-                      {detail.view.garden_view && <li className="text-lg">Garden View</li>}
-                      {detail.view.beach_view && <li className="text-lg">Beach View</li>}
-                      {detail.view.jungle_view && <li className="text-lg">Jungle View</li>}
-                      {detail.view.montain_view && <li className="text-lg">Montain View</li>}
-                      {detail.view.pool_view && <li className="text-lg">Pool View</li>}
-                      {detail.view.rice_field && <li className="text-lg">Rice Field View</li>}
-                      {detail.view.sunrise_view && <li className="text-lg">Sun Rise View</li>}
-                      {detail.view.volcano_view && <li className="text-lg">Volcano View</li>}
+                      {(detail.view || detail.View).ocean_view && <li className="text-lg">Ocean view</li>}
+                      {(detail.view || detail.View).sunset_view && <li className="text-lg">Sunset View</li>}
+                      {(detail.view || detail.View).garden_view && <li className="text-lg">Garden View</li>}
+                      {(detail.view || detail.View).beach_view && <li className="text-lg">Beach View</li>}
+                      {(detail.view || detail.View).jungle_view && <li className="text-lg">Jungle View</li>}
+                      {(detail.view || detail.View).montain_view && <li className="text-lg">Montain View</li>}
+                      {(detail.view || detail.View).pool_view && <li className="text-lg">Pool View</li>}
+                      {(detail.view || detail.View).rice_field && <li className="text-lg">Rice Field View</li>}
+                      {(detail.view || detail.View).sunrise_view && <li className="text-lg">Sun Rise View</li>}
+                      {(detail.view || detail.View).volcano_view && <li className="text-lg">Volcano View</li>}
                     </ul>
                   </div>
                 )}

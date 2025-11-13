@@ -15,6 +15,8 @@ function UpdatePropertyForm() {
   const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState("");
+  const [errors, setErrors] = useState({});
   const [generalAreas, setGeneralAreas] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
@@ -138,7 +140,9 @@ function UpdatePropertyForm() {
         const availabilityData = property.availability?.[0] || {};
         const facilitiesData = property.facilities?.[0] || {};
         const ownerData = property.propertiesOwner?.[0] || {};
-        const additionalDetailsData = property.additionalDetails?.[0] || {};
+        const additionalDetailsData = Array.isArray(property.additionalDetails)
+          ? (property.additionalDetails[0] || {})
+          : (property.additionalDetails || {});
 
         setFormData({
           type_id: property.type_id || "",
@@ -196,21 +200,21 @@ function UpdatePropertyForm() {
             cleaning_requency: additionalDetailsData.cleaning_requency || "",
             linen_chaneg: additionalDetailsData.linen_chaneg || "",
             parking: {
-              car_parking: additionalDetailsData.parking?.car_parking || false,
-              bike_parking: additionalDetailsData.parking?.bike_parking || false,
-              both_car_and_bike: additionalDetailsData.parking?.both_car_and_bike || false
+              car_parking: (additionalDetailsData.Parking?.car_parking ?? additionalDetailsData.parking?.car_parking) || false,
+              bike_parking: (additionalDetailsData.Parking?.bike_parking ?? additionalDetailsData.parking?.bike_parking) || false,
+              both_car_and_bike: (additionalDetailsData.Parking?.both_car_and_bike ?? additionalDetailsData.parking?.both_car_and_bike) || false
             },
             view: {
-              ocean_view: additionalDetailsData.view?.ocean_view || false,
-              sunset_view: additionalDetailsData.view?.sunset_view || false,
-              garden_view: additionalDetailsData.view?.garden_view || false,
-              beach_view: additionalDetailsData.view?.beach_view || false,
-              jungle_view: additionalDetailsData.view?.jungle_view || false,
-              montain_view: additionalDetailsData.view?.montain_view || false,
-              pool_view: additionalDetailsData.view?.pool_view || false,
-              rice_field: additionalDetailsData.view?.rice_field || false,
-              sunrise_view: additionalDetailsData.view?.sunrise_view || false,
-              volcano_view: additionalDetailsData.view?.volcano_view || false,
+              ocean_view: (additionalDetailsData.View?.ocean_view ?? additionalDetailsData.view?.ocean_view) || false,
+              sunset_view: (additionalDetailsData.View?.sunset_view ?? additionalDetailsData.view?.sunset_view) || false,
+              garden_view: (additionalDetailsData.View?.garden_view ?? additionalDetailsData.view?.garden_view) || false,
+              beach_view: (additionalDetailsData.View?.beach_view ?? additionalDetailsData.view?.beach_view) || false,
+              jungle_view: (additionalDetailsData.View?.jungle_view ?? additionalDetailsData.view?.jungle_view) || false,
+              montain_view: (additionalDetailsData.View?.montain_view ?? additionalDetailsData.view?.montain_view) || false,
+              pool_view: (additionalDetailsData.View?.pool_view ?? additionalDetailsData.view?.pool_view) || false,
+              rice_field: (additionalDetailsData.View?.rice_field ?? additionalDetailsData.view?.rice_field) || false,
+              sunrise_view: (additionalDetailsData.View?.sunrise_view ?? additionalDetailsData.view?.sunrise_view) || false,
+              volcano_view: (additionalDetailsData.View?.volcano_view ?? additionalDetailsData.view?.volcano_view) || false
             }
           }
         });
@@ -258,6 +262,20 @@ function UpdatePropertyForm() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validateForm = () => {
+    const errs = {};
+    if (!formData.type_id) errs.type_id = "Type property wajib diisi";
+    if (!String(formData.property_tittle || "").trim()) errs.property_tittle = "Judul properti wajib diisi";
+    const plainDesc = String(formData.description || "").replace(/<[^>]*>/g, "").trim();
+    if (!plainDesc) errs.description = "Deskripsi wajib diisi";
+    if (!formData.price) errs.price = "Harga wajib diisi";
+    if (!String(formData.location.general_area || "").trim()) errs.general_area = "General area wajib dipilih";
+    const from = formData.availability?.[0]?.available_from;
+    const to = formData.availability?.[0]?.available_to;
+    if (!from || !to) errs.availability = "Tanggal ketersediaan wajib diisi";
+    return errs;
+  };
+
   const formatDateToISO = (dateString) => {
   if (!dateString) return "";
   try {
@@ -279,6 +297,15 @@ const handleSubmit = async (e) => {
     return;
   }
 
+  const validationErrors = validateForm();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    setMessage('Periksa kembali field yang wajib diisi');
+    return;
+  }
+  setErrors({});
+  setMessage("");
+
   // Prepare data with properly formatted dates
   const availabilityData = {
     available_from: formatDateToISO(formData.availability[0]?.available_from),
@@ -297,12 +324,51 @@ const handleSubmit = async (e) => {
   formDataToSend.append('monthly_price', formData.monthly_price);
   formDataToSend.append('yearly_price', formData.yearly_price);
   
-  // Stringify nested objects with proper date formatting
   formDataToSend.append('location', JSON.stringify(formData.location));
   formDataToSend.append('availability', JSON.stringify(availabilityData));
   formDataToSend.append('facilities', JSON.stringify(formData.facilities));
   formDataToSend.append('propertiesOwner', JSON.stringify(formData.propertiesOwner));
-  formDataToSend.append('additionalDetails', JSON.stringify(formData.additionalDetails));
+  const additionalDetailsPayload = {
+    allow_path: formData.additionalDetails.allow_path,
+    construction_nearby: formData.additionalDetails.construction_nearby,
+    cleaning_requency: formData.additionalDetails.cleaning_requency,
+    linen_chaneg: formData.additionalDetails.linen_chaneg,
+    Parking: {
+      car_parking: formData.additionalDetails.parking?.car_parking || false,
+      bike_parking: formData.additionalDetails.parking?.bike_parking || false,
+      both_car_and_bike: formData.additionalDetails.parking?.both_car_and_bike || false,
+    },
+    View: {
+      ocean_view: formData.additionalDetails.view?.ocean_view || false,
+      sunset_view: formData.additionalDetails.view?.sunset_view || false,
+      garden_view: formData.additionalDetails.view?.garden_view || false,
+      beach_view: formData.additionalDetails.view?.beach_view || false,
+      jungle_view: formData.additionalDetails.view?.jungle_view || false,
+      montain_view: formData.additionalDetails.view?.montain_view || false,
+      pool_view: formData.additionalDetails.view?.pool_view || false,
+      rice_field: formData.additionalDetails.view?.rice_field || false,
+      sunrise_view: formData.additionalDetails.view?.sunrise_view || false,
+      volcano_view: formData.additionalDetails.view?.volcano_view || false,
+    },
+    parking: {
+      car_parking: formData.additionalDetails.parking?.car_parking || false,
+      bike_parking: formData.additionalDetails.parking?.bike_parking || false,
+      both_car_and_bike: formData.additionalDetails.parking?.both_car_and_bike || false,
+    },
+    view: {
+      ocean_view: formData.additionalDetails.view?.ocean_view || false,
+      sunset_view: formData.additionalDetails.view?.sunset_view || false,
+      garden_view: formData.additionalDetails.view?.garden_view || false,
+      beach_view: formData.additionalDetails.view?.beach_view || false,
+      jungle_view: formData.additionalDetails.view?.jungle_view || false,
+      montain_view: formData.additionalDetails.view?.montain_view || false,
+      pool_view: formData.additionalDetails.view?.pool_view || false,
+      rice_field: formData.additionalDetails.view?.rice_field || false,
+      sunrise_view: formData.additionalDetails.view?.sunrise_view || false,
+      volcano_view: formData.additionalDetails.view?.volcano_view || false,
+    },
+  };
+  formDataToSend.append('additionalDetails', JSON.stringify(additionalDetailsPayload));
 
   // Append images
   newImages.forEach(file => {
@@ -317,11 +383,14 @@ const handleSubmit = async (e) => {
         "Content-Type": "multipart/form-data",
       }
     });
-
+    setSuccess('Berhasil mengupdate properti');
     navigate('/user/home');
   } catch (error) {
     console.error("Update error:", error.response?.data || error.message);
     setMessage(`Gagal update: ${error.response?.data?.message || error.message}`);
+    if (error.response?.data?.errors && typeof error.response.data.errors === 'object') {
+      setErrors(error.response.data.errors);
+    }
   } finally {
     setLoading(false);
   }
@@ -352,6 +421,7 @@ const handleSubmit = async (e) => {
     <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-4">Update Property</h1>
       {message && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{message}</div>}
+      {success && <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">{success}</div>}
 
       {/* Image Gallery */}
       <div className="bg-secondary/50 backdrop-blur-lg px-5 py-5 rounded-lg mb-5">
@@ -436,19 +506,20 @@ const handleSubmit = async (e) => {
 
         {/* Property Type */}
         <div className="flex mb-5 flex-wrap gap-2 justify-center p-5 bg-secondary/50 backdrop-blur-lg rounded-lg">
-          {typeOptions.map((type) => (
-            <button 
-              key={type.id} 
-              type="button" 
-              className={`btn shadow-2xl ${
-                formData.type_id === type.id ? "btn-primary" : "btn-secondary"
-              }`}
-              onClick={() => setFormData(prev => ({ ...prev, type_id: type.id }))}
-            >
-              {type.type_name}
-            </button>
-          ))}
-        </div>
+      {typeOptions.map((type) => (
+        <button 
+          key={type.id} 
+          type="button" 
+          className={`btn shadow-2xl ${
+            formData.type_id === type.id ? "btn-primary" : "btn-secondary"
+          }`}
+          onClick={() => setFormData(prev => ({ ...prev, type_id: type.id }))}
+        >
+          {type.type_name}
+        </button>
+      ))}
+    </div>
+    {errors.type_id && <p className="text-red-500 text-sm">{errors.type_id}</p>}
 
         {/* Property Title */}
         <div className="mb-4 bg-secondary/50 backdrop-blur-lg p-5 rounded-lg">
@@ -461,6 +532,7 @@ const handleSubmit = async (e) => {
             onChange={handleChange} 
             className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
           />
+          {errors.property_tittle && <p className="text-red-500 text-sm mt-2">{errors.property_tittle}</p>}
         </div>
 
         {/* Description */}
@@ -489,6 +561,7 @@ const handleSubmit = async (e) => {
               "bullet",
             ]}
           />
+          {errors.description && <p className="text-red-500 text-sm mt-2">{errors.description}</p>}
         </div>
 
         {/* Property Details */}
@@ -552,16 +625,17 @@ const handleSubmit = async (e) => {
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-white mb-1">Price per Day</label>
-              <input
-                type="number"
-                id="price"
-                placeholder="Price per Day"
-                value={formData.price}
-                onChange={e => setFormData({ ...formData, price: e.target.value })}
-                className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
-                min="0"
-              />
-            </div>
+            <input
+              type="number"
+              id="price"
+              placeholder="Price per Day"
+              value={formData.price}
+              onChange={e => setFormData({ ...formData, price: e.target.value })}
+              className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
+              min="0"
+            />
+            {errors.price && <p className="text-red-500 text-sm mt-2">{errors.price}</p>}
+          </div>
             <div>
               <label htmlFor="monthly_price" className="block text-sm font-medium text-white mb-1">Monthly Price</label>
               <input
@@ -613,6 +687,7 @@ const handleSubmit = async (e) => {
               />
             </div>
           </div>
+          {errors.availability && <p className="text-red-500 text-sm mt-2">{errors.availability}</p>}
         </div>
 
         {/* Facilities Group */}
@@ -768,6 +843,7 @@ const handleSubmit = async (e) => {
               </option>
             ))}
           </select>
+          {errors.general_area && <p className="text-red-500 text-sm">{errors.general_area}</p>}
 
           {/* <input
             type="text"
