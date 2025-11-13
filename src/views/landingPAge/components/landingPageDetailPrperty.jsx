@@ -271,7 +271,11 @@ function LandingPageDetailProperty() {
           <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl'>
             <h2 className="text-xl font-semibold mb-4">Additional Details</h2>
             <hr className='mb-4'/>
-            {property.additionalDetails.map((detail) => (
+            {(() => {
+              const detailsArr = Array.isArray(property?.additionalDetails)
+                ? property.additionalDetails
+                : (property?.additionalDetails ? [property.additionalDetails] : []);
+              return detailsArr.map((detail) => (
               <div key={detail.id} className="space-y-2 mt-3">
 
                 {detail.allow_path && (
@@ -297,20 +301,16 @@ function LandingPageDetailProperty() {
                     <hr className=''/>
 
                     {detail.cleaning_requency && (
-                      <p className="text-lg">
-                        Cleaning Frequency : <br /> 
-                        <ul className='ml-8 space-y-1 list-disc list-inside'>
-                          <li >{detail.cleaning_requency}</li>
-                        </ul>
-                      </p>
+                      <div className="text-lg ml-8 flex items-center gap-2">
+                        <span className="font-semibold">Cleaning Frequency: </span>
+                        <span className="text-lg">{detail.cleaning_requency}</span>
+                      </div>
                     )}
                     {detail.linen_chaneg && (
-                      <p className="text-lg">
-                        Linen Change Frequency : <br />
-                        <ul className='ml-8 space-y-1 list-disc list-inside'>
-                          <li >{detail.linen_chaneg}</li>
-                        </ul>
-                      </p>
+                      <div className="text-lg ml-8 flex items-center gap-2">
+                        <span className="font-semibold">Linen Change Frequency:</span>
+                        <span>{detail.linen_chaneg}</span>
+                      </div>
                     )}
                   </div>
                 )}
@@ -354,7 +354,8 @@ function LandingPageDetailProperty() {
                   </div>
                 )}
               </div>
-            ))}
+              ));
+            })()}
           </div>
 
           {/* Lokasi */}
