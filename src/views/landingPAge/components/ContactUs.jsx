@@ -8,6 +8,8 @@ const ContactUs = ({id}) => {
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
     const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
+    const [contacts, setContacts] = useState([]);
+    const [contactLoading, setContactLoading] = useState(true);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -23,6 +25,21 @@ const ContactUs = ({id}) => {
 
     fetchProperty();
   }, [id]);
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const res = await Api.get('/contact');
+        setContacts(res.data.data);
+      } catch (error) {
+        console.error('Gagal memuat data kontak:', error);
+      } finally {
+        setContactLoading(false);
+      }
+    };
+
+    fetchContacts();
+  }, []);
 
   if (loading) return <p>Loading...</p>;
   if (!property) return <p>Property not found.</p>;
@@ -55,7 +72,38 @@ const ContactUs = ({id}) => {
 
         {/* kontak */}
         <div className='bg-secondary/65 shadow-2xl px-5 py-5 rounded-2xl mt-5'>
-          <h2 className="text-xl font-semibold">Kontak</h2>
+          <h2 className="text-xl font-semibold mb-3">Kontak</h2>
+
+          {contactLoading ? (
+            <p>Loading kontak...</p>
+          ) : contacts.length === 0 ? (
+            <p>Tidak ada kontak tersedia</p>
+          ) : (
+            <div className="space-y-3">
+              {contacts.map((contact) => (
+                <div
+                  key={contact.id}
+                  className="flex items-center justify-between p-3 bg-secondary/80 rounded-lg shadow-md"
+                >
+                  <div>
+                    <p className="text-lg font-medium">📞 {contact.number}</p>
+                    <p className="text-sm text-gray-300">
+                      Status: {contact.status}
+                    </p>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/${contact.number.replace('+', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                  >
+                    WhatsApp
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

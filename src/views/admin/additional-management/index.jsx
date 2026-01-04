@@ -19,7 +19,7 @@ export default function AdditionalManagement() {
             </div>
             <div>
                 <h1 className='mt-20 text-4xl font-bold text-center text-primary'>
-                    Contact Management Comming Soon
+                    Additional management
                 </h1>
             </div>
         </div>

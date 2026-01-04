@@ -21,8 +21,9 @@ export default function NavbarAdmin() {
         { path: "/admin/property-management", label: "Properti Management" },
         { path: "/admin/users-management", label: "Users Management" },
         { path: "/admin/property-owner-management", label: "Property Owner Management" },
-        { path: "/admin/additional-management", label: "Additional Management" },
+        { path: "/admin/contact", label: "Contact Management" },
         { path: "/admin/service-management", label: "Service Management" },
+        { path: "/admin/additional-management", label: "Additional Management" },
     ];
 
     return (

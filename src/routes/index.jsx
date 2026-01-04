@@ -23,6 +23,10 @@ import UpdateImagesOnly from "../views/admin/propertyManagement/updateProperty/U
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
 // property owner management
 import PropertyOwnerManagement from "../views/admin/property-owner-management/index.jsx"
+// contact management
+import ContactMabagement from "../views/admin/contact/index.jsx"
+import AddContactPage from "../views/admin/contact/addContact/addContactPage.jsx"
+import UpdateContactPage from "../views/admin/contact/updateContact/updateContactPage.jsx"
 // additional management
 import AdditionalManagement from "../views/admin/additional-management/index.jsx"
 // service management
@@ -80,6 +84,16 @@ export default function AppRoutes() {
             {/* property owner management */}
             <Route path="/admin/property-owner-management" element={
                 isAuthenticated && userRole === 'admin' ? <PropertyOwnerManagement /> : <Navigate to="/" replace />
+            } />
+            {/* contact management */}
+            <Route path="/admin/contact" element={
+                isAuthenticated && userRole === 'admin' ? <ContactMabagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/add/contact" element={
+                isAuthenticated && userRole === 'admin' ? <AddContactPage /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/update/contact/:id" element={
+                isAuthenticated && userRole === 'admin' ? <UpdateContactPage /> : <Navigate to="/" replace />
             } />
             {/* service management */}
             <Route path="/admin/service-management" element={
