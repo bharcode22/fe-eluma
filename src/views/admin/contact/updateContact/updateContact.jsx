@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import api from '../../../../service/api.js';
-
 const baseUrl = api.defaults.baseURL;
 
 function UpdateContact() {
@@ -28,8 +27,6 @@ function UpdateContact() {
                 });
 
                 const contact = res.data.data;
-                console.log("conatct", contact);
-                
 
                 if (contact) {
                     setNumber(contact[0].number ?? '');

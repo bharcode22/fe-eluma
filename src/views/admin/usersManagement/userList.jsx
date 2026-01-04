@@ -95,7 +95,9 @@ export default function UserList() {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
-                            <th>Created At</th>
+                            <th>Status</th>
+                            <th>Properties</th>
+                            <th>Registered At</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -107,11 +109,13 @@ export default function UserList() {
                                 <td className="font-normal">{user.name || '-'}</td>
                                 <td className="font-normal">{user.email || '-'}</td>
                                 <td className="font-normal">{user.role || '-'}</td>
+                                <td className="font-normal">{user.status || '-'}</td>
+                                <td className="font-normal">{user._count.properties || '0'}</td>
                                 <td className="font-normal">{new Date(user.created_at).toLocaleDateString()}</td>
                                 <td className="px-4 py-2 mt-3 flex justify-center items-center gap-2">
                                     <button
                                         className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                                        onClick={() => window.location.href = `/admin/detail-property-management/${property.id}`}
+                                        onClick={() => window.location.href = `/admin/users-management/detail/${user.id}`}
                                     >
                                         Detail
                                     </button>

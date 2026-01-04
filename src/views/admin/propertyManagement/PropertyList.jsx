@@ -129,7 +129,7 @@ export default function PropertyList() {
                             <th>No</th>
                             <th className=''>Property Title</th>
                             <th className='text-center'>Property Code</th>
-                            <th className='text-center'>Room Info</th>
+                            <th className='text-center'>User Info</th>
                             <th className='text-center'>Status</th>
                             <th className='text-center'>Listed At</th>
                             <th className='text-center'>Action</th>
@@ -143,12 +143,17 @@ export default function PropertyList() {
                                 <td className="font-normal text-center bg-secondary/50 rounded-md px-4 py-2 mt-3 flex items-center justify-center">
                                     {property.property_code || '-'}
                                 </td>
-                                <td className="font-normal text-center">
-                                    <div className='flex justify-center gap-x-4'>
-                                        <p>Bedrooms: {property.number_of_bedrooms || '-'}</p>
-                                        <p>Bathrooms: {property.number_of_bathrooms || '-'}</p>
+
+                                <td className="font-normal text-left">
+                                    <div className="grid grid-cols-[100px_auto] gap-y-1">
+                                        <span className="font-semibold">Username</span>
+                                        <span>: {property.user?.username || '-'}</span>
+
+                                        <span className="font-semibold">Email</span>
+                                        <span>: {property.user?.email || '-'}</span>
                                     </div>
                                 </td>
+
                                 <td className="text-center">
                                     <span
                                         className={`inline-flex items-center justify-center text-sm font-medium rounded-md px-4 py-2 
