@@ -121,15 +121,9 @@ export default function UserList() {
                                     </button>
                                     <button
                                         className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80 transition"
-                                        onClick={() => window.location.href = `/admin/update-property-management/${property.id}`}
+                                        onClick={() => window.location.href = `/admin/users-management/update/${user.id}`}
                                     >
                                         Edit
-                                    </button>
-                                    <button
-                                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
-                                        onClick={() => DeleteData(property.id)}
-                                    >
-                                        Delete
                                     </button>
                                 </td>
                             </tr>

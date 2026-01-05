@@ -22,6 +22,7 @@ import UpdateImagesOnly from "../views/admin/propertyManagement/updateProperty/U
 // users management
 import UsersManagement from "../views/admin/usersManagement/index.jsx"
 import DetailUserPage from "../views/admin/usersManagement/detailUser/detailUserPage.jsx"
+import UpdateUserPage from "../views/admin/usersManagement/updateUser/updateUserPage.jsx"
 // property owner management
 import PropertyOwnerManagement from "../views/admin/property-owner-management/index.jsx"
 // contact management
@@ -80,6 +81,9 @@ export default function AppRoutes() {
             } />
             <Route path="/admin/users-management/detail/:id" element={
                 isAuthenticated && userRole === 'admin' ? <DetailUserPage /> : <Navigate to="/" replace />
+            } />
+            <Route path="/admin/users-management/update/:id" element={
+                isAuthenticated && userRole === 'admin' ? <UpdateUserPage /> : <Navigate to="/" replace />
             } />
             {/* additional management */}
             <Route path="/admin/additional-management" element={
