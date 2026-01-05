@@ -31,8 +31,9 @@ function NavbarUsers() {
     };
 
     const navItems = [
-        { path: "/user/all/property", label: "All Property" },
-        { path: "/user/home", label: "My Public Property" },
+        { path: "/user/all/property", label: "Property" },
+        { path: "/user/service", label: "Service" },
+        { path: "/user/home", label: "Public Property" },
         { path: "/user/private/property", label: "My Private Property" },
         { path: "/user/saved/property", label: "Saved Property" },
         { path: "/user/add/property", label: <img src={add} className="w-7 h-7" /> },

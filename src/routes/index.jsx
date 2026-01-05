@@ -5,6 +5,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 // Landing Page
 import Home from "../views/landingPAge/home/Home.jsx";
 import DetailPropertyLandingPage from "../views/landingPAge/components/landingPageDetailPrperty.jsx";
+import ServicePage from "../views/landingPAge/Service/servicePage.jsx";
 import Contact from "../views/landingPAge/Contact/Contact.jsx";
 import About from "../views/landingPAge/About/About.jsx";
 
@@ -50,6 +51,7 @@ export default function AppRoutes() {
             {/* landing page */}
             <Route path="/" element={<Home />} />
             <Route path="/detail/:id" element={<DetailPropertyLandingPage />} />
+            <Route path="/service" element={ <ServicePage />} />
             <Route path="/about" element={ <About />} />
             <Route path="/contact" element={<Contact />} />
 
@@ -111,6 +113,9 @@ export default function AppRoutes() {
             {/* user */}
             <Route path="/user/home" element={
                 isAuthenticated && userRole === 'user' ? <HomeUsers /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/service" element={
+                isAuthenticated && userRole === 'user' ? <ServicePage /> : <Navigate to="/" replace />
             } />
             <Route path="/user/add/property" element={
                 isAuthenticated && userRole === 'user' ? <AddProperty /> : <Navigate to="/" replace />

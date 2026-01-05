@@ -33,6 +33,7 @@ function NavbarLandingPage() {
 
     const navItems = [
         { path: '/', label: 'Properti' },
+        { path: '/service', label: 'Service' },
         { path: '/about', label: 'About' },
         { path: '/contact', label: 'Kontak' }
     ];
