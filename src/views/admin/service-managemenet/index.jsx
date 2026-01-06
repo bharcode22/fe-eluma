@@ -1,26 +1,14 @@
 import NavbarAdmin from '../../../components/NavbarAdmin.jsx';
-import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie'
+import ServicePage from './servicePage.jsx';
 
 export default function ServiceManagement() {
-    const [username, setUsername] = useState([]);
-    useEffect(() => {
-        const userData = Cookies.get('user');
-        
-        if (userData) {
-            setUsername(JSON.parse(userData));
-        }
-    }, []);
-
     return (
-        <div>
-            <div>
-                <NavbarAdmin />
-            </div>
-            <div>
-                <h1 className='mt-20 text-4xl font-bold text-center text-primary'>
-                    Service Management Comming Soon
-                </h1>
+        <div className='flex justify-center'>
+
+            <NavbarAdmin />
+
+            <div className='w-350'>
+                <ServicePage />
             </div>
         </div>
     )
