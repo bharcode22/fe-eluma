@@ -51,8 +51,8 @@ export default function AppRoutes() {
             {/* landing page */}
             <Route path="/" element={<Home />} />
             <Route path="/detail/:id" element={<DetailPropertyLandingPage />} />
-            <Route path="/service" element={ <ServicePage />} />
-            <Route path="/about" element={ <About />} />
+            <Route path="/service" element={<ServicePage />} />
+            <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
 
             {/* admin */}

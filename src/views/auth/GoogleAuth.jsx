@@ -13,7 +13,7 @@ export default function AithGoogle() {
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <GoogleLogin onSuccess={async credentialResponse => {
+            <GoogleLogin onSuccess={async credentialResponse => {
                 try {
                     const decoded = jwtDecode(credentialResponse.credential);
                     console.log(decoded);
@@ -21,39 +21,48 @@ export default function AithGoogle() {
                     const res = await fetch(`${baseUrl}/auth/google-login`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            token: credentialResponse.credential 
+                        body: JSON.stringify({
+                            token: credentialResponse.credential
                         })
                     });
 
                     const data = await res.json();
-                    console.log(data);
+
+                    if (!res.ok) {
+                        console.error("Login failed:", data.message || "Unknown error");
+                        alert(`Login failed: ${data.message || "Please try again"}`);
+                        return;
+                    }
 
                     // Ambil dari response backend
                     const { access_token, user } = data;
 
-                    // Simpan ke cookies
-                    Cookies.set('token', access_token);
-                    Cookies.set('user', JSON.stringify(user));
+                    if (user && user.role) {
+                        // Simpan ke cookies
+                        Cookies.set('token', access_token);
+                        Cookies.set('user', JSON.stringify(user));
 
-                    // Update context auth
-                    setIsAuthenticated(true);
-                    setUserRole(user.role);
+                        // Update context auth
+                        setIsAuthenticated(true);
+                        setUserRole(user.role);
 
-                    // Redirect sesuai role
-                    if (user.role === 'admin') {
-                        navigate("/admin/dashboard", { replace: true });
-                    } else if (user.role === 'user') {
-                        navigate("/user/home", { replace: true });
+                        // Redirect sesuai role
+                        if (user.role === 'admin') {
+                            navigate("/admin/dashboard", { replace: true });
+                        } else if (user.role === 'user') {
+                            navigate("/user/home", { replace: true });
+                        }
+                    } else {
+                        console.error("User data missing in response");
                     }
                 } catch (err) {
                     console.error("Google login error:", err);
                 }
             }}
-            onError={() => {
-                console.log("Login Failed");
-            }}
-        />
+                onError={() => {
+                    console.log("Login Failed");
+                }}
+            />
         </GoogleOAuthProvider>
     );
 }

@@ -3,16 +3,30 @@ import Cookies from 'js-cookie';
 
 export const AuthContext = createContext();
 
+const getUserFromCookie = () => {
+    const user = Cookies.get('user');
+    if (!user || user === 'undefined') return null;
+    try {
+        return JSON.parse(user);
+    } catch (e) {
+        console.error("Error parsing user cookie:", e);
+        return null;
+    }
+};
+
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!Cookies.get('token'));
-    const [userRole, setUserRole] = useState(Cookies.get('user') ? JSON.parse(Cookies.get('user')).role : null);
+    const [userRole, setUserRole] = useState(() => {
+        const user = getUserFromCookie();
+        return user ? user.role : null;
+    });
 
     useEffect(() => {
         const updateAuthStatus = () => {
             const token = Cookies.get('token');
-            const user = Cookies.get('user');
+            const user = getUserFromCookie();
             setIsAuthenticated(!!token);
-            setUserRole(user ? JSON.parse(user).role : null);
+            setUserRole(user ? user.role : null);
         };
 
         updateAuthStatus();
