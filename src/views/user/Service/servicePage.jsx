@@ -1,11 +1,12 @@
-import NavbarLandingPage from "../../../components/NavbarLandingPage.jsx";
+import React from 'react'
+import NavbarUser from "../../../components/NavbarUser.jsx";
 import Service from './service';
 
-function servicePage() {
+function servicePageUser() {
     return (
         <div>
             <div>
-                <NavbarLandingPage />
+                <NavbarUser />
             </div>
             <div>
                 <Service />
@@ -14,4 +15,4 @@ function servicePage() {
     )
 }
 
-export default servicePage
+export default servicePageUser

@@ -1,17 +1,47 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  MapPin,
+  Bed,
+  Users,
+  Calendar,
+  Clock,
+  Home,
+  DollarSign,
+  Eye,
+  Edit,
+  Trash2,
+  Shield,
+  ShieldOff,
+  ChevronLeft,
+  ChevronRight,
+  MoreVertical,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Loader2,
+  Search,
+  Plus,
+  Filter,
+  TrendingUp,
+  Building2,
+  Bath,
+  Maximize2,
+  Star,
+  Sparkles,
+  Package,
+  Info,
+  AlertCircle,
+  CalendarDays,
+  Check,
+  X,
+  MoreHorizontal
+} from 'lucide-react';
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 import { useCurrency } from "../../../context/CurrencyContext.jsx";
 import { translateNodes } from "../../../utils/translator.js";
-
-import location from '../../../assets/svg/location.svg';
-import bedroom from '../../../assets/svg/bedroom.svg';
-import guest from '../../../assets/svg/guest.svg';
-import calender from '../../../assets/svg/calender.svg';
-import duration from '../../../assets/svg/duration.svg';
 import api from '../../../service/api.js';
 
 const baseUrl = api.defaults.baseURL;
@@ -24,10 +54,15 @@ const GetMyProperty = () => {
   const [priceView, setPriceView] = useState('monthly');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState(null);
+  const [propertyToToggle, setPropertyToToggle] = useState(null);
+  const [activePropertyMenu, setActivePropertyMenu] = useState(null);
+  const [filter, setFilter] = useState('all'); // all, active, inactive
+  const navigate = useNavigate();
+  
   const token = Cookies.get('token');
   const divRef = useRef(null);
   const { lang } = useLanguage();
-  const { currency } = useCurrency();
+  const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
 
   useEffect(() => {
     if (divRef.current) {
@@ -35,32 +70,7 @@ const GetMyProperty = () => {
     }
   }, [lang]);
 
-  const exchangeRates = {
-    IDR: 1,
-    USD: 15000, // Example rate: 1 USD = 15000 IDR
-    EUR: 16500, // Example rate: 1 EUR = 16500 IDR
-  };
-
-  const convertPrice = (priceInIDR) => {
-    if (!priceInIDR) return 0;
-    const rate = exchangeRates[currency] || 1;
-    return (priceInIDR / rate).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  };
-
-  const getCurrencySymbol = () => {
-    switch (currency) {
-      case 'IDR':
-        return 'Rp';
-      case 'USD':
-        return '$';
-      case 'EUR':
-        return '€';
-      default:
-        return '';
-    }
-  };
-
-const fetchData = async () => {
+  const fetchData = async () => {
     try {
       const response = await axios.get(`${baseUrl}/property/my/property`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,16 +123,17 @@ const fetchData = async () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       fetchData();
+      setPropertyToToggle(null);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
+      setPropertyToToggle(null);
     }
   };
 
   useEffect(() => {
     if (!token) {
-      setError('Token tidak ditemukan. Harap login terlebih dahulu.');
+      setError('Authentication required. Please login first.');
       setLoading(false);
       return;
     }
@@ -130,7 +141,8 @@ const fetchData = async () => {
     fetchData();
   }, []);
 
-  const handlePrev = (propertyId, totalImages) => {
+  const handlePrev = (propertyId, totalImages, e) => {
+    e.stopPropagation();
     setCarouselIndexes((prevIndexes) => ({
       ...prevIndexes,
       [propertyId]: prevIndexes[propertyId] === 0
@@ -139,20 +151,306 @@ const fetchData = async () => {
     }));
   };
 
-  const handleNext = (propertyId, totalImages) => {
+  const handleNext = (propertyId, totalImages, e) => {
+    e.stopPropagation();
     setCarouselIndexes((prevIndexes) => ({
       ...prevIndexes,
       [propertyId]: (prevIndexes[propertyId] + 1) % totalImages,
     }));
   };
 
+  const handleAddProperty = () => {
+    navigate('/user/add/property');
+  };
+
+  const filteredProperties = properties.filter(property => {
+    if (filter === 'active') return property.is_active === true;
+    if (filter === 'inactive') return property.is_active === false;
+    return true;
+  });
+
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="bg-base-100 rounded-2xl shadow-lg overflow-hidden animate-pulse">
+          <div className="h-64 bg-base-300" />
+          <div className="p-6 space-y-4">
+            <div className="h-4 bg-base-300 rounded w-3/4" />
+            <div className="h-4 bg-base-300 rounded w-1/2" />
+            <div className="space-y-2">
+              <div className="h-3 bg-base-300 rounded" />
+              <div className="h-3 bg-base-300 rounded" />
+            </div>
+            <div className="h-10 bg-base-300 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const PropertyCard = ({ property }) => {
+    const currentIndex = carouselIndexes[property.id] || 0;
+
+    return (
+      <div className="group bg-gradient-to-b from-base-100 to-base-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-base-300 hover:border-primary/30">
+        {/* Header with Status */}
+        <div className="relative h-64 overflow-hidden">
+          {/* Carousel */}
+          <div
+            className="flex h-full transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          >
+            {property.images.map((image) => (
+              <div key={image.id} className="w-full flex-shrink-0 relative">
+                <img
+                  src={`${baseUrl}/propertyImages/${image.imageName}`}
+                  alt={image.imageName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              </div>
+            ))}
+          </div>
+
+          {/* Status Badge */}
+          <div className="absolute top-4 left-4 z-20">
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${property.is_active
+                ? 'bg-success/90 text-success-content'
+                : 'bg-error/90 text-error-content'
+              }`}>
+              {property.is_active ? (
+                <>
+                  <CheckCircle className="w-3 h-3 inline mr-1" />
+                  Active
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-3 h-3 inline mr-1" />
+                  Inactive
+                </>
+              )}
+            </span>
+          </div>
+
+          {/* Property Menu */}
+          <div className="absolute top-4 right-4 z-20">
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActivePropertyMenu(activePropertyMenu === property.id ? null : property.id);
+                }}
+                className="p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors"
+              >
+                <MoreVertical className="w-5 h-5 text-white" />
+              </button>
+
+              {activePropertyMenu === property.id && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-base-100 border border-base-300 rounded-lg shadow-xl z-50">
+                  <Link
+                    to={`/user/update/property/${property.id}`}
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-base-200 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Edit className="w-4 h-4" />
+                    <span>Edit Property</span>
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPropertyToToggle(property.id);
+                      setActivePropertyMenu(null);
+                    }}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-base-200 transition-colors"
+                  >
+                    {property.is_private ? (
+                      <>
+                        <ShieldOff className="w-4 h-4" />
+                        <span>Make Public</span>
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4" />
+                        <span>Make Private</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      DeleteData(property.id);
+                      setActivePropertyMenu(null);
+                    }}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-error/10 text-error transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Property</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Carousel Navigation */}
+          {property.images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => handlePrev(property.id, property.images.length, e)}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={(e) => handleNext(property.id, property.images.length, e)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
+          )}
+
+          {/* Image Counter */}
+          {property.images.length > 1 && (
+            <div className="absolute bottom-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-xs">
+              {currentIndex + 1} / {property.images.length}
+            </div>
+          )}
+        </div>
+
+        {/* Property Info */}
+        <div className="p-6 space-y-4">
+          {/* Header */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-bold text-base-content truncate">
+                {property.property_code}
+              </h3>
+              {property.is_featured && (
+                <Star className="w-5 h-5 text-warning fill-current" />
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-base-content/60">
+              <MapPin className="w-4 h-4" />
+              <span className="truncate">
+                {property.location?.[0]?.general_area || 'Location not specified'}
+              </span>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Bed className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-base-content">
+                  {property.number_of_bedrooms}
+                </div>
+                <div className="text-xs text-base-content/50">Bedrooms</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-secondary/10 rounded-lg">
+                <Bath className="w-4 h-4 text-secondary" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-base-content">
+                  {property.number_of_bathrooms || '-'}
+                </div>
+                <div className="text-xs text-base-content/50">Bathrooms</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Price Section */}
+          <div className="pt-4 border-t border-base-300">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-medium text-base-content/60">
+                {priceView === 'monthly' ? 'Monthly Rate' : 'Annual Rate'}
+              </div>
+              <div className="flex bg-base-300 rounded-lg p-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPriceView('monthly');
+                  }}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'monthly'
+                    ? 'bg-primary text-primary-content'
+                    : 'text-base-content/70 hover:text-base-content'
+                    }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPriceView('yearly');
+                  }}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'yearly'
+                    ? 'bg-primary text-primary-content'
+                    : 'text-base-content/70 hover:text-base-content'
+                    }`}
+                >
+                  Yearly
+                </button>
+              </div>
+            </div>
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="text-2xl font-bold text-primary">
+                  {getCurrencySymbol()}
+                  {convertPrice(
+                    priceView === 'monthly'
+                      ? property.monthly_price
+                      : property.yearly_price,
+                    currency,
+                    exchangeRates
+                  ).toLocaleString()}
+                </div>
+                <div className="text-sm text-base-content/50">
+                  {priceView === 'monthly' ? 'per month' : 'per year'}
+                </div>
+              </div>
+              <div className="text-right">
+                {property.minimum_stay && (
+                  <div className="flex items-center gap-1 text-sm text-base-content/60">
+                    <Clock className="w-4 h-4" />
+                    <span>Min. {property.minimum_stay} months</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="pt-4 border-t border-base-300">
+            <div className="flex gap-3">
+              <Link
+                to={`/detail/${property.id}`}
+                className="flex-1 btn btn-outline btn-primary gap-2 hover:btn-primary hover:text-primary-content transition-all"
+              >
+                <Eye className="w-4 h-4" />
+                View Details
+              </Link>
+              <Link
+                to={`/user/update/property/${property.id}`}
+                className="btn btn-outline gap-2"
+              >
+                <Edit className="w-4 h-4" />
+                Edit
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="mt-4 text-primary">Loading</p>
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <LoadingSkeleton />
       </div>
     );
   }
@@ -160,165 +458,225 @@ const fetchData = async () => {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="alert alert-error text-center p-4">
-          <span>{error}</span>
+        <div className="text-center space-y-4 max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error/10">
+            <AlertCircle className="w-8 h-8 text-error" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-error">Failed to Load Properties</h3>
+            <p className="text-base-content/70">{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary gap-2"
+          >
+            <Loader2 className="w-4 h-4" />
+            Try Again
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div ref={divRef} className="container mx-auto p-4">
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-accent mb-2">Properti Saya</h2>
-        <p className="text-gray-600">Daftar properti milik Anda</p>
-      </div>
-
-      {properties.length === 0 ? (
-        <p className="text-center text-gray-500">Tidak ada properti yang ditemukan.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property) => {
-            const currentIndex = carouselIndexes[property.id] || 0;
-
-            return (
-              <div key={property.id} className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
-                {/* Carousel */}
-                <div className="relative w-full h-64 overflow-hidden">
-                  <div
-                    className="flex transition-transform duration-700 ease-in-out h-full"
-                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                  >
-                    {property.images.map((image) => (
-                      <img
-                        key={image.id}
-                        src={`${baseUrl}/propertyImages/${image.imageName}`}
-                        alt={image.imageName}
-                        className="w-full h-64 object-cover flex-shrink-0"
-                      />
-                    ))}
-                  </div>
-
-                  <div className="absolute top-3 right-3 flex gap-3">
-                    <div>
-                      <Link to={`/user/update/property/${property.id}`} className="backdrop-blur-lg bg-primary bg-opacity-70 text-primary-content px-3 py-1 rounded-md hover:bg-primary-focus transition-colors">
-                        <span>Update</span>
-                      </Link>
-                    </div>
-
-                    <div>
-                      <Link onClick={() => DeleteData(property.id)} className="backdrop-blur-lg bg-error bg-opacity-70 text-error-content px-3 py-1 rounded-md hover:bg-red-700 transition-colors" >
-                        <span>Hapus</span>
-                      </Link>
-                    </div>
-
-                    <div>
-                      <Link onClick={() => ToglePropertyStatus(property.id)} className="backdrop-blur-lg bg-info bg-opacity-70 text-info-content px-3 py-1 rounded-md hover:bg-blue-700 transition-colors" >
-                        <span>Private</span>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Carousel Nav */}
-                  <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between z-10">
-                    <button onClick={() => handlePrev(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50">
-                      ❮
-                    </button>
-                    <button onClick={() => handleNext(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50">
-                      ❯
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
-                  <hr className="border-t-2 border-accent pr-10" />
-
-                  <div className="flex items-center justify-between mb-4 mt-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={location} alt="Location" className='w-5 h-5' />
-                        <p className="text-primary font-bold">{property.location[0]?.general_area || '-'}</p>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={bedroom} alt="Bedroom" className='w-5 h-5' />
-                        <p className="text-primary font-bold">{property.number_of_bedrooms} kamar tidur</p>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={guest} alt="Guests" className='w-5 h-5' />
-                        <p className="text-primary font-bold">Max Guests: {property.maximum_guest}</p>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={calender} alt="Availability" className='w-5 h-5' />
-                        <p className="text-primary font-bold">
-                          {property.availability.length > 0
-                            ? `${new Date(property.availability[0].available_from).toLocaleDateString()} - ${new Date(property.availability[0].available_to).toLocaleDateString()}`
-                            : '-'}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-2">
-                        <img src={duration} alt="Duration" className='w-5 h-5' />
-                        <p className="text-primary font-bold">Min stay: {property.minimum_stay} bulan</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row justify-between items-center bg-secondary/65 p-4 rounded-2xl shadow-xl">
-                    <div className="border-2 border-accent p-4 rounded-lg shadow-md">
-                      <p className="font-bold text-primary text-xl">
-                        {getCurrencySymbol()} {convertPrice(priceView === 'monthly' ? property.monthly_price : property.yearly_price)}
-                      </p>
-                      <p className="text-sm text-primary">/ {priceView === 'monthly' ? 'Bulan' : 'Tahun'}</p>
-                    </div>
-
-                    <div>
-                      <button onClick={() => setPriceView('monthly')} className={`px-2 py-1 rounded-l-lg border border-accent ${priceView === 'monthly' ? 'bg-accent text-white' : 'bg-white text-accent'}`}>
-                        Bulan
-                      </button>
-                      <button onClick={() => setPriceView('yearly')} className={`px-2 py-1 rounded-r-lg border border-accent ${priceView === 'yearly' ? 'bg-accent text-white' : 'bg-white text-accent'}`}>
-                        Tahun
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end text-accent mt-5 gap-5">
-                    <Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
-                      <span>Detail</span>
-                      <span>❯</span>
-                    </Link>
-                  </div>
+    <div ref={divRef} className="min-h-screen bg-gradient-to-b from-base-100 to-base-200">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Package className="w-8 h-8 text-primary" />
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-base-content">
+                    My Properties
+                  </h1>
+                  <p className="text-base-content/70">
+                    Manage all your listed properties
+                  </p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-slate-800/15 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-secondary/50 backdrop-blur-2xl rounded-lg p-6 w-full max-w-md text-center">
-            <h3 className="text-lg font-bold mb-4">Konfirmasi Hapus</h3>
-            <p className="mb-6">Apakah Anda yakin ingin menghapus properti ini?</p>
-            <div className="flex justify-center gap-4">
+            </div>
+            <button
+              onClick={handleAddProperty}
+              className="btn btn-primary gap-2 shadow-lg hover:shadow-xl"
+            >
+              <Plus className="w-4 h-4" />
+              Add New Property
+            </button>
+          </div>
+
+          {/* Stats and Filters */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                <div className="text-2xl font-bold text-primary">{properties.length}</div>
+                <div className="text-sm text-base-content/70">Total Properties</div>
+              </div>
+              <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                <div className="text-2xl font-bold text-success">
+                  {properties.filter(p => p.is_active).length}
+                </div>
+                <div className="text-sm text-base-content/70">Active</div>
+              </div>
+              <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                <div className="text-2xl font-bold text-error">
+                  {properties.filter(p => !p.is_active).length}
+                </div>
+                <div className="text-sm text-base-content/70">Inactive</div>
+              </div>
+              <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                <div className="text-2xl font-bold text-warning">
+                  {properties.filter(p => p.is_featured).length}
+                </div>
+                <div className="text-sm text-base-content/70">Featured</div>
+              </div>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex bg-base-300 rounded-lg p-1">
               <button
-                onClick={handleCancelDelete}
-                className="btn bg-gray-300 hover:bg-gray-400 text-gray-800"
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'all'
+                    ? 'bg-primary text-primary-content'
+                    : 'text-base-content/70 hover:text-base-content'
+                  }`}
               >
-                Batal
+                All Properties
               </button>
               <button
-                onClick={handleConfirmDelete}
-                className="btn bg-error hover:bg-red-700 text-white"
+                onClick={() => setFilter('active')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'active'
+                    ? 'bg-primary text-primary-content'
+                    : 'text-base-content/70 hover:text-base-content'
+                  }`}
               >
-                Hapus
+                Public
+              </button>
+              <button
+                onClick={() => setFilter('inactive')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filter === 'inactive'
+                    ? 'bg-primary text-primary-content'
+                    : 'text-base-content/70 hover:text-base-content'
+                  }`}
+              >
+                Private
               </button>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Properties Grid */}
+        {filteredProperties.length === 0 ? (
+          <div className="text-center py-16 space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-info/10">
+              <Home className="w-8 h-8 text-info" />
+            </div>
+            <h3 className="text-xl font-semibold text-base-content">No Properties Found</h3>
+            <p className="text-base-content/70">
+              {filter === 'all'
+                ? "You haven't listed any properties yet."
+                : `No ${filter} properties found.`
+              }
+            </p>
+            <button
+              onClick={handleAddProperty}
+              className="btn btn-primary gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Your First Property
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProperties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+              onClick={handleCancelDelete}
+            />
+            <div className="relative w-full max-w-md bg-gradient-to-b from-base-100 to-base-200 rounded-2xl shadow-2xl overflow-hidden border border-base-300">
+              <div className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error/10">
+                    <AlertTriangle className="w-8 h-8 text-error" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-base-content">Delete Property</h3>
+                    <p className="text-base-content/70 mt-2">
+                      Are you sure you want to delete this property? This action cannot be undone.
+                    </p>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={handleCancelDelete}
+                      className="btn btn-outline flex-1 gap-2"
+                    >
+                      <X className="w-4 h-4" />
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleConfirmDelete}
+                      className="btn btn-error flex-1 gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Status Modal */}
+        {propertyToToggle && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+              onClick={() => setPropertyToToggle(null)}
+            />
+            <div className="relative w-full max-w-md bg-gradient-to-b from-base-100 to-base-200 rounded-2xl shadow-2xl overflow-hidden border border-base-300">
+              <div className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning/10">
+                    <Shield className="w-8 h-8 text-warning" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-base-content">Change Privacy Status</h3>
+                    <p className="text-base-content/70 mt-2">
+                      Do you want to make this property {properties.find(p => p.id === propertyToToggle)?.is_private ? 'public' : 'private'}?
+                    </p>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => setPropertyToToggle(null)}
+                      className="btn btn-outline flex-1 gap-2"
+                    >
+                      <X className="w-4 h-4" />
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => ToglePropertyStatus(propertyToToggle)}
+                      className="btn btn-warning flex-1 gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

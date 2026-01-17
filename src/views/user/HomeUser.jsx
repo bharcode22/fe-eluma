@@ -7,7 +7,7 @@ export default function Home() {
             <div>
                 <NavbarUsers />
             </div>
-            <div className="mt-12">
+            <div>
                 <GetMyProperty />
             </div>
         </div>

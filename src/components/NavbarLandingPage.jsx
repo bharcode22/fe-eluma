@@ -186,7 +186,7 @@ function NavbarLandingPage() {
     // Navigation Items
     const navItems = [
         { path: '/', label: 'Properties', icon: Home },
-        { path: '/services', label: 'Services', icon: Building2 },
+        { path: '/service', label: 'Services', icon: Building2 },
         { path: '/about', label: 'About', icon: Info },
         { path: '/contact', label: 'Contact', icon: Phone }
     ];
@@ -230,7 +230,7 @@ function NavbarLandingPage() {
     // ==================== Render ====================
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full bg-base-100/90 backdrop-blur-md border-b border-base-300 shadow-sm">
+            <nav className="fixed top-0 z-50 w-full bg-base-100/90 backdrop-blur-md border-b border-base-300 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex justify-between items-center h-16">
                         {/* Logo */}
@@ -342,6 +342,7 @@ function NavbarLandingPage() {
                     </div>
                 </div>
             </nav>
+            <div className="h-16" />
 
             {/* Mobile Menu */}
             {isMenuOpen && (

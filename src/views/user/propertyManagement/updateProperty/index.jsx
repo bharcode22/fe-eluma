@@ -8,7 +8,7 @@ function index() {
             <div className='mb-15'>
                 <NavbarUsers />
             </div>
-            <div className='text-4xl flex justify-center mt-50'>
+            <div className='text-4xl flex justify-center'>
                 <UpdateProperty />
             </div>
         </div>

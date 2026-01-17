@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Api from '../../../service/api.js';
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 import { translateNodes } from "../../../utils/translator.js";
@@ -112,26 +112,23 @@ const ImageCarousel = ({ images, baseUrl, selectedIndex, onClose, onNavigate }) 
   if (selectedIndex === null) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="relative w-full max-w-6xl mx-auto">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute -top-12 right-0 z-50 bg-error text-white rounded-full p-3 hover:bg-error/90 transition-colors shadow-lg"
-        >
-          <X size={24} />
-        </button>
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50">
+      <button
+        onClick={onClose}
+        className="fixed top-4 right-4 z-[60] bg-error text-white rounded-full p-3 hover:bg-error/90 transition-colors shadow-lg"
+      >
+        <X size={24} />
+      </button>
 
-        {/* Carousel */}
-        <div className="relative rounded-xl overflow-hidden bg-black">
-          <div className="relative">
+      <div className="h-full w-full max-w-6xl mx-auto px-4 py-4 flex flex-col">
+        <div className="relative flex-1 rounded-xl overflow-hidden bg-black">
+          <div className="relative h-full flex items-center justify-center">
             <img
               src={`${baseUrl}${images[selectedIndex].imagesUrl}`}
               alt={images[selectedIndex].imageName}
-              className="w-full max-h-[80vh] object-contain"
+              className="w-full max-h-[calc(100vh-160px)] object-contain"
             />
 
-            {/* Image Info */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
               <p className="text-white text-lg font-medium">
                 {images[selectedIndex].imageName}
@@ -142,7 +139,6 @@ const ImageCarousel = ({ images, baseUrl, selectedIndex, onClose, onNavigate }) 
             </div>
           </div>
 
-          {/* Navigation Buttons */}
           <button
             onClick={() => onNavigate('prev')}
             className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full p-3 backdrop-blur-sm transition-all"
@@ -157,7 +153,6 @@ const ImageCarousel = ({ images, baseUrl, selectedIndex, onClose, onNavigate }) 
           </button>
         </div>
 
-        {/* Thumbnail Strip */}
         <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
           {images.map((img, index) => (
             <button
@@ -362,6 +357,7 @@ const PropertyStats = ({ property }) => (
 function LandingPageDetailProperty() {
   // Hooks
   const { id } = useParams();
+  const navigate = useNavigate();
   const divRef = useRef(null);
   const { lang } = useLanguage();
   const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
@@ -463,6 +459,22 @@ function LandingPageDetailProperty() {
       {/* <NavbarUsers /> */}
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <div>
+          <button
+            type="button"
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
+            className="btn btn-ghost gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back
+          </button>
+        </div>
         {/* Header with Property Code and Price */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-base-100 rounded-2xl p-6 shadow-xl">
           <div>

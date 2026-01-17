@@ -102,6 +102,7 @@ function GetAllProperty() {
   }, [currentPage, itemsPerPage]);
 
   const handlePrev = (propertyId, totalImages, e) => {
+    e.preventDefault();
     e.stopPropagation();
     setCarouselIndexes((prevIndexes) => ({
       ...prevIndexes,
@@ -113,6 +114,7 @@ function GetAllProperty() {
   };
 
   const handleNext = (propertyId, totalImages, e) => {
+    e.preventDefault();
     e.stopPropagation();
     setCarouselIndexes((prevIndexes) => ({
       ...prevIndexes,
@@ -146,7 +148,7 @@ function GetAllProperty() {
   };
 
   const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
       {[...Array(8)].map((_, i) => (
         <div key={i} className="bg-base-100 rounded-2xl shadow-lg overflow-hidden animate-pulse">
           <div className="h-64 bg-base-300" />
@@ -190,15 +192,15 @@ function GetAllProperty() {
         {/* Image Carousel */}
         <div className="relative h-64 overflow-hidden">
           <div
-            className="flex h-full transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            className="flex h-full transform-gpu transition-transform duration-700 ease-in-out"
+            style={{ transform: `translateX(-${currentIndex * 100}%)`, willChange: 'transform' }}
           >
             {property.images.map((image) => (
               <div key={image.id} className="w-full flex-shrink-0 relative">
                 <img
                   src={`${baseUrl}/propertyImages/${image.imageName}`}
                   alt={image.imageName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
               </div>
@@ -496,7 +498,7 @@ function GetAllProperty() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
               {filteredProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}

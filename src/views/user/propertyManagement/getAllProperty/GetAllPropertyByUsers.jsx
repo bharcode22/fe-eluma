@@ -1,12 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import location from '../../../../assets/svg/location.svg';
-import bedroom from '../../../../assets/svg/bedroom.svg';
-import guest from '../../../../assets/svg/guest.svg';
-import calender from '../../../../assets/svg/calender.svg';
-import duration from '../../../../assets/svg/duration.svg';
-import love from '../../../../assets/svg/love.svg';
+import {
+    MapPin,
+    Bed,
+    Users,
+    Clock,
+    Heart,
+    ChevronLeft,
+    ChevronRight,
+    Home,
+    Star,
+    Filter,
+    Search,
+    Eye,
+    Bath,
+    Maximize2,
+    Wifi,
+    Car,
+    Snowflake,
+    Tv,
+    Waves,
+    Coffee,
+    Loader2,
+    AlertCircle,
+    ChevronLast,
+    ChevronFirst,
+    CalendarDays,
+    Award,
+    Bookmark,
+    BookmarkCheck,
+    Shield,
+} from 'lucide-react';
 import api from '../../../../service/api.js';
 import PropertyFilter from '../../../landingPAge/home/PropertyFilter.jsx'; 
 import Cookies from 'js-cookie';
@@ -26,15 +51,16 @@ function GetAllPropertyByUsers() {
     const [filteredProperties, setFilteredProperties] = useState([]);
     const [favorites, setFavorites] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3);
+    const [itemsPerPage] = useState(12);
     const [paginationInfo, setPaginationInfo] = useState({
         currentPage: 1,
-        itemsPerPage: 3,
+        itemsPerPage: 12,
         totalItems: 0,
         totalPages: 1,
         hasNextPage: false,
         hasPreviousPage: false,
     });
+    const [hoveredProperty, setHoveredProperty] = useState(null);
     const token = Cookies.get('token');
 
     const divRef = useRef(null);
@@ -48,90 +74,77 @@ function GetAllPropertyByUsers() {
     }, [lang]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchProperties = async () => {
             try {
+                setLoading(true);
                 const response = await axios.get(`${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`);
-                setProperties(response.data.data.properties);
+                const props = response.data.data.properties;
+                
+                setProperties(props);
                 setTotalData(response.data.totalData);
-                setFilteredProperties(response.data.data.properties);
+                setFilteredProperties(props);
                 setPaginationInfo(response.data.data.pagination);
 
                 // Initialize carousel index for each property
                 const initialIndexes = {};
-                response.data.data.properties.forEach((property) => {
+                props.forEach((property) => {
                     initialIndexes[property.id] = 0;
                 });
                 setCarouselIndexes(initialIndexes);
 
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [currentPage, itemsPerPage]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`);
-                const props = response.data.data.properties;
-                setProperties(props);
-
+                // Fetch favorite statuses
                 const favStatuses = {};
                 for (const prop of props) {
                     try {
-                        const favRes = await axios.get( `${baseUrl}/favorite-properties/${prop.id}`, 
+                        const favRes = await axios.get(
+                            `${baseUrl}/favorite-properties/${prop.id}`, 
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
-
-                        
                         favStatuses[prop.id] = favRes.data.status;
-                        console.log("favorite status: ", {
-                            status: favRes.data.status, 
-                            propId: prop.id
-                        });
                     } catch (err) {
                         favStatuses[prop.id] = false;
                     }
                 }
-
                 setFavorites(favStatuses);
+
             } catch (error) {
-                setError(error.message);
+                setError(error.message || 'Failed to fetch properties');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchData();
-    }, [currentPage, itemsPerPage]);
+        if (token) {
+            fetchProperties();
+        }
+    }, [currentPage, itemsPerPage, token]);
 
-    const handlePrev = (propertyId, totalImages) => {
+    const handlePrev = (propertyId, totalImages, e) => {
+        e.stopPropagation();
         setCarouselIndexes((prevIndexes) => ({
-        ...prevIndexes,
-        [propertyId]:
-            prevIndexes[propertyId] === 0
-            ? totalImages - 1
-            : prevIndexes[propertyId] - 1,
+            ...prevIndexes,
+            [propertyId]:
+                prevIndexes[propertyId] === 0
+                ? totalImages - 1
+                : prevIndexes[propertyId] - 1,
         }));
     };
 
-    const handleNext = (propertyId, totalImages) => {
+    const handleNext = (propertyId, totalImages, e) => {
+        e.stopPropagation();
         setCarouselIndexes((prevIndexes) => ({
-        ...prevIndexes,
-        [propertyId]: (prevIndexes[propertyId] + 1) % totalImages,
+            ...prevIndexes,
+            [propertyId]: (prevIndexes[propertyId] + 1) % totalImages,
         }));
     };
 
-    const SaveProperties = async (propertyId) => {
+    const SaveProperties = async (propertyId, e) => {
+        e.stopPropagation();
         try {
             await axios.post(
-            `${baseUrl}/favorite-properties/${propertyId}`,
-            {},
-            { headers: { Authorization: `Bearer ${token}` } }
+                `${baseUrl}/favorite-properties/${propertyId}`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
             setFavorites((prev) => ({
@@ -143,195 +156,468 @@ function GetAllPropertyByUsers() {
         }
     };
 
-    if (loading)
-        return (
-        <div className="flex justify-center items-center min-h-screen">
-            <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            <p className="mt-4 text-primary">Loading</p>
-            </div>
-        </div>
-        );
-
-    if (error)
-        return (
-        <div className="flex justify-center items-center min-h-screen">
-            <div className="text-center">
-            <div className="alert alert-error">
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current flex-shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-                </svg>
-                <span>{error}</span>
-            </div>
-            </div>
-        </div>
-        );
-
-    return (
-        <>
-            <div ref={divRef} className="container mx-auto p-4">
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-accent mb-2">
-                    Property List ({totalData} properties)
-                    </h1>
-                    <p className="text-gray-600">Discover our amazing properties</p>
+    const LoadingSkeleton = () => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-base-100 rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                    <div className="h-64 bg-base-300" />
+                    <div className="p-6 space-y-4">
+                        <div className="h-4 bg-base-300 rounded w-3/4" />
+                        <div className="h-4 bg-base-300 rounded w-1/2" />
+                        <div className="space-y-2">
+                            <div className="h-3 bg-base-300 rounded" />
+                            <div className="h-3 bg-base-300 rounded" />
+                        </div>
+                        <div className="h-10 bg-base-300 rounded" />
+                    </div>
                 </div>
+            ))}
+        </div>
+    );
 
-                <div className='mb-10'>
-                    <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
-                </div>
+    const PropertyCard = ({ property }) => {
+        const currentIndex = carouselIndexes[property.id] || 0;
+        const isFavorite = favorites[property.id];
+        const isHovered = hoveredProperty === property.id;
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProperties.map((property) => {
-                    const currentIndex = carouselIndexes[property.id] || 0;
+        const facilityIcons = {
+            wifi: Wifi,
+            parking: Car,
+            ac: Snowflake,
+            tv: Tv,
+            pool: Waves,
+            kitchen: Coffee,
+        };
 
-                    return (
-                        <div key={property.id} className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
-                            {/* Carousel */}
-                            <div className="relative w-full h-64 overflow-hidden">
-                                <div className="flex transition-transform duration-700 ease-in-out h-full" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
-                                    {property.images.map((image) => ( <img key={image.id} src={`${baseUrl}/propertyImages/${image.imageName}`} alt={image.imageName} className="w-full h-64 object-cover flex-shrink-0" /> ))}
-                                </div>
+        const activeFacilities = property.facilities?.[0] 
+            ? Object.entries(property.facilities[0])
+                .filter(([key, value]) => value && facilityIcons[key])
+                .slice(0, 4)
+            : [];
 
-                                <button onClick={() => SaveProperties(property.id)}>
-                                    <img src={love} className={`absolute top-3 right-3 w-9 h-9 px-1 py-1 rounded-full backdrop-blur-lg shadow-3xl ${favorites[property.id] ? "bg-red-500/80" : "bg-accent/20 hover:bg-accent/50"}`}
-                                        alt="favorite" />
-                                </button>
-
-                                {/* Navigation Buttons */}
-                                <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between z-10">
-                                    <button onClick={() => handlePrev(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50" > ❮ </button>
-                                    <button onClick={() => handleNext(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50" > ❯ </button>
-                                </div>
+        return (
+            <div 
+                className="group bg-gradient-to-b from-base-100 to-base-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-base-300 hover:border-primary/30"
+                onMouseEnter={() => setHoveredProperty(property.id)}
+                onMouseLeave={() => setHoveredProperty(null)}
+            >
+                {/* Image Carousel */}
+                <div className="relative h-64 overflow-hidden">
+                    <div
+                        className="flex h-full transition-transform duration-500 ease-out"
+                        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                    >
+                        {property.images.map((image) => (
+                            <div key={image.id} className="w-full flex-shrink-0 relative">
+                                <img
+                                    src={`${baseUrl}/propertyImages/${image.imageName}`}
+                                    alt={image.imageName}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                             </div>
+                        ))}
+                    </div>
 
-                            {/* Property Info */}
-                            <div className="p-4">
-                                <h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
-                                <hr className="border-t-2 border-accent pr-10" />
+                    {/* Favorite Button */}
+                    <button
+                        onClick={(e) => SaveProperties(property.id, e)}
+                        className="absolute top-4 right-4 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors"
+                        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    >
+                        {isFavorite ? (
+                            <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                        ) : (
+                            <Heart className="w-5 h-5 text-white" />
+                        )}
+                    </button>
 
-                                <div className="flex items-center justify-between mb-4 mt-4">
-                                    <div>
+                    {/* Property Badges */}
+                    <div className="absolute top-4 left-4 z-20 flex gap-2">
+                        {property.is_featured && (
+                            <span className="px-3 py-1 bg-gradient-to-r from-warning to-warning/80 backdrop-blur-sm text-white text-xs font-medium rounded-full">
+                                <Star className="w-3 h-3 inline mr-1" />
+                                Featured
+                            </span>
+                        )}
+                        <span className="px-3 py-1 bg-primary/90 backdrop-blur-sm text-white text-xs font-medium rounded-full">
+                            {property.property_type || 'Property'}
+                        </span>
+                    </div>
 
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img src={location} alt="Location" className='w-5 h-5' />
-                                            <p className="text-primary font-bold">{property.location[0]?.general_area || '-'}</p>
-                                        </div>
+                    {/* Image Counter */}
+                    {property.images.length > 1 && (
+                        <div className="absolute bottom-4 left-4 z-20 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-xs">
+                            {currentIndex + 1} / {property.images.length}
+                        </div>
+                    )}
 
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img src={bedroom} alt="Location" className='w-5 h-5' />
-                                            <p className="text-primary font-bold">{property.number_of_bedrooms} kamar tidur</p>
-                                        </div>
+                    {/* Carousel Navigation */}
+                    {property.images.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => handlePrev(property.id, property.images.length, e)}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+                            >
+                                <ChevronLeft className="w-5 h-5 text-white" />
+                            </button>
+                            <button
+                                onClick={(e) => handleNext(property.id, property.images.length, e)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+                            >
+                                <ChevronRight className="w-5 h-5 text-white" />
+                            </button>
+                        </>
+                    )}
+                </div>
 
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img src={guest} alt="Location" className='w-5 h-5' />
-                                            <p className="text-primary font-bold">Max Guests: {property.maximum_guest}</p>
-                                        </div>
+                {/* Property Info */}
+                <div className="p-6 space-y-4">
+                    {/* Header */}
+                    <div>
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-lg font-bold text-base-content truncate">
+                                {property.property_code}
+                            </h3>
+                            {property.verified && (
+                                <Shield className="w-4 h-4 text-success" />
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-base-content/60">
+                            <MapPin className="w-4 h-4" />
+                            <span className="truncate">
+                                {property.location?.[0]?.general_area || 'Location not specified'}
+                            </span>
+                        </div>
+                    </div>
 
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <img src={calender} alt="Location" className='w-5 h-5' />
-                                            <p className="text-primary font-bold">
-                                                Tersedia dari: {new Date(property.availability[0]?.available_from).toLocaleDateString('id-ID', {
-                                                day: 'numeric',
-                                                month: 'long',
-                                                year: 'numeric'
-                                                })}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center gap-3 mb-2">
-                                        <img src={duration} alt="Location" className='w-5 h-5' />
-                                        <p className="text-primary font-bold">Masa tinggal minimum {property.minimum_stay} bulan</p>
-                                        </div>
-                                    </div>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <Bed className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-medium text-base-content">
+                                    {property.number_of_bedrooms}
                                 </div>
-
-                                <div className="flex flex-row justify-between items-center bg-secondary/65 p-4 rounded-2xl shadow-xl">
-                                    {/* Price Display */}
-                                    <div className="border-2 border-accent p-4 rounded-lg shadow-md">
-                                        <p className="font-bold text-primary text-xl">
-                                        {getCurrencySymbol()} {convertPrice(priceView === 'monthly' ? property.monthly_price : property.yearly_price)}
-                                        </p>
-                                        <p className="text-sm text-primary">
-                                        / {priceView === 'monthly' ? 'Bulan' : 'Tahun'}
-                                        </p>
-                                    </div>
-
-                                    {/* Toggle Button */}
-                                    <div>
-                                        <div>
-                                        <button
-                                            onClick={() => setPriceView('monthly')}
-                                            className={`px-2 py-1 rounded-l-lg border border-accent ${
-                                            priceView === 'monthly' ? 'bg-accent text-white' : 'bg-white text-accent'
-                                            }`}
-                                        >
-                                            Bulan
-                                        </button>
-                                        <button
-                                            onClick={() => setPriceView('yearly')}
-                                            className={`px-2 py-1 rounded-r-lg border border-accent ${
-                                            priceView === 'yearly' ? 'bg-accent text-white' : 'bg-white text-accent'
-                                            }`}
-                                        >
-                                            Tahun
-                                        </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='flex justify-end text-accent mt-5 gap-5'>
-                                    <Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
-                                        <span>Detail</span>
-                                        <span>❯</span>
-                                    </Link>
-                                </div>
-
+                                <div className="text-xs text-base-content/50">Bedrooms</div>
                             </div>
                         </div>
-                    );
-                    })}
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-secondary/10 rounded-lg">
+                                <Bath className="w-4 h-4 text-secondary" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-medium text-base-content">
+                                    {property.number_of_bathrooms || '-'}
+                                </div>
+                                <div className="text-xs text-base-content/50">Bathrooms</div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-accent/10 rounded-lg">
+                                <Users className="w-4 h-4 text-accent" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-medium text-base-content">
+                                    {property.maximum_guest || '-'}
+                                </div>
+                                <div className="text-xs text-base-content/50">Max Guests</div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 bg-info/10 rounded-lg">
+                                <Maximize2 className="w-4 h-4 text-info" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-medium text-base-content">
+                                    {property.size || '-'}
+                                </div>
+                                <div className="text-xs text-base-content/50">m²</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Facilities Icons */}
+                    {activeFacilities.length > 0 && (
+                        <div className="flex gap-2 pt-2 border-t border-base-300">
+                            {activeFacilities.map(([key]) => {
+                                const Icon = facilityIcons[key];
+                                return Icon ? (
+                                    <div
+                                        key={key}
+                                        className="p-2 bg-base-300/50 rounded-lg tooltip"
+                                        data-tip={key.replace(/_/g, ' ')}
+                                    >
+                                        <Icon className="w-4 h-4 text-base-content/70" />
+                                    </div>
+                                ) : null;
+                            })}
+                        </div>
+                    )}
+
+                    {/* Price Section */}
+                    <div className="pt-4 border-t border-base-300">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="text-sm font-medium text-base-content/60">
+                                {priceView === 'monthly' ? 'Monthly Rate' : 'Annual Rate'}
+                            </div>
+                            <div className="flex bg-base-300 rounded-lg p-1">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPriceView('monthly');
+                                    }}
+                                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'monthly'
+                                        ? 'bg-primary text-primary-content'
+                                        : 'text-base-content/70 hover:text-base-content'
+                                    }`}
+                                >
+                                    Monthly
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPriceView('yearly');
+                                    }}
+                                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'yearly'
+                                        ? 'bg-primary text-primary-content'
+                                        : 'text-base-content/70 hover:text-base-content'
+                                    }`}
+                                >
+                                    Yearly
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex items-end justify-between">
+                            <div>
+                                <div className="text-2xl font-bold text-primary">
+                                    {getCurrencySymbol()}
+                                    {convertPrice(
+                                        priceView === 'monthly'
+                                            ? property.monthly_price
+                                            : property.yearly_price,
+                                        currency,
+                                        exchangeRates
+                                    ).toLocaleString()}
+                                </div>
+                                <div className="text-sm text-base-content/50">
+                                    {priceView === 'monthly' ? 'per month' : 'per year'}
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                {property.minimum_stay && (
+                                    <div className="flex items-center gap-1 text-sm text-base-content/60">
+                                        <Clock className="w-4 h-4" />
+                                        <span>Min. {property.minimum_stay} months</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-1 text-sm text-base-content/60 mt-1">
+                                    <CalendarDays className="w-4 h-4" />
+                                    <span>
+                                        {property.availability?.[0]
+                                            ? new Date(property.availability[0].available_from).toLocaleDateString()
+                                            : 'Check availability'
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="pt-4 border-t border-base-300">
+                        <div className="flex gap-3">
+                            <Link
+                                to={`/detail/${property.id}`}
+                                className="flex-1 btn btn-outline btn-primary gap-2 hover:btn-primary hover:text-primary-content transition-all"
+                            >
+                                <Eye className="w-4 h-4" />
+                                View Details
+                            </Link>
+                            {/* <button
+                                onClick={(e) => SaveProperties(property.id, e)}
+                                className={`btn gap-2 ${isFavorite
+                                    ? 'btn-error hover:btn-error'
+                                    : 'btn-outline hover:btn-secondary'
+                                }`}
+                            >
+                                {isFavorite ? (
+                                    <BookmarkCheck className="w-4 h-4" />
+                                ) : (
+                                    <Bookmark className="w-4 h-4" />
+                                )}
+                                {isFavorite ? 'Saved' : 'Save'}
+                            </button> */}
+                        </div>
+                    </div>
                 </div>
             </div>
-            {/* Pagination Controls */}
-            <div className="flex justify-center mt-8">
-                <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={!paginationInfo.hasPreviousPage}
-                    className="px-4 py-2 mx-1 rounded-lg bg-accent text-white disabled:opacity-50"
-                >
-                    Previous
-                </button>
-                {Array.from({ length: paginationInfo.totalPages }, (_, i) => (
-                    <button
-                        key={i + 1}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`px-4 py-2 mx-1 rounded-lg ${
-                            paginationInfo.currentPage === i + 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
-                        }`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
-                <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationInfo.totalPages))}
-                    disabled={!paginationInfo.hasNextPage}
-                    className="px-4 py-2 mx-1 rounded-lg bg-accent text-white disabled:opacity-50"
-                >
-                    Next
-                </button>
+        );
+    };
+
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <LoadingSkeleton />
             </div>
-        </>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-center space-y-4 max-w-md">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error/10">
+                        <AlertCircle className="w-8 h-8 text-error" />
+                    </div>
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-semibold text-error">Failed to Load Properties</h3>
+                        <p className="text-base-content/70">{error}</p>
+                    </div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="btn btn-primary gap-2"
+                    >
+                        <Loader2 className="w-4 h-4" />
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div ref={divRef} className="min-h-screen bg-gradient-to-b from-base-100 to-base-200">
+            <div className="container mx-auto px-4 py-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <Home className="w-8 h-8 text-primary" />
+                                <h1 className="text-3xl md:text-4xl font-bold text-base-content">
+                                    Browse Properties
+                                </h1>
+                            </div>
+                            <p className="text-base-content/70">
+                                Discover amazing properties tailored for you
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                            <Award className="w-5 h-5 text-primary" />
+                            <span className="font-semibold text-primary">
+                                {totalData} Properties Available
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Search and Filter */}
+                    <div className="mb-8">
+                        <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
+                    </div>
+                </div>
+
+                {/* Properties Grid */}
+                {filteredProperties.length === 0 ? (
+                    <div className="text-center py-16 space-y-4">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning/10">
+                            <Search className="w-8 h-8 text-warning" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-base-content">No Properties Found</h3>
+                        <p className="text-base-content/70">
+                            Try adjusting your filters or search criteria
+                        </p>
+                        <button
+                            onClick={() => setFilteredProperties(properties)}
+                            className="btn btn-outline gap-2"
+                        >
+                            <Filter className="w-4 h-4" />
+                            Clear All Filters
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                            {filteredProperties.map((property) => (
+                                <PropertyCard key={property.id} property={property} />
+                            ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {paginationInfo.totalPages > 1 && (
+                            <div className="mt-12 pt-8 border-t border-base-300">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="text-sm text-base-content/70">
+                                        Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
+                                        {Math.min(currentPage * itemsPerPage, totalData)} of {totalData} properties
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setCurrentPage(1)}
+                                            disabled={currentPage === 1}
+                                            className="btn btn-square btn-sm btn-ghost disabled:opacity-50"
+                                        >
+                                            <ChevronFirst className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                            disabled={!paginationInfo.hasPreviousPage}
+                                            className="btn btn-sm btn-ghost gap-2 disabled:opacity-50"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                            Previous
+                                        </button>
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: Math.min(5, paginationInfo.totalPages) }, (_, i) => {
+                                                let pageNum;
+                                                if (paginationInfo.totalPages <= 5) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage <= 3) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage >= paginationInfo.totalPages - 2) {
+                                                    pageNum = paginationInfo.totalPages - 4 + i;
+                                                } else {
+                                                    pageNum = currentPage - 2 + i;
+                                                }
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        onClick={() => setCurrentPage(pageNum)}
+                                                        className={`btn btn-sm btn-square ${currentPage === pageNum
+                                                            ? 'btn-primary'
+                                                            : 'btn-ghost'
+                                                        }`}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationInfo.totalPages))}
+                                            disabled={!paginationInfo.hasNextPage}
+                                            className="btn btn-sm btn-ghost gap-2 disabled:opacity-50"
+                                        >
+                                            Next
+                                            <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage(paginationInfo.totalPages)}
+                                            disabled={currentPage === paginationInfo.totalPages}
+                                            className="btn btn-square btn-sm btn-ghost disabled:opacity-50"
+                                        >
+                                            <ChevronLast className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+        </div>
     );
 }
 

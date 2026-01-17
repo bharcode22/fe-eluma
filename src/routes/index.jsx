@@ -43,6 +43,7 @@ import UpdateImageOnly from "../views/user/propertyManagement/updateProperty/Upd
 import GetAllPropertyByUsers from "../views/user/propertyManagement/getAllProperty/index.jsx"
 import GetPrivateProperty from "../views/user/propertyManagement/getPrivateProperty/index.jsx"
 import GetSavedProperty from "../views/user/propertyManagement/savedProperty/index.jsx"
+import ServicePageUser from "../views/user/Service/servicePage.jsx"
 
 export default function AppRoutes() {
     const { isAuthenticated, userRole } = useContext(AuthContext);
@@ -115,7 +116,7 @@ export default function AppRoutes() {
                 isAuthenticated && userRole === 'user' ? <HomeUsers /> : <Navigate to="/" replace />
             } />
             <Route path="/user/service" element={
-                isAuthenticated && userRole === 'user' ? <ServicePage /> : <Navigate to="/" replace />
+                isAuthenticated && userRole === 'user' ? <ServicePageUser /> : <Navigate to="/" replace />
             } />
             <Route path="/user/add/property" element={
                 isAuthenticated && userRole === 'user' ? <AddProperty /> : <Navigate to="/" replace />
