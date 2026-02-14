@@ -55,9 +55,9 @@ const NavbarUsers = () => {
     const navItems = [
         { path: "/user/all/property", label: "Properties", icon: Building },
         { path: "/user/service", label: "Services", icon: Briefcase },
-        { path: "/user/home", label: "Public Properties", icon: Home },
-        { path: "/user/private/property", label: "My Properties", icon: Package },
-        { path: "/user/saved/property", icon: Heart },
+        { path: "/user/home", label: "My Properties", icon: Home },
+        // { path: "/user/private/property", label: "My Properties", icon: Package },
+        // { path: "/user/saved/property", icon: Heart },
         // { path: "/user/add/property", icon: Plus },
     ];
 
@@ -71,11 +71,11 @@ const NavbarUsers = () => {
 
     const LanguageSelector = ({ value, onChange, className = '' }) => {
         const languages = [
-            { code: 'en', name: 'English', flag: '🇺🇸' },
-            { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
-            { code: 'fr', name: 'French', flag: '🇫🇷' },
-            { code: 'de', name: 'German', flag: '🇩🇪' },
-            { code: 'es', name: 'Spanish', flag: '🇪🇸' }
+            { code: 'en', flag: '🇺🇸' },
+            { code: 'id', flag: '🇮🇩' },
+            { code: 'fr', flag: '🇫🇷' },
+            { code: 'de', flag: '🇩🇪' },
+            { code: 'es', flag: '🇪🇸' }
         ];
 
         const selectedLang = languages.find(l => l.code === value);
