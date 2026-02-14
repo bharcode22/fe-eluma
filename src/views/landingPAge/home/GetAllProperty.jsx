@@ -57,7 +57,7 @@ function GetAllProperty() {
   const [itemsPerPage] = useState(12);
   const [paginationInfo, setPaginationInfo] = useState({
     currentPage: 1,
-    itemsPerPage: 12,
+    itemsPerPage: 6,
     totalItems: 0,
     totalPages: 1,
     hasNextPage: false,
@@ -77,17 +77,27 @@ function GetAllProperty() {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(
           `${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`
         );
-        setProperties(response.data.data.properties);
-        setTotalData(response.data.totalData);
-        setFilteredProperties(response.data.data.properties);
-        setPaginationInfo(response.data.data.pagination);
-
+        const props = response.data.data?.properties || [];
+        setProperties(props);
+        setTotalData(response.data.totalData || 0);
+        setFilteredProperties(props);
+        // Use backend pagination info if available, else fallback
+        setPaginationInfo({
+          currentPage: response.data.data?.pagination?.currentPage || currentPage,
+          itemsPerPage: response.data.data?.pagination?.itemsPerPage || itemsPerPage,
+          totalItems: response.data.data?.pagination?.totalItems || response.data.totalData || props.length,
+          totalPages: response.data.data?.pagination?.totalPages || Math.ceil((response.data.totalData || props.length) / itemsPerPage),
+          hasNextPage: response.data.data?.pagination?.hasNextPage ?? (currentPage < Math.ceil((response.data.totalData || props.length) / itemsPerPage)),
+          hasPreviousPage: response.data.data?.pagination?.hasPreviousPage ?? (currentPage > 1),
+        });
         const initialIndexes = {};
-        response.data.data.properties.forEach((property) => {
+        props.forEach((property) => {
           initialIndexes[property.id] = 0;
         });
         setCarouselIndexes(initialIndexes);
@@ -97,8 +107,8 @@ function GetAllProperty() {
         setLoading(false);
       }
     };
-
     fetchData();
+    // eslint-disable-next-line
   }, [currentPage, itemsPerPage]);
 
   const handlePrev = (propertyId, totalImages, e) => {
@@ -529,30 +539,36 @@ function GetAllProperty() {
                       Previous
                     </button>
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, paginationInfo.totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (paginationInfo.totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= paginationInfo.totalPages - 2) {
-                          pageNum = paginationInfo.totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
+                      {(() => {
+                        const pages = [];
+                        const total = paginationInfo.totalPages;
+                        let start = 1;
+                        let end = total;
+                        if (total > 5) {
+                          if (currentPage <= 3) {
+                            start = 1;
+                            end = 5;
+                          } else if (currentPage >= total - 2) {
+                            start = total - 4;
+                            end = total;
+                          } else {
+                            start = currentPage - 2;
+                            end = currentPage + 2;
+                          }
                         }
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`btn btn-sm btn-square ${currentPage === pageNum
-                              ? 'btn-primary'
-                              : 'btn-ghost'
-                              }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                        for (let i = start; i <= end; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              onClick={() => setCurrentPage(i)}
+                              className={`btn btn-sm btn-square ${currentPage === i ? 'btn-primary' : 'btn-ghost'}`}
+                            >
+                              {i}
+                            </button>
+                          );
+                        }
+                        return pages;
+                      })()}
                     </div>
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationInfo.totalPages))}
