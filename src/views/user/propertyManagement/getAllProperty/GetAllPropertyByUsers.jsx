@@ -51,10 +51,10 @@ function GetAllPropertyByUsers() {
     const [filteredProperties, setFilteredProperties] = useState([]);
     const [favorites, setFavorites] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(12);
+    const [itemsPerPage] = useState(6);
     const [paginationInfo, setPaginationInfo] = useState({
         currentPage: 1,
-        itemsPerPage: 12,
+        itemsPerPage: 6,
         totalItems: 0,
         totalPages: 1,
         hasNextPage: false,

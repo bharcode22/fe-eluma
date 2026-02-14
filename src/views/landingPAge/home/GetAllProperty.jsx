@@ -54,7 +54,7 @@ function GetAllProperty() {
   const [priceView, setPriceView] = useState('monthly');
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(6);
   const [paginationInfo, setPaginationInfo] = useState({
     currentPage: 1,
     itemsPerPage: 6,
