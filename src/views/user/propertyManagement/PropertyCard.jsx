@@ -59,7 +59,7 @@ const PropertyCard = ({
         </div>
 
         {/* Status Badge */}
-        <div className="absolute top-4 left-4 z-20">
+        {/* <div className="absolute top-4 left-4 z-20">
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${property.is_active
               ? 'bg-success/90 text-success-content'
               : 'bg-error/90 text-error-content'
@@ -70,7 +70,7 @@ const PropertyCard = ({
               <><XCircle className="w-3 h-3 inline mr-1" />Inactive</>
             )}
           </span>
-        </div>
+        </div> */}
 
         {/* Property Menu */}
         <div className="absolute top-4 right-4 z-20">
