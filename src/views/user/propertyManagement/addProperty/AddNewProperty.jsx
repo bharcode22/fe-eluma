@@ -332,6 +332,7 @@ const AddProperty = () => {
         {/* Header */}
         <div className="mb-8">
           <button
+            type="button"
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-base-content/70 hover:text-base-content transition-colors mb-4"
           >
@@ -355,6 +356,7 @@ const AddProperty = () => {
             {sections.map((section) => (
               <button
                 key={section.id}
+                type="button"
                 onClick={() => setActiveSection(section.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${activeSection === section.id
                     ? 'bg-primary text-primary-content shadow-md'
@@ -800,35 +802,6 @@ const AddProperty = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Longitude</label>
-                    <input
-                      type="text"
-                      placeholder="Longitude"
-                      value={formState.location.longitude}
-                      onChange={e => setFormState({
-                        ...formState,
-                        location: { ...formState.location, longitude: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Latitude</label>
-                    <input
-                      type="text"
-                      placeholder="Latitude"
-                      value={formState.location.latitude}
-                      onChange={e => setFormState({
-                        ...formState,
-                        location: { ...formState.location, latitude: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <label className="text-sm text-base-content/70">Map URL (Optional)</label>
                   <input
@@ -895,7 +868,7 @@ const AddProperty = () => {
                     Phone Number
                   </label>
                   <input
-                    type="tel"
+                    type="number"
                     placeholder="Phone number"
                     value={formState.propertiesOwner.phone}
                     onChange={e => setFormState({
@@ -912,7 +885,7 @@ const AddProperty = () => {
                     WhatsApp
                   </label>
                   <input
-                    type="tel"
+                    type="number"
                     placeholder="WhatsApp number"
                     value={formState.propertiesOwner.watsapp}
                     onChange={e => setFormState({
@@ -1132,6 +1105,7 @@ const AddProperty = () => {
 
               {activeSection !== 'additional' ? (
                 <button
+                  key="nav-next"
                   type="button"
                   onClick={() => {
                     const currentIndex = sections.findIndex(s => s.id === activeSection);
@@ -1146,6 +1120,7 @@ const AddProperty = () => {
                 </button>
               ) : (
                 <button
+                  key="nav-submit"
                   type="submit"
                   className="btn btn-primary gap-2 shadow-lg hover:shadow-xl"
                   disabled={loading}

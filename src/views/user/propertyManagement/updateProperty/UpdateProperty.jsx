@@ -972,35 +972,6 @@ const UpdateProperty = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Longitude</label>
-                    <input
-                      type="text"
-                      placeholder="Longitude"
-                      value={formState.location.longitude}
-                      onChange={e => setFormState({
-                        ...formState,
-                        location: { ...formState.location, longitude: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Latitude</label>
-                    <input
-                      type="text"
-                      placeholder="Latitude"
-                      value={formState.location.latitude}
-                      onChange={e => setFormState({
-                        ...formState,
-                        location: { ...formState.location, latitude: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <label className="text-sm text-base-content/70">Map URL (Optional)</label>
                   <input
@@ -1304,6 +1275,7 @@ const UpdateProperty = () => {
 
               {activeSection !== 'additional' ? (
                 <button
+                  key="nav-next"
                   type="button"
                   onClick={() => {
                     const currentIndex = sections.findIndex(s => s.id === activeSection);
@@ -1318,6 +1290,7 @@ const UpdateProperty = () => {
                 </button>
               ) : (
                 <button
+                  key="nav-submit"
                   type="submit"
                   className="btn btn-primary gap-2 shadow-lg hover:shadow-xl"
                   disabled={loading}
