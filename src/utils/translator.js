@@ -1,52 +1,81 @@
 import axios from "axios";
 
-const VITE_LIBER_TRANSLATE_URL = `${import.meta.env.VITE_LIBER_TRANSLATE_URL}/translate`;
+// Ambil URL server penerjemah dari .env
+const getTranslateUrl = () => {
+  const envUrl = import.meta.env.VITE_LIBER_TRANSLATE_URL;
+  if (!envUrl) return null;
+  const cleaned = envUrl.replace(/\/+$/, "");
+  return cleaned.endsWith("/translate") ? cleaned : `${cleaned}/translate`;
+};
+
+const VITE_LIBER_TRANSLATE_URL = getTranslateUrl();
 
 const getCache = (key) => {
-  const data = localStorage.getItem("translationCache");
-  if (data) {
-    const cache = JSON.parse(data);
-    return cache[key] || null;
+  try {
+    const data = localStorage.getItem("translationCache");
+    if (data) {
+      const cache = JSON.parse(data);
+      return cache[key] || null;
+    }
+  } catch (e) {
+    return null;
   }
   return null;
 };
 
 const setCache = (key, value) => {
-  const data = localStorage.getItem("translationCache");
-  let cache = {};
-  if (data) {
-    cache = JSON.parse(data);
+  try {
+    const data = localStorage.getItem("translationCache");
+    let cache = {};
+    if (data) {
+      cache = JSON.parse(data);
+    }
+    cache[key] = value;
+    localStorage.setItem("translationCache", JSON.stringify(cache));
+  } catch (e) {
+    // Ignore storage errors
   }
-  cache[key] = value;
-  localStorage.setItem("translationCache", JSON.stringify(cache));
 };
 
 export const translateNodes = async (node, targetLang) => {
-  if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== "") {
-    const cacheKey = `${node.nodeValue}_${targetLang}`;
+  // Jika bahasa tujuan adalah bahasa asal ('id') atau URL translate belum diset, lewati
+  if (!node || !targetLang || targetLang === "id" || !VITE_LIBER_TRANSLATE_URL) return;
+
+  if (node.nodeType === Node.TEXT_NODE && node.nodeValue && node.nodeValue.trim() !== "") {
+    const textToTranslate = node.nodeValue.trim();
+    const cacheKey = `${textToTranslate}_${targetLang}`;
     const cached = getCache(cacheKey);
 
     if (cached) {
-      node.nodeValue = cached;
+      node.nodeValue = node.nodeValue.replace(textToTranslate, cached);
     } else {
       try {
-        console.log("Attempting to translate:", node.nodeValue, "to", targetLang);
-        const res = await axios.post(VITE_LIBER_TRANSLATE_URL, {
-          q: node.nodeValue,
-          source: "id",
-          target: targetLang,
-          format: "text",
-        });
+        const res = await axios.post(
+          VITE_LIBER_TRANSLATE_URL,
+          {
+            q: textToTranslate,
+            source: "id",
+            target: targetLang,
+            format: "text",
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+            timeout: 3000,
+          }
+        );
 
-        const translated = res.data.translatedText;
-        node.nodeValue = translated;
-        setCache(cacheKey, translated);
+        const translated = res.data?.translatedText || res.data?.translated_text;
+        if (translated) {
+          node.nodeValue = node.nodeValue.replace(textToTranslate, translated);
+          setCache(cacheKey, translated);
+        }
       } catch (err) {
-        console.error("Error translating text:", err.response ? err.response.data : err.message);
+        // Catat warning saja agar tidak memenuhi console jika server offline / 404
+        console.warn(`Translation service unavailable (${VITE_LIBER_TRANSLATE_URL}):`, err.message);
       }
     }
-  } else {
-    for (const child of node.childNodes) {
+  } else if (node.childNodes && node.childNodes.length > 0) {
+    for (const child of Array.from(node.childNodes)) {
       await translateNodes(child, targetLang);
     }
   }

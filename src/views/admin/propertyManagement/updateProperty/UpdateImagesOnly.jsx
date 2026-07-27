@@ -194,11 +194,10 @@ function UpdateImagesOnly() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`relative aspect-square rounded-lg overflow-hidden shadow-md transition-all duration-200 ease-in-out ${
-                              idx === 0
-                                ? 'border-4 border-amber-500 ring-2 ring-amber-300' // Highlight main image
-                                : 'border border-gray-200'
-                            } ${snapshot.isDragging ? 'scale-105 rotate-2 shadow-lg' : ''}`}
+                            className={`relative aspect-square rounded-lg overflow-hidden shadow-md transition-all duration-200 ease-in-out ${idx === 0
+                              ? 'border-4 border-amber-500 ring-2 ring-amber-300' // Highlight main image
+                              : 'border border-gray-200'
+                              } ${snapshot.isDragging ? 'scale-105 rotate-2 shadow-lg' : ''}`}
                             style={{
                               ...provided.draggableProps.style,
                               zIndex: snapshot.isDragging ? 5000 : 'auto',

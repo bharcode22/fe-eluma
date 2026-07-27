@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { Home, Loader2, AlertCircle, Calendar, Users, Bed, Bath, Globe, Lock } from 'lucide-react';
 import api from '../../../service/api.js';
+
 const baseUrl = api.defaults.baseURL;
 
 export default function LatestPropertyList() {
@@ -14,7 +16,7 @@ export default function LatestPropertyList() {
             try {
                 const token = Cookies.get('token');
                 if (!token) {
-                    setError('Token tidak ditemukan. Harap login terlebih dahulu.');
+                    setError('Authentication required. Please login first.');
                     setLoading(false);
                     return;
                 }
@@ -40,63 +42,109 @@ export default function LatestPropertyList() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                    <p className="mt-4 text-primary">Loading</p>
-                </div>
+            <div className="bg-base-100 rounded-2xl border border-base-300 shadow-sm p-8 text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
+                <p className="text-base-content/70 text-sm">Loading latest property data...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="alert alert-error text-center p-4">
-                    <span>{error}</span>
-                </div>
+            <div className="bg-base-100 rounded-2xl border border-error/30 p-6 text-center">
+                <AlertCircle className="w-8 h-8 text-error mx-auto mb-2" />
+                <p className="text-error font-medium">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto mb-10">
-            <h1 className="text-xl font-bold text-left text-primary mb-3">Latest Property List</h1>
-
-            <div className="overflow-x-auto">
-                <table className="table bg-secondary/30">
-                    <thead className="bg-primary text-white sticky top-0 z-10">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Property Code</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Number of Bathrooms</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Number of Bedrooms</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Maximum Guest</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Monthly Price</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Yearly Price</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Created At</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {properties.map((property, index) => (
-                            <tr key={property.property_code} className="hover:bg-primary/40">
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.property_code}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.number_of_bedrooms}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.number_of_bathrooms}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{property.maximum_guest}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">Rp {property.monthly_price.toLocaleString()}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">Rp {property.yearly_price.toLocaleString()}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap text-sm ">{new Date(property.created_at).toLocaleDateString()}</td>
-                                <td className="font-normal px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${property.isPublic ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                        {property.isPublic ? 'Publik' : 'Privat'}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <div className="bg-base-100 rounded-2xl border border-base-300 shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-primary/10 rounded-xl text-primary">
+                    <Home className="w-5 h-5" />
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-base-content">Latest Property Listings</h2>
+                    <p className="text-sm text-base-content/60">Recently added properties across the platform</p>
+                </div>
             </div>
+
+            {properties.length === 0 ? (
+                <div className="text-center py-12 text-base-content/60">
+                    <Home className="w-12 h-12 mx-auto mb-3 text-base-content/30" />
+                    <p className="text-base font-medium">No properties found yet</p>
+                </div>
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-base-300 bg-base-200/50 text-xs font-semibold uppercase tracking-wider text-base-content/70">
+                                <th className="px-4 py-3.5 rounded-l-xl">Code</th>
+                                <th className="px-4 py-3.5">Bedrooms</th>
+                                <th className="px-4 py-3.5">Bathrooms</th>
+                                <th className="px-4 py-3.5">Max Guests</th>
+                                <th className="px-4 py-3.5">Monthly Price</th>
+                                <th className="px-4 py-3.5">Yearly Price</th>
+                                <th className="px-4 py-3.5">Created At</th>
+                                <th className="px-4 py-3.5 rounded-r-xl">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-base-200 text-sm">
+                            {properties.map((property) => (
+                                <tr key={property.property_code} className="hover:bg-base-200/40 transition-colors">
+                                    <td className="px-4 py-4 font-bold text-primary">
+                                        {property.property_code}
+                                    </td>
+                                    <td className="px-4 py-4 text-base-content/80">
+                                        <div className="flex items-center gap-1.5">
+                                            <Bed className="w-4 h-4 text-primary" />
+                                            <span>{property.number_of_bedrooms}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 text-base-content/80">
+                                        <div className="flex items-center gap-1.5">
+                                            <Bath className="w-4 h-4 text-primary" />
+                                            <span>{property.number_of_bathrooms}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 text-base-content/80">
+                                        <div className="flex items-center gap-1.5">
+                                            <Users className="w-4 h-4 text-primary" />
+                                            <span>{property.maximum_guest}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 font-semibold text-base-content">
+                                        Rp {property.monthly_price ? property.monthly_price.toLocaleString() : 0}
+                                    </td>
+                                    <td className="px-4 py-4 font-semibold text-base-content">
+                                        Rp {property.yearly_price ? property.yearly_price.toLocaleString() : 0}
+                                    </td>
+                                    <td className="px-4 py-4 text-base-content/60 text-xs">
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="w-3.5 h-3.5" />
+                                            <span>{new Date(property.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        {property.isPublic ? (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-success/10 text-success rounded-full">
+                                                <Globe className="w-3 h-3" />
+                                                Publik
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-warning/10 text-warning rounded-full">
+                                                <Lock className="w-3 h-3" />
+                                                Privat
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }

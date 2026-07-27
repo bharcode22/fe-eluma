@@ -176,7 +176,12 @@ const GetMyProperty = () => {
 			</div>
 
 			{properties.length === 0 ? (
-				<p className="text-center text-gray-500">Tidak ada properti yang ditemukan.</p>
+				<div className="text-center py-16 space-y-4">
+					<p className="text-gray-500 text-lg">Tidak ada properti yang ditemukan.</p>
+					<Link to="/user/add/property" className="btn btn-primary gap-2 inline-flex items-center">
+						<span>+ Tambah Properti Baru</span>
+					</Link>
+				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{properties.map((property) => {

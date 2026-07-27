@@ -4,14 +4,11 @@ import AddContact from './addContact.jsx';
 
 export default function AddContactPages() {
     return (
-        <div className="min-h-screen flex">
-
+        <div className="flex min-h-screen bg-gradient-to-b from-base-100 to-base-200">
             <NavbarAdmin />
-
-            <div className="flex-1 flex justify-center items-center">
+            <div className="w-full">
                 <AddContact />
             </div>
-
         </div>
     );
 }

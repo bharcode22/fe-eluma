@@ -2,16 +2,13 @@ import React from 'react';
 import NavbarAdmin from '../../../../components/NavbarAdmin.jsx';
 import UpdateContact from './updateContact.jsx';
 
-export default function AddContactPages() {
+export default function UpdateContactPage() {
     return (
-        <div className="min-h-screen flex">
-
+        <div className="flex min-h-screen bg-gradient-to-b from-base-100 to-base-200">
             <NavbarAdmin />
-
-            <div className="flex-1 flex justify-center items-center">
+            <div className="w-full">
                 <UpdateContact />
             </div>
-
         </div>
     );
 }

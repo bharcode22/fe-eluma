@@ -7,7 +7,7 @@ export default function PropertyManagement() {
     const [username, setUsername] = useState([]);
     useEffect(() => {
         const userData = Cookies.get('user');
-        
+
         if (userData) {
             setUsername(JSON.parse(userData));
         }

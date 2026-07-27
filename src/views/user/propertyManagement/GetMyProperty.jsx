@@ -28,7 +28,7 @@ const GetMyProperty = () => {
   const [activePropertyMenu, setActivePropertyMenu] = useState(null);
   const [filter, setFilter] = useState('public');
   const navigate = useNavigate();
-  
+
   const token = Cookies.get('token');
   const divRef = useRef(null);
   const { lang } = useLanguage();

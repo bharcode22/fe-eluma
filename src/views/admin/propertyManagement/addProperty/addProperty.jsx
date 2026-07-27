@@ -14,198 +14,198 @@ const AddProperty = () => {
   const [generalAreas, setGeneralAreas] = useState([]);
   const [typeOptions, setTypeOptions] = useState([]);
 
-    useEffect(() => {
-      fetch(`${baseUrl}/general-area`)
-        .then(res => res.json())
-        .then(data => {
-          setGeneralAreas(data.data || []);
-        })
-        .catch(err => console.error('Failed to fetch general areas:', err));
-    }, []); 
+  useEffect(() => {
+    fetch(`${baseUrl}/general-area`)
+      .then(res => res.json())
+      .then(data => {
+        setGeneralAreas(data.data || []);
+      })
+      .catch(err => console.error('Failed to fetch general areas:', err));
+  }, []);
 
-    useEffect(() => {
-      fetch(`${baseUrl}/type-property/`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.data) setTypeOptions(data.data);
-        })
-        .catch(err => console.error('Failed to fetch type property:', err));
-    }, []);
+  useEffect(() => {
+    fetch(`${baseUrl}/type-property/`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.data) setTypeOptions(data.data);
+      })
+      .catch(err => console.error('Failed to fetch type property:', err));
+  }, []);
 
-    const navigate = useNavigate();
-    const [formState, setFormState] = useState({
-        type_id: '',
-        property_tittle: '',
-        description: '',
-        number_of_bedrooms: '',
-        number_of_bathrooms: '',
-        maximum_guest: '',
-        minimum_stay: '',
-        price: '',
-        monthly_price: '',
-        yearly_price: '',
-        location: {
-            general_area: '',
-            map_url: '',
-            longitude: '',
-            latitude: ''
-        },
-        availability: {
-            available_from: '',
-            available_to: ''
-        },
-        facilities: {
-            wifi: false,
-            washing_machine: false,
-            coffee_maker: false,
-            celling_fan: false,
-            kettle: false,
-            air_conditioning: false,
-            tv: false,
-            game_console: false,
-            private_entrance: false,
-            microwave: false,
-            pool: false,
-            beach_access: false,
-            drying_machine: false,
-            workspace_area: false,
-            toaster: false,
-            kitchen: false,
-            gym: false,
-            refrigenerator: false,
-            fridge: false,
-            security: false
-        },
-        propertiesOwner: {
-            fullname: '',
-            name: '',
-            phone: '',
-            watsapp: '',
-            email: ''
-        },
-        additionalDetails: {
-            allow_pets: false,
-            construction_nearby: false,
-            cleaning_requency: '',
-            linen_chaneg: '',
-            parking: {
-                car_parking: false,
-                bike_parking: false,
-                both_car_and_bike: false,
-            },
-            view: {
-                ocean_view: false,
-                sunset_view: false,
-                garden_view: false,
-                beach_view: false,
-                jungle_view: false,
-                montain_view: false,
-                pool_view: false,
-                rice_field: false,
-                sunrise_view: false,
-                volcano_view: false,
-            }
-        }
+  const navigate = useNavigate();
+  const [formState, setFormState] = useState({
+    type_id: '',
+    property_tittle: '',
+    description: '',
+    number_of_bedrooms: '',
+    number_of_bathrooms: '',
+    maximum_guest: '',
+    minimum_stay: '',
+    price: '',
+    monthly_price: '',
+    yearly_price: '',
+    location: {
+      general_area: '',
+      map_url: '',
+      longitude: '',
+      latitude: ''
+    },
+    availability: {
+      available_from: '',
+      available_to: ''
+    },
+    facilities: {
+      wifi: false,
+      washing_machine: false,
+      coffee_maker: false,
+      celling_fan: false,
+      kettle: false,
+      air_conditioning: false,
+      tv: false,
+      game_console: false,
+      private_entrance: false,
+      microwave: false,
+      pool: false,
+      beach_access: false,
+      drying_machine: false,
+      workspace_area: false,
+      toaster: false,
+      kitchen: false,
+      gym: false,
+      refrigenerator: false,
+      fridge: false,
+      security: false
+    },
+    propertiesOwner: {
+      fullname: '',
+      name: '',
+      phone: '',
+      watsapp: '',
+      email: ''
+    },
+    additionalDetails: {
+      allow_pets: false,
+      construction_nearby: false,
+      cleaning_requency: '',
+      linen_chaneg: '',
+      parking: {
+        car_parking: false,
+        bike_parking: false,
+        both_car_and_bike: false,
+      },
+      view: {
+        ocean_view: false,
+        sunset_view: false,
+        garden_view: false,
+        beach_view: false,
+        jungle_view: false,
+        montain_view: false,
+        pool_view: false,
+        rice_field: false,
+        sunrise_view: false,
+        volcano_view: false,
+      }
+    }
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = Cookies.get('token');
+
+    if (!token) {
+      setMessage('Token tidak tersedia. Harap login terlebih dahulu.');
+      return;
+    }
+
+    const formData = new FormData();
+    const {
+      type_id,
+      property_tittle,
+      description,
+      number_of_bedrooms,
+      number_of_bathrooms,
+      maximum_guest,
+      minimum_stay,
+      price,
+      monthly_price,
+      yearly_price,
+      location,
+      availability,
+      facilities,
+      propertiesOwner,
+      additionalDetails
+    } = formState;
+
+    formData.append('type_id', type_id);
+    formData.append('property_tittle', property_tittle);
+    formData.append('description', description);
+    formData.append('number_of_bedrooms', number_of_bedrooms);
+    formData.append('number_of_bathrooms', number_of_bathrooms);
+    formData.append('maximum_guest', maximum_guest);
+    formData.append('minimum_stay', minimum_stay);
+    formData.append('price', price);
+    formData.append('monthly_price', monthly_price);
+    formData.append('yearly_price', yearly_price);
+
+    formData.append('location', JSON.stringify(location));
+    const formattedAvailability = {
+      ...availability,
+      available_from: availability.available_from ? new Date(availability.available_from).toISOString() : '',
+      available_to: availability.available_to ? new Date(availability.available_to).toISOString() : '',
+    };
+    formData.append('availability', JSON.stringify(formattedAvailability));
+    formData.append('facilities', JSON.stringify(facilities));
+    const propertiesOwnerForBackend = {
+      ...propertiesOwner,
+      phone: propertiesOwner.phone ? parseInt(propertiesOwner.phone) : null,
+      watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp) : null,
+    };
+    formData.append('propertiesOwner', JSON.stringify(propertiesOwnerForBackend));
+    formData.append('additionalDetails', JSON.stringify(additionalDetails));
+
+    images.forEach((file) => {
+      formData.append('images', file);
     });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const token = Cookies.get('token');
-
-        if (!token) {
-            setMessage('Token tidak tersedia. Harap login terlebih dahulu.');
-            return;
+    try {
+      const res = await axios.post(`${baseUrl}/property`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
+      });
+      setMessage('Properti berhasil ditambahkan!');
+      console.log(res.data);
+      console.log(res);
+      navigate('/admin/property-management');
+    } catch (err) {
+      console.error(err);
+      setMessage(err.response?.data?.message || 'Gagal menambahkan properti.');
+    }
+  };
 
-        const formData = new FormData();
-        const {
-            type_id,
-            property_tittle,
-            description,
-            number_of_bedrooms,
-            number_of_bathrooms,
-            maximum_guest,
-            minimum_stay,
-            price,
-            monthly_price,
-            yearly_price,
-            location,
-            availability,
-            facilities,
-            propertiesOwner,
-            additionalDetails
-        } = formState;
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImages(prev => [...prev, ...files]);
+  };
 
-        formData.append('type_id', type_id);
-        formData.append('property_tittle', property_tittle);
-        formData.append('description', description);
-        formData.append('number_of_bedrooms', number_of_bedrooms);
-        formData.append('number_of_bathrooms', number_of_bathrooms);
-        formData.append('maximum_guest', maximum_guest);
-        formData.append('minimum_stay', minimum_stay);
-        formData.append('price', price);
-        formData.append('monthly_price', monthly_price);
-        formData.append('yearly_price', yearly_price);
+  const handleRemoveImage = (idx) => {
+    setImages(prev => prev.filter((_, i) => i !== idx));
+  };
 
-        formData.append('location', JSON.stringify(location));
-        const formattedAvailability = {
-            ...availability,
-            available_from: availability.available_from ? new Date(availability.available_from).toISOString() : '',
-            available_to: availability.available_to ? new Date(availability.available_to).toISOString() : '',
-        };
-        formData.append('availability', JSON.stringify(formattedAvailability));
-        formData.append('facilities', JSON.stringify(facilities));
-        const propertiesOwnerForBackend = {
-            ...propertiesOwner,
-            phone: propertiesOwner.phone ? parseInt(propertiesOwner.phone) : null,
-            watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp) : null,
-        };
-        formData.append('propertiesOwner', JSON.stringify(propertiesOwnerForBackend));
-        formData.append('additionalDetails', JSON.stringify(additionalDetails));
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    setImages(prev => [...prev, ...files]);
+  };
 
-        images.forEach((file) => {
-            formData.append('images', file);
-        });
-
-        try {
-        const res = await axios.post(`${baseUrl}/property`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data'
-              }
-        });
-        setMessage('Properti berhasil ditambahkan!');
-        console.log(res.data);
-        console.log(res);
-        navigate('/admin/property-management');
-        } catch (err) {
-            console.error(err);
-            setMessage(err.response?.data?.message || 'Gagal menambahkan properti.');
-        }
-    };
-
-    const handleImagesChange = (e) => {
-      const files = Array.from(e.target.files);
-      setImages(prev => [...prev, ...files]);
-    };
-
-    const handleRemoveImage = (idx) => {
-      setImages(prev => prev.filter((_, i) => i !== idx));
-    };
-
-    const handleDrop = (e) => {
-      e.preventDefault();
-      const files = Array.from(e.dataTransfer.files);
-      setImages(prev => [...prev, ...files]);
-    };
-
-    const handleReorderImages = (result) => {
-      if (!result.destination) return;
-      const reordered = Array.from(images);
-      const [removed] = reordered.splice(result.source.index, 1);
-      reordered.splice(result.destination.index, 0, removed);
-      setImages(reordered);
-    };
+  const handleReorderImages = (result) => {
+    if (!result.destination) return;
+    const reordered = Array.from(images);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+    setImages(reordered);
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto shadow-md rounded-md">
@@ -226,144 +226,144 @@ const AddProperty = () => {
           ))}
         </div>
 
-      {/* judul property */}
-      <div className="flex flex-wrap gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
-        <input
-          type="text"
-          placeholder="Property Name"
-          value={formState.property_tittle}
-          onChange={(e) =>
-            setFormState({ ...formState, property_tittle: e.target.value })
-          }
-          className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
-        />
-      </div>
-
-      {/* Upload image */}
-      <div className="gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
-        <label
-          htmlFor="images"
-          className="block text-sm font-medium text-gray-100 mb-4"
-        >
-          Upload Image
-          <span className="text-red-400 ml-1">*</span>
-          <span className="text-sm text-gray-300 ml-2">
-            (Upload at least one image)
-          </span>
-        </label>
-
-        <div
-          className="flex flex-col items-center justify-center w-full py-8 px-4 rounded-lg border-2 border-dashed border-gray-400 bg-secondary/50 backdrop-blur-lg shadow-lg hover:border-amber-500 transition-colors"
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-        >
-          {/* Icon & text */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="36"
-            height="36"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="mb-3 text-gray-300"
-            viewBox="0 0 24 24"
-          >
-            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-            <circle cx="9" cy="9" r="2" />
-            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-          </svg>
-
-          <label
-            htmlFor="images"
-            className="cursor-pointer text-amber-400 hover:text-amber- font-medium"
-          >
-            <span>Upload or drag image here</span>
-            <input
-              id="images"
-              name="images"
-              type="file"
-              multiple
-              accept="image/*"
-              className="sr-only"
-              onChange={handleImagesChange}
-            />
-          </label>
-
-          <p className="mt-2 text-xs text-gray-300">
-            PNG, JPG, GIF maximum 10MB per file
-          </p>
+        {/* judul property */}
+        <div className="flex flex-wrap gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
+          <input
+            type="text"
+            placeholder="Property Name"
+            value={formState.property_tittle}
+            onChange={(e) =>
+              setFormState({ ...formState, property_tittle: e.target.value })
+            }
+            className="input input-primary w-full rounded-lg bg-secondary/50 backdrop-blur-lg shadow-lg"
+          />
         </div>
 
-        {images && images.length > 0 && (
-          <DragDropContext onDragEnd={handleReorderImages}>
-            <Droppable droppableId="images-droppable" direction="horizontal">
-              {(provided) => (
-                <div
-                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-5"
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                >
-                  {images.map((img, idx) => (
-                    <Draggable key={idx} draggableId={`img-${idx}`} index={idx}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`relative aspect-square select-none rounded-lg overflow-hidden bg-secondary/50 backdrop-blur-lg shadow-md border ${idx === 0 ? 'border-amber-400 ring-2 ring-amber-400' : 'border-gray-300'} cursor-move`}
-                          style={{
-                            ...provided.draggableProps.style,
-                            opacity: snapshot.isDragging ? 0.9 : 1,
-                            zIndex: snapshot.isDragging ? 50 : 1,
-                            transition: 'box-shadow 0.2s, opacity 0.2s',
-                          }}
-                        >
-                          {idx === 0 && (
-                            <div className="absolute top-2 left-2 z-20 bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                              Main Image
-                            </div>
-                          )}
+        {/* Upload image */}
+        <div className="gap-2 mb-5 justify-center p-2 rounded-lg bg-secondary/50 backdrop-blur-lg py-5">
+          <label
+            htmlFor="images"
+            className="block text-sm font-medium text-gray-100 mb-4"
+          >
+            Upload Image
+            <span className="text-red-400 ml-1">*</span>
+            <span className="text-sm text-gray-300 ml-2">
+              (Upload at least one image)
+            </span>
+          </label>
 
-                          <img
-                            alt={`Uploaded image ${idx + 1}`}
-                            src={
-                              typeof img === 'string'
-                                ? img
-                                : URL.createObjectURL(img)
-                            }
-                            className="w-full h-full object-cover rounded-lg"
-                            draggable={false}
-                          />
+          <div
+            className="flex flex-col items-center justify-center w-full py-8 px-4 rounded-lg border-2 border-dashed border-gray-400 bg-secondary/50 backdrop-blur-lg shadow-lg hover:border-amber-500 transition-colors"
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+          >
+            {/* Icon & text */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="36"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="mb-3 text-gray-300"
+              viewBox="0 0 24 24"
+            >
+              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+            </svg>
 
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
+            <label
+              htmlFor="images"
+              className="cursor-pointer text-amber-400 hover:text-amber- font-medium"
+            >
+              <span>Upload or drag image here</span>
+              <input
+                id="images"
+                name="images"
+                type="file"
+                multiple
+                accept="image/*"
+                className="sr-only"
+                onChange={handleImagesChange}
+              />
+            </label>
+
+            <p className="mt-2 text-xs text-gray-300">
+              PNG, JPG, GIF maximum 10MB per file
+            </p>
+          </div>
+
+          {images && images.length > 0 && (
+            <DragDropContext onDragEnd={handleReorderImages}>
+              <Droppable droppableId="images-droppable" direction="horizontal">
+                {(provided) => (
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-5"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    {images.map((img, idx) => (
+                      <Draggable key={idx} draggableId={`img-${idx}`} index={idx}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`relative aspect-square select-none rounded-lg overflow-hidden bg-secondary/50 backdrop-blur-lg shadow-md border ${idx === 0 ? 'border-amber-400 ring-2 ring-amber-400' : 'border-gray-300'} cursor-move`}
+                            style={{
+                              ...provided.draggableProps.style,
+                              opacity: snapshot.isDragging ? 0.9 : 1,
+                              zIndex: snapshot.isDragging ? 50 : 1,
+                              transition: 'box-shadow 0.2s, opacity 0.2s',
+                            }}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
+                            {idx === 0 && (
+                              <div className="absolute top-2 left-2 z-20 bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                Main Image
+                              </div>
+                            )}
+
+                            <img
+                              alt={`Uploaded image ${idx + 1}`}
+                              src={
+                                typeof img === 'string'
+                                  ? img
+                                  : URL.createObjectURL(img)
+                              }
+                              className="w-full h-full object-cover rounded-lg"
+                              draggable={false}
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(idx)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
                             >
-                              <path d="M18 6 6 18" />
-                              <path d="m6 6 12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </div>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+        </div>
 
         {/* deskripsi */}
         <div className="bg-secondary/50 backdrop-blur-lg rounded-2xl p-4 shadow-md mb-5">
@@ -690,7 +690,7 @@ const AddProperty = () => {
         </div>
 
       </form>
-        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+      {message && <p className="mt-4 text-center text-red-500">{message}</p>}
     </div>
   );
 };

@@ -10,6 +10,12 @@ const LikedProperties = ({ properties, ...props }) => {
         </div>
         <h3 className="text-xl font-semibold text-base-content">No Liked Properties</h3>
         <p className="text-base-content/70">You haven't liked any properties yet.</p>
+        {props.handleAddProperty && (
+          <button onClick={props.handleAddProperty} className="btn btn-primary gap-2">
+            <props.Plus className="w-4 h-4" />
+            Add Property
+          </button>
+        )}
       </div>
     );
   }
