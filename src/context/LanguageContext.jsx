@@ -1,20 +1,28 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { translateNodes } from "../utils/translator";
 
-const LanguageContext = createContext();
+const LanguageContext = createContext(null);
 
 export const LanguageProvider = ({ children }) => {
     const [lang, setLang] = useState(() => {
-        const storedLang = localStorage.getItem("appLanguage");
-        console.log("Initializing language from localStorage:", storedLang);
-        return storedLang || "en";
+        try {
+            const storedLang = localStorage.getItem("appLanguage");
+            return storedLang || "en";
+        } catch (err) {
+            console.warn("LanguageProvider: Failed to access localStorage", err);
+            return "en";
+        }
     });
 
     useEffect(() => {
-        console.log("Saving language to localStorage:", lang);
-        localStorage.setItem("appLanguage", lang);
-        // Panggil fungsi terjemahan setiap kali bahasa berubah
-        translateNodes(document.body, lang);
+        try {
+            localStorage.setItem("appLanguage", lang);
+            if (typeof translateNodes === 'function') {
+                translateNodes(document.body, lang);
+            }
+        } catch (err) {
+            console.warn("LanguageProvider: Error in translation effect", err);
+        }
     }, [lang]);
 
     return (
@@ -24,4 +32,10 @@ export const LanguageProvider = ({ children }) => {
     );
 };
 
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = () => {
+    const context = useContext(LanguageContext);
+    if (!context) {
+        return { lang: 'en', setLang: () => {} };
+    }
+    return context;
+};

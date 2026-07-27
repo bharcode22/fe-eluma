@@ -16,8 +16,25 @@ import {
   Eye,
   Sparkles,
 } from 'lucide-react';
+import { useCurrency } from '../../../../context/CurrencyContext';
 
-const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbol, convertPrice, currency, exchangeRates }) => {
+const PropertyInfo = memo(({
+  property,
+  priceView,
+  setPriceView,
+  getCurrencySymbol: propGetCurrencySymbol,
+  convertPrice: propConvertPrice,
+  currency: propCurrency,
+  exchangeRates: propExchangeRates
+}) => {
+  const currencyCtx = useCurrency();
+
+  // Safely fallback to prop or context or default
+  const getCurrencySymbolFn = propGetCurrencySymbol || currencyCtx.getCurrencySymbol || (() => 'Rp');
+  const convertPriceFn = propConvertPrice || currencyCtx.convertPrice || ((p) => p || 0);
+  const activeCurrency = propCurrency || currencyCtx.currency || 'IDR';
+  const activeExchangeRates = propExchangeRates || currencyCtx.exchangeRates || {};
+
   const facilityIcons = {
     wifi: Wifi,
     parking: Car,
@@ -26,17 +43,41 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
     pool: Waves,
     kitchen: Coffee,
   };
-  const propertyFacilities = property.facilities?.[0] || {};
+
+  const propertyFacilities = Array.isArray(property.facilities)
+    ? property.facilities[0] || {}
+    : property.facilities || {};
+
   const activeFacilities = Object.entries(propertyFacilities)
     .filter(([key, value]) => value && facilityIcons[key])
     .slice(0, 4);
+
+  const rawPrice = priceView === 'monthly' ? property.monthly_price : property.yearly_price;
+  const convertedVal = typeof convertPriceFn === 'function'
+    ? convertPriceFn(rawPrice, activeCurrency, activeExchangeRates)
+    : (rawPrice || 0);
+
+  const formattedPrice = (typeof convertedVal === 'number' || typeof convertedVal === 'string')
+    ? Number(convertedVal).toLocaleString()
+    : '0';
+
+  const symbol = typeof getCurrencySymbolFn === 'function' ? getCurrencySymbolFn() : 'Rp';
+
+  const propertyLocation = Array.isArray(property.location)
+    ? property.location[0]?.general_area
+    : property.location?.general_area;
+
+  const propertyAvailability = Array.isArray(property.availability)
+    ? property.availability[0]?.available_from
+    : property.availability?.available_from;
+
   return (
     <>
       {/* Header */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-bold text-base-content truncate">
-            {property.property_code}
+            {property.property_code || property.property_tittle || 'Property'}
           </h3>
           {property.is_featured && (
             <Sparkles className="w-5 h-5 text-warning" />
@@ -45,10 +86,11 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
         <div className="flex items-center gap-2 text-sm text-base-content/60">
           <MapPin className="w-4 h-4" />
           <span className="truncate">
-            {property.location[0]?.general_area || 'Location not specified'}
+            {propertyLocation || 'Location not specified'}
           </span>
         </div>
       </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -57,11 +99,12 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
           </div>
           <div>
             <div className="text-sm font-medium text-base-content">
-              {property.number_of_bedrooms}
+              {property.number_of_bedrooms ?? 0}
             </div>
             <div className="text-xs text-base-content/50">Bedrooms</div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <div className="p-2 bg-secondary/10 rounded-lg">
             <Bath className="w-4 h-4 text-secondary" />
@@ -73,6 +116,7 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
             <div className="text-xs text-base-content/50">Bathrooms</div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <div className="p-2 bg-accent/10 rounded-lg">
             <Users className="w-4 h-4 text-accent" />
@@ -84,6 +128,7 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
             <div className="text-xs text-base-content/50">Max Guests</div>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <div className="p-2 bg-info/10 rounded-lg">
             <Maximize2 className="w-4 h-4 text-info" />
@@ -96,6 +141,7 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
           </div>
         </div>
       </div>
+
       {/* Facilities Icons */}
       {activeFacilities.length > 0 && (
         <div className="flex gap-2 pt-2 border-t border-base-300">
@@ -113,43 +159,43 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
           })}
         </div>
       )}
+
       {/* Price Section */}
       <div className="pt-4 border-t border-base-300">
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm font-medium text-base-content/60">
             {priceView === 'monthly' ? 'Monthly Rate' : 'Annual Rate'}
           </div>
-          <div className="flex bg-base-300 rounded-lg p-1">
-            <button
-              onClick={(e) => { e.preventDefault(); setPriceView('monthly'); }}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'monthly' ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:text-base-content'}`}
-              type="button"
-            >
-              Monthly
-            </button>
-            <button
-              onClick={(e) => { e.preventDefault(); setPriceView('yearly'); }}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'yearly' ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:text-base-content'}`}
-              type="button"
-            >
-              Yearly
-            </button>
-          </div>
+          {setPriceView && (
+            <div className="flex bg-base-300 rounded-lg p-1">
+              <button
+                onClick={(e) => { e.preventDefault(); setPriceView('monthly'); }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'monthly' ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:text-base-content'}`}
+                type="button"
+              >
+                Monthly
+              </button>
+              <button
+                onClick={(e) => { e.preventDefault(); setPriceView('yearly'); }}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${priceView === 'yearly' ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:text-base-content'}`}
+                type="button"
+              >
+                Yearly
+              </button>
+            </div>
+          )}
         </div>
+
         <div className="flex items-end justify-between">
           <div>
             <div className="text-2xl font-bold text-primary">
-              {getCurrencySymbol()}
-              {convertPrice(
-                priceView === 'monthly' ? property.monthly_price : property.yearly_price,
-                currency,
-                exchangeRates
-              ).toLocaleString()}
+              {symbol} {formattedPrice}
             </div>
             <div className="text-sm text-base-content/50">
               {priceView === 'monthly' ? 'per month' : 'per year'}
             </div>
           </div>
+
           <div className="text-right">
             {property.minimum_stay && (
               <div className="flex items-center gap-1 text-sm text-base-content/60">
@@ -160,14 +206,15 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
             <div className="flex items-center gap-1 text-sm text-base-content/60 mt-1">
               <CalendarDays className="w-4 h-4" />
               <span>
-                {property.availability?.[0]
-                  ? new Date(property.availability[0].available_from).toLocaleDateString()
+                {propertyAvailability
+                  ? new Date(propertyAvailability).toLocaleDateString()
                   : 'Check availability'}
               </span>
             </div>
           </div>
         </div>
       </div>
+
       {/* View Details Button */}
       <div className="pt-4 border-t border-base-300">
         <span className="w-full btn btn-outline btn-primary gap-2 group-hover:btn-primary group-hover:text-primary-content">

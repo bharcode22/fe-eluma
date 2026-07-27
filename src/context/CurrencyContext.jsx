@@ -1,24 +1,32 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
-export const CurrencyContext = createContext();
+export const CurrencyContext = createContext(null);
 
 export const CurrencyProvider = ({ children }) => {
     const [currency, setCurrency] = useState(() => {
-        const storedCurrency = localStorage.getItem('currency');
-        return storedCurrency || 'IDR'; // Default to Indonesian Rupiah
+        try {
+            const storedCurrency = localStorage.getItem('currency');
+            return storedCurrency || 'IDR';
+        } catch {
+            return 'IDR';
+        }
     });
     const [exchangeRates, setExchangeRates] = useState({});
 
     useEffect(() => {
-        localStorage.setItem('currency', currency);
+        try {
+            localStorage.setItem('currency', currency);
+        } catch (err) {
+            console.warn('Failed to save currency to localStorage:', err);
+        }
     }, [currency]);
 
     useEffect(() => {
         const fetchExchangeRates = async () => {
             try {
-                const response = await axios.get('https://api.exchangerate-api.com/v4/latest/IDR'); // Ganti dengan API nilai tukar yang sesuai
-                setExchangeRates(response.data.rates);
+                const response = await axios.get('https://api.exchangerate-api.com/v4/latest/IDR');
+                setExchangeRates(response.data?.rates || {});
             } catch (error) {
                 console.error("Error fetching exchange rates:", error);
             }
@@ -27,8 +35,10 @@ export const CurrencyProvider = ({ children }) => {
     }, []);
 
     const convertPrice = (price) => {
-        if (!price || !exchangeRates[currency]) return price; // Handle cases where price or exchange rate is not available
-        return (price * exchangeRates[currency]).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        if (!price) return 0;
+        const rate = exchangeRates[currency];
+        if (!rate) return price;
+        return Math.round(price * rate);
     };
 
     const getCurrencySymbol = () => {
@@ -42,7 +52,7 @@ export const CurrencyProvider = ({ children }) => {
             case 'JPY':
                 return '¥';
             default:
-                return '';
+                return 'Rp';
         }
     };
 
@@ -53,4 +63,16 @@ export const CurrencyProvider = ({ children }) => {
     );
 };
 
-export const useCurrency = () => useContext(CurrencyContext);
+export const useCurrency = () => {
+    const context = useContext(CurrencyContext);
+    if (!context) {
+        return {
+            currency: 'IDR',
+            setCurrency: () => {},
+            exchangeRates: {},
+            convertPrice: (price) => price || 0,
+            getCurrencySymbol: () => 'Rp'
+        };
+    }
+    return context;
+};

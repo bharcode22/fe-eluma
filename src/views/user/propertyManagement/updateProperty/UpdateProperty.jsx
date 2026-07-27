@@ -1,105 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import {
-  Upload,
-  Image,
-  X,
-  GripVertical,
-  Home,
-  Bed,
-  Bath,
-  Users,
-  Calendar,
-  DollarSign,
-  MapPin,
-  Wifi,
-  Car,
-  Coffee,
-  Fan,
-  Tv,
-  Gamepad2,
-  DoorOpen,
-  Microwave,
-  Waves,
-  Umbrella,
-  Monitor,
-  ChefHat,
-  Dumbbell,
-  Refrigerator,
-  Shield,
-  PawPrint,
-  Construction,
-  Sparkles,
-  Building,
-  Mountain,
-  Sunrise,
-  Sunset,
-  Trees,
-  Eye,
-  Save,
+  Image as ImageIcon,
+  Edit2,
   ArrowLeft,
   CheckCircle,
   AlertCircle,
   Loader2,
-  Plus,
-  Filter,
   ChevronRight,
-  ClipboardList,
-  Package,
-  Phone,
-  Mail,
-  MessageCircle,
-  User,
-  Clock,
-  Camera,
-  Grid3x3,
-  LayoutGrid,
-  Star,
-  CloudUpload,
-  Trash2,
-  Edit2,
-  CheckSquare,
-  Square,
-  Navigation
+  Save
 } from 'lucide-react';
 import api from '../../../../service/api';
 
+import SectionNavigation from './components/SectionNavigation';
+import BasicInfoSection from './components/BasicInfoSection';
+import MediaSection from './components/MediaSection';
+import DetailsSection from './components/DetailsSection';
+import PricingSection from './components/PricingSection';
+import FacilitiesSection from './components/FacilitiesSection';
+import LocationSection from './components/LocationSection';
+import OwnerSection from './components/OwnerSection';
+import AdditionalSection from './components/AdditionalSection';
+import { sections } from './components/constants';
+
+const baseUrl = api.defaults.baseURL;
+
 const UpdateProperty = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [existingImages, setExistingImages] = useState([]);
   const [images, setImages] = useState([]);
   const [isFetching, setIsFetching] = useState(true);
   const [loading, setLoading] = useState(false);
-  const baseUrl = api.defaults.baseURL;
   const [generalAreas, setGeneralAreas] = useState([]);
   const [typeOptions, setTypeOptions] = useState([]);
   const [activeSection, setActiveSection] = useState('basic');
-  const { id } = useParams();
 
-  useEffect(() => {
-    fetch(`${baseUrl}/general-area`)
-      .then(res => res.json())
-      .then(data => {
-        setGeneralAreas(data.data || []);
-      })
-      .catch(err => console.error('Failed to fetch general areas:', err));
-  }, []);
-
-  useEffect(() => {
-    fetch(`${baseUrl}/type-property/`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.data) setTypeOptions(data.data);
-      })
-      .catch(err => console.error('Failed to fetch type property:', err));
-  }, []);
-
-  const navigate = useNavigate();
   const [formState, setFormState] = useState({
     type_id: '',
     property_tittle: '',
@@ -180,7 +119,6 @@ const UpdateProperty = () => {
     try {
       const date = new Date(dateString);
       if (Number.isNaN(date.getTime())) return '';
-
       const timezoneOffset = date.getTimezoneOffset() * 60000;
       const adjustedDate = new Date(date.getTime() - timezoneOffset);
       return adjustedDate.toISOString().slice(0, 16);
@@ -188,6 +126,18 @@ const UpdateProperty = () => {
       return '';
     }
   };
+
+  useEffect(() => {
+    axios.get(`${baseUrl}/general-area`)
+      .then(res => setGeneralAreas(res.data.data || []))
+      .catch(err => console.error('Failed to fetch general areas:', err));
+
+    axios.get(`${baseUrl}/type-property/`)
+      .then(res => {
+        if (res.data.data) setTypeOptions(res.data.data);
+      })
+      .catch(err => console.error('Failed to fetch type property:', err));
+  }, [baseUrl]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -198,107 +148,103 @@ const UpdateProperty = () => {
       }
 
       try {
-        setIsFetching(true);
-        const res = await axios.get(`${baseUrl}/property/${id}`);
+        const response = await axios.get(`${baseUrl}/property/${id}`);
+        const rawData = response.data?.data;
+        const propertyData = Array.isArray(rawData) ? rawData[0] : rawData;
 
-        const property = Array.isArray(res.data?.data) ? res.data.data[0] : res.data?.data;
-        if (!property) {
-          setMessage('Property data not found.');
-          return;
+        if (propertyData) {
+          const getFirstOrObj = (val) => (Array.isArray(val) ? val[0] : val) || {};
+
+          const avail = getFirstOrObj(propertyData.availability);
+          const loc = getFirstOrObj(propertyData.location);
+          const owner = getFirstOrObj(propertyData.propertiesOwner);
+          const fac = getFirstOrObj(propertyData.facilities);
+          const add = getFirstOrObj(propertyData.additionalDetails);
+          const parking = getFirstOrObj(add.Parking || add.parking);
+          const view = getFirstOrObj(add.View || add.view);
+
+          setFormState({
+            type_id: propertyData.type_id || '',
+            property_tittle: propertyData.property_tittle || '',
+            description: propertyData.description || '',
+            number_of_bedrooms: propertyData.number_of_bedrooms ?? '',
+            number_of_bathrooms: propertyData.number_of_bathrooms ?? '',
+            maximum_guest: propertyData.maximum_guest ?? '',
+            minimum_stay: propertyData.minimum_stay ?? '',
+            price: propertyData.price ?? '',
+            monthly_price: propertyData.monthly_price ?? '',
+            yearly_price: propertyData.yearly_price ?? '',
+            location: {
+              general_area: loc.general_area || '',
+              map_url: loc.map_url || '',
+              longitude: loc.longitude || '',
+              latitude: loc.latitude || ''
+            },
+            availability: {
+              available_from: formatDateTimeForInput(avail.available_from),
+              available_to: formatDateTimeForInput(avail.available_to)
+            },
+            facilities: {
+              wifi: !!fac.wifi,
+              washing_machine: !!fac.washing_machine,
+              coffee_maker: !!fac.coffee_maker,
+              celling_fan: !!fac.celling_fan,
+              kettle: !!fac.kettle,
+              air_conditioning: !!fac.air_conditioning,
+              tv: !!fac.tv,
+              game_console: !!fac.game_console,
+              private_entrance: !!fac.private_entrance,
+              microwave: !!fac.microwave,
+              pool: !!fac.pool,
+              beach_access: !!fac.beach_access,
+              drying_machine: !!fac.drying_machine,
+              workspace_area: !!fac.workspace_area,
+              toaster: !!fac.toaster,
+              kitchen: !!fac.kitchen,
+              gym: !!fac.gym,
+              refrigenerator: !!fac.refrigenerator,
+              fridge: !!fac.fridge,
+              security: !!fac.security
+            },
+            propertiesOwner: {
+              fullname: owner.fullname || '',
+              name: owner.name || '',
+              phone: owner.phone || '',
+              watsapp: owner.watsapp || '',
+              email: owner.email || ''
+            },
+            additionalDetails: {
+              allow_pets: !!(add.allow_pets ?? add.allow_path),
+              construction_nearby: !!add.construction_nearby,
+              cleaning_requency: add.cleaning_requency || '',
+              linen_chaneg: add.linen_chaneg || '',
+              parking: {
+                car_parking: !!parking.car_parking,
+                bike_parking: !!parking.bike_parking,
+                both_car_and_bike: !!parking.both_car_and_bike,
+              },
+              view: {
+                ocean_view: !!view.ocean_view,
+                sunset_view: !!view.sunset_view,
+                garden_view: !!view.garden_view,
+                beach_view: !!view.beach_view,
+                jungle_view: !!view.jungle_view,
+                montain_view: !!view.montain_view,
+                pool_view: !!view.pool_view,
+                rice_field: !!view.rice_field,
+                sunrise_view: !!view.sunrise_view,
+                volcano_view: !!view.volcano_view,
+              }
+            }
+          });
+
+          if (propertyData.images && Array.isArray(propertyData.images)) {
+            setExistingImages(propertyData.images);
+          }
         }
-
-        const locationData = property.location?.[0] || {};
-        const availabilityData = property.availability?.[0] || {};
-        const facilitiesData = property.facilities?.[0] || {};
-        const ownerData = property.propertiesOwner?.[0] || {};
-
-        const additionalDetailsRaw = Array.isArray(property.additionalDetails)
-          ? (property.additionalDetails[0] || {})
-          : (property.additionalDetails || {});
-
-        const additionalView = additionalDetailsRaw.View || additionalDetailsRaw.view || {};
-        const additionalParking = additionalDetailsRaw.Parking || additionalDetailsRaw.parking || {};
-
-        setFormState({
-          type_id: property.type_id || '',
-          property_tittle: property.property_tittle || '',
-          description: property.description || '',
-          number_of_bedrooms: property.number_of_bedrooms ?? '',
-          number_of_bathrooms: property.number_of_bathrooms ?? '',
-          maximum_guest: property.maximum_guest ?? '',
-          minimum_stay: property.minimum_stay ?? '',
-          price: property.price ?? '',
-          monthly_price: property.monthly_price ?? '',
-          yearly_price: property.yearly_price ?? '',
-          location: {
-            general_area: locationData.general_area || '',
-            map_url: locationData.map_url || '',
-            longitude: locationData.longitude || '',
-            latitude: locationData.latitude || '',
-          },
-          availability: {
-            available_from: formatDateTimeForInput(availabilityData.available_from),
-            available_to: formatDateTimeForInput(availabilityData.available_to),
-          },
-          facilities: {
-            wifi: !!facilitiesData.wifi,
-            washing_machine: !!facilitiesData.washing_machine,
-            coffee_maker: !!facilitiesData.coffee_maker,
-            celling_fan: !!facilitiesData.celling_fan,
-            kettle: !!facilitiesData.kettle,
-            air_conditioning: !!facilitiesData.air_conditioning,
-            tv: !!facilitiesData.tv,
-            game_console: !!facilitiesData.game_console,
-            private_entrance: !!facilitiesData.private_entrance,
-            microwave: !!facilitiesData.microwave,
-            pool: !!facilitiesData.pool,
-            beach_access: !!facilitiesData.beach_access,
-            drying_machine: !!facilitiesData.drying_machine,
-            workspace_area: !!facilitiesData.workspace_area,
-            toaster: !!facilitiesData.toaster,
-            kitchen: !!facilitiesData.kitchen,
-            gym: !!facilitiesData.gym,
-            refrigenerator: !!facilitiesData.refrigenerator,
-            fridge: !!facilitiesData.fridge,
-            security: !!facilitiesData.security,
-          },
-          propertiesOwner: {
-            fullname: ownerData.fullname || '',
-            name: ownerData.name || '',
-            phone: ownerData.phone || '',
-            watsapp: ownerData.watsapp || '',
-            email: ownerData.email || '',
-          },
-          additionalDetails: {
-            allow_pets: !!(additionalDetailsRaw.allow_pets ?? additionalDetailsRaw.allow_path),
-            construction_nearby: !!additionalDetailsRaw.construction_nearby,
-            cleaning_requency: additionalDetailsRaw.cleaning_requency || '',
-            linen_chaneg: additionalDetailsRaw.linen_chaneg || '',
-            parking: {
-              car_parking: !!additionalParking.car_parking,
-              bike_parking: !!additionalParking.bike_parking,
-              both_car_and_bike: !!additionalParking.both_car_and_bike,
-            },
-            view: {
-              ocean_view: !!additionalView.ocean_view,
-              sunset_view: !!additionalView.sunset_view,
-              garden_view: !!additionalView.garden_view,
-              beach_view: !!additionalView.beach_view,
-              jungle_view: !!additionalView.jungle_view,
-              montain_view: !!additionalView.montain_view,
-              pool_view: !!additionalView.pool_view,
-              rice_field: !!additionalView.rice_field,
-              sunrise_view: !!additionalView.sunrise_view,
-              volcano_view: !!additionalView.volcano_view,
-            },
-          },
-        });
-
-        const imgs = Array.isArray(property.images) ? property.images : [];
-        setExistingImages(imgs);
       } catch (err) {
         console.error(err);
-        setMessage('Failed to load property data.');
+        setMessage('Failed to load property details.');
       } finally {
         setIsFetching(false);
       }
@@ -306,42 +252,6 @@ const UpdateProperty = () => {
 
     fetchProperty();
   }, [id, baseUrl]);
-
-  const facilityIcons = {
-    wifi: Wifi,
-    washing_machine: Package,
-    coffee_maker: Coffee,
-    celling_fan: Fan,
-    kettle: Coffee,
-    air_conditioning: Fan,
-    tv: Tv,
-    game_console: Gamepad2,
-    private_entrance: DoorOpen,
-    microwave: Microwave,
-    pool: Waves,
-    beach_access: Umbrella,
-    drying_machine: Monitor,
-    workspace_area: Monitor,
-    toaster: ChefHat,
-    kitchen: ChefHat,
-    gym: Dumbbell,
-    refrigenerator: Refrigerator,
-    fridge: Refrigerator,
-    security: Shield
-  };
-
-  const viewIcons = {
-    ocean_view: Waves,
-    sunset_view: Sunset,
-    garden_view: Trees,
-    beach_view: Umbrella,
-    jungle_view: Trees,
-    montain_view: Mountain,
-    pool_view: Waves,
-    rice_field: Trees,
-    sunrise_view: Sunrise,
-    volcano_view: Mountain
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -352,12 +262,9 @@ const UpdateProperty = () => {
       return;
     }
 
-    if (!id) {
-      setMessage('Property ID not found.');
-      return;
-    }
-
     setLoading(true);
+    setMessage('');
+
     const formData = new FormData();
     const {
       type_id,
@@ -398,21 +305,15 @@ const UpdateProperty = () => {
     formData.append('facilities', JSON.stringify(facilities));
     const propertiesOwnerForBackend = {
       ...propertiesOwner,
-      phone: propertiesOwner.phone ? parseInt(propertiesOwner.phone) : null,
-      watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp) : null,
+      phone: propertiesOwner.phone ? parseInt(propertiesOwner.phone, 10) : null,
+      watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp, 10) : null,
     };
     formData.append('propertiesOwner', JSON.stringify(propertiesOwnerForBackend));
-    const additionalDetailsForBackend = {
-      ...additionalDetails,
-      allow_path: additionalDetails.allow_pets,
-    };
-    formData.append('additionalDetails', JSON.stringify(additionalDetailsForBackend));
+    formData.append('additionalDetails', JSON.stringify(additionalDetails));
 
-    if (images.length > 0) {
-      images.forEach((file) => {
-        formData.append('images', file);
-      });
-    }
+    images.forEach((file) => {
+      formData.append('images', file);
+    });
 
     try {
       await axios.patch(`${baseUrl}/property/${id}`, formData, {
@@ -424,7 +325,7 @@ const UpdateProperty = () => {
       setMessage('Property updated successfully!');
       setTimeout(() => {
         navigate('/user/home');
-      }, 2000);
+      }, 1500);
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || 'Failed to update property.');
@@ -433,886 +334,202 @@ const UpdateProperty = () => {
     }
   };
 
-  const handleImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    setImages(prev => [...prev, ...files]);
-  };
-
-  const handleRemoveImage = (idx) => {
-    setImages(prev => prev.filter((_, i) => i !== idx));
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    setImages(prev => [...prev, ...files]);
-  };
-
-  const handleReorderImages = (result) => {
-    if (!result.destination) return;
-    const reordered = Array.from(images);
-    const [removed] = reordered.splice(result.source.index, 1);
-    reordered.splice(result.destination.index, 0, removed);
-    setImages(reordered);
-  };
-
-  const sections = [
-    { id: 'basic', label: 'Basic Info', icon: Home },
-    { id: 'media', label: 'Media', icon: Image },
-    { id: 'details', label: 'Details', icon: ClipboardList },
-    { id: 'pricing', label: 'Pricing', icon: DollarSign },
-    { id: 'facilities', label: 'Facilities', icon: Grid3x3 },
-    { id: 'location', label: 'Location', icon: MapPin },
-    { id: 'owner', label: 'Owner', icon: User },
-    { id: 'additional', label: 'Additional', icon: Plus }
-  ];
+  if (isFetching) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 p-8 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
+          <p className="text-sm font-medium text-base-content/70">Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-base-content/70 hover:text-base-content transition-colors mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-primary to-primary/70 rounded-lg">
-              <Home className="w-6 h-6 text-white" />
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-8 px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+
+        {/* Header Bar */}
+        <div className="bg-base-100 p-6 rounded-2xl border border-base-300 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="btn btn-circle btn-ghost btn-sm text-base-content/70 hover:bg-base-200"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-base-content">Update Property</h1>
-              <p className="text-base-content/70">Update the details of your property</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-base-content flex items-center gap-2">
+                <Edit2 className="w-7 h-7 text-primary" />
+                Update Property
+              </h1>
+              <p className="text-base-content/70 text-xs sm:text-sm mt-0.5">
+                Update property listing details and photos
+              </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/user/update/image/property/${id}`)}
+            className="btn btn-outline btn-sm rounded-xl gap-2 text-xs self-start sm:self-auto"
+          >
+            <ImageIcon className="w-4 h-4 text-primary" />
+            <span>Manage Images Only</span>
+          </button>
         </div>
 
-        {isFetching && (
-          <div className="flex justify-center items-center py-16">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="mt-4 text-primary">Loading property data...</p>
-            </div>
+        {/* Navigation Step Pills */}
+        <SectionNavigation
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+
+        {/* Global Alert Banner */}
+        {message && (
+          <div className={`p-4 rounded-2xl flex items-center gap-3 border ${
+            message.includes('success')
+              ? 'bg-success/10 border-success/30 text-success'
+              : 'bg-error/10 border-error/30 text-error'
+          }`}>
+            {message.includes('success') ? (
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            )}
+            <span className="text-sm font-medium">{message}</span>
           </div>
         )}
 
-        {!isFetching && (
-          <>
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2 mb-6">
-              {sections.map((section) => (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${activeSection === section.id
-                      ? 'bg-primary text-primary-content shadow-md'
-                      : 'bg-base-200 hover:bg-base-300 text-base-content/70 hover:text-base-content'
-                    }`}
-                >
-                  <section.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{section.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Form Container */}
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+              e.preventDefault();
+            }
+          }}
+          encType="multipart/form-data"
+          className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden"
+        >
 
-          {message && (
-            <div className={`mb-6 p-4 rounded-xl ${message.includes('success') ? 'bg-success/10 border border-success/20' : 'bg-error/10 border border-error/20'}`}>
-              <div className="flex items-center gap-3">
-                {message.includes('success') ? (
-                  <CheckCircle className="w-5 h-5 text-success" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-error" />
-                )}
-                <span className={message.includes('success') ? 'text-success' : 'text-error'}>{message}</span>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} encType="multipart/form-data" className="bg-base-100 rounded-2xl shadow-xl border border-base-300 overflow-hidden">
-          {/* Basic Info Section */}
           {activeSection === 'basic' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Home className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Basic Information</h2>
-              </div>
-
-              {/* Property Type */}
-              <div className="space-y-3">
-                <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                  <Building className="w-4 h-4" />
-                  Property Type
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {typeOptions.map(type => (
-                    <button
-                      key={type.id}
-                      type="button"
-                      className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${formState.type_id === type.id
-                          ? 'bg-primary text-primary-content shadow-md'
-                          : 'bg-base-200 hover:bg-base-300 text-base-content'
-                        }`}
-                      onClick={() => setFormState({ ...formState, type_id: type.id })}
-                    >
-                      {type.type_name}
-                      {formState.type_id === type.id && <CheckCircle className="w-4 h-4" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Property Title */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                  <Edit2 className="w-4 h-4" />
-                  Property Title
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter property name"
-                  value={formState.property_tittle}
-                  onChange={(e) =>
-                    setFormState({ ...formState, property_tittle: e.target.value })
-                  }
-                  className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  required
-                />
-              </div>
-
-              {/* Property Description */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                  <ClipboardList className="w-4 h-4" />
-                  Description
-                </label>
-                <ReactQuill
-                  value={formState.description || ""}
-                  onChange={(value) => setFormState((prev) => ({ ...prev, description: value }))}
-                  placeholder="Describe your property..."
-                  className="custom-quill bg-base-100 rounded-lg border border-base-300"
-                  modules={{
-                    toolbar: [
-                      [{ header: [1, 2, false] }],
-                      ["bold", "italic", "underline"],
-                      [{ list: "ordered" }, { list: "bullet" }],
-                      ["link"],
-                      ["clean"]
-                    ],
-                  }}
-                />
-              </div>
-            </div>
+            <BasicInfoSection
+              formState={formState}
+              setFormState={setFormState}
+              typeOptions={typeOptions}
+            />
           )}
 
-          {/* Media Section */}
           {activeSection === 'media' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Image className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Property Images</h2>
-              </div>
-
-              {existingImages.length > 0 && images.length === 0 && (
-                <div className="space-y-3">
-                  <div className="text-sm font-medium text-base-content">Current Images</div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {existingImages.map((img) => (
-                      <div key={img.id || img.imageName} className="relative aspect-square rounded-lg overflow-hidden border border-base-300">
-                        <img
-                          src={`${baseUrl}${img.imagesUrl}`}
-                          alt={img.imageName}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-xs text-base-content/60">
-                    Uploading new images will replace all current images.
-                  </div>
-                </div>
-              )}
-
-              {/* Upload Area */}
-              <div
-                className="flex flex-col items-center justify-center w-full p-8 rounded-xl border-2 border-dashed border-base-300 bg-base-200/50 hover:border-primary/50 transition-colors cursor-pointer"
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                onClick={() => document.getElementById('images').click()}
-              >
-                <div className="p-4 bg-primary/10 rounded-full mb-4">
-                  <CloudUpload className="w-12 h-12 text-primary" />
-                </div>
-                <div className="text-center">
-                  <p className="text-lg font-medium text-base-content mb-2">
-                    Drop images here or click to upload
-                  </p>
-                  <p className="text-sm text-base-content/60">
-                    Upload at least one image. PNG, JPG, GIF up to 10MB each
-                  </p>
-                </div>
-                <input
-                  id="images"
-                  name="images"
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleImagesChange}
-                />
-              </div>
-
-              {/* Image Gallery */}
-              {images.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-base-content/60" />
-                      <span className="text-sm font-medium text-base-content">
-                        {images.length} image{images.length > 1 ? 's' : ''} uploaded
-                      </span>
-                    </div>
-                    <span className="text-xs text-base-content/50">Drag to reorder</span>
-                  </div>
-
-                  <DragDropContext onDragEnd={handleReorderImages}>
-                    <Droppable droppableId="images-droppable" direction="horizontal">
-                      {(provided) => (
-                        <div
-                          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                        >
-                          {images.map((img, idx) => (
-                            <Draggable key={idx} draggableId={`img-${idx}`} index={idx}>
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className={`relative aspect-square rounded-lg overflow-hidden border-2 ${idx === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-base-300'
-                                    } ${snapshot.isDragging ? 'shadow-lg scale-105' : ''} transition-all`}
-                                >
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="absolute top-2 left-2 z-20 p-1.5 bg-black/40 backdrop-blur-sm rounded cursor-move"
-                                  >
-                                    <GripVertical className="w-4 h-4 text-white" />
-                                  </div>
-
-                                  {idx === 0 && (
-                                    <div className="absolute top-2 right-2 z-20 px-2 py-1 bg-primary text-primary-content text-xs font-medium rounded-full">
-                                      <Star className="w-3 h-3 inline mr-1" />
-                                      Main
-                                    </div>
-                                  )}
-
-                                  <img
-                                    alt={`Uploaded image ${idx + 1}`}
-                                    src={typeof img === 'string' ? img : URL.createObjectURL(img)}
-                                    className="w-full h-full object-cover"
-                                  />
-
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveImage(idx)}
-                                    className="absolute bottom-2 right-2 z-20 p-1.5 bg-error text-error-content rounded-full hover:bg-error/90 transition-colors"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity">
-                                    <div className="absolute bottom-2 left-2 text-white text-xs">
-                                      Image {idx + 1}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                </div>
-              )}
-            </div>
+            <MediaSection
+              id={id}
+              baseUrl={baseUrl}
+              existingImages={existingImages}
+              images={images}
+              setImages={setImages}
+            />
           )}
 
-          {/* Details Section */}
           {activeSection === 'details' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <ClipboardList className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Property Details</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Bed className="w-4 h-4" />
-                    Bedrooms
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Number of bedrooms"
-                    value={formState.number_of_bedrooms}
-                    onChange={e => setFormState({ ...formState, number_of_bedrooms: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Bath className="w-4 h-4" />
-                    Bathrooms
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Number of bathrooms"
-                    value={formState.number_of_bathrooms}
-                    onChange={e => setFormState({ ...formState, number_of_bathrooms: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Users className="w-4 h-4" />
-                    Maximum Guests
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Maximum guests"
-                    value={formState.maximum_guest}
-                    onChange={e => setFormState({ ...formState, maximum_guest: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Clock className="w-4 h-4" />
-                    Minimum Stay (months)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Minimum stay in months"
-                    value={formState.minimum_stay}
-                    onChange={e => setFormState({ ...formState, minimum_stay: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-
-              {/* Availability */}
-              <div className="space-y-4 pt-4 border-t border-base-300">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <h3 className="font-medium text-base-content">Availability</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Available From</label>
-                    <input
-                      type="datetime-local"
-                      value={formState.availability.available_from}
-                      onChange={e => setFormState({
-                        ...formState,
-                        availability: { ...formState.availability, available_from: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-base-content/70">Available To</label>
-                    <input
-                      type="datetime-local"
-                      value={formState.availability.available_to}
-                      onChange={e => setFormState({
-                        ...formState,
-                        availability: { ...formState.availability, available_to: e.target.value }
-                      })}
-                      className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <DetailsSection
+              formState={formState}
+              setFormState={setFormState}
+            />
           )}
 
-          {/* Pricing Section */}
           {activeSection === 'pricing' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <DollarSign className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Pricing Information</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <DollarSign className="w-4 h-4" />
-                    Base Price
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Base price"
-                    value={formState.price}
-                    onChange={e => setFormState({ ...formState, price: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Calendar className="w-4 h-4" />
-                    Monthly Price
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Monthly price"
-                    value={formState.monthly_price}
-                    onChange={e => setFormState({ ...formState, monthly_price: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Calendar className="w-4 h-4" />
-                    Yearly Price
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Yearly price"
-                    value={formState.yearly_price}
-                    onChange={e => setFormState({ ...formState, yearly_price: e.target.value })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-            </div>
+            <PricingSection
+              formState={formState}
+              setFormState={setFormState}
+            />
           )}
 
-          {/* Facilities Section */}
           {activeSection === 'facilities' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Grid3x3 className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Facilities & Amenities</h2>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {Object.entries(facilityIcons).map(([key, Icon]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() =>
-                      setFormState({
-                        ...formState,
-                        facilities: {
-                          ...formState.facilities,
-                          [key]: !formState.facilities[key],
-                        },
-                      })
-                    }
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${formState.facilities[key]
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-base-300 hover:border-base-400 text-base-content/70 hover:text-base-content'
-                      }`}
-                  >
-                    <Icon className="w-6 h-6 mb-2" />
-                    <span className="text-xs font-medium text-center capitalize">
-                      {key.replace(/_/g, ' ')}
-                    </span>
-                    <div className="mt-2">
-                      {formState.facilities[key] ? (
-                        <CheckSquare className="w-4 h-4 text-primary" />
-                      ) : (
-                        <Square className="w-4 h-4 text-base-300" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FacilitiesSection
+              formState={formState}
+              setFormState={setFormState}
+            />
           )}
 
-          {/* Location Section */}
           {activeSection === 'location' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <MapPin className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Location Information</h2>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Navigation className="w-4 h-4" />
-                    General Area
-                  </label>
-                  <select
-                    value={formState.location.general_area}
-                    onChange={e => setFormState({
-                      ...formState,
-                      location: { ...formState.location, general_area: e.target.value }
-                    })}
-                    className="select select-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Select area</option>
-                    {generalAreas.map((area, idx) => (
-                      <option key={idx} value={area.area}>{area.area}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm text-base-content/70">Map URL (Optional)</label>
-                  <input
-                    type="text"
-                    placeholder="Google Maps or other map URL"
-                    value={formState.location.map_url}
-                    onChange={e => setFormState({
-                      ...formState,
-                      location: { ...formState.location, map_url: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-            </div>
+            <LocationSection
+              formState={formState}
+              setFormState={setFormState}
+              generalAreas={generalAreas}
+            />
           )}
 
-          {/* Owner Section */}
           {activeSection === 'owner' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <User className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Property Owner Information</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <User className="w-4 h-4" />
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Owner's full name"
-                    value={formState.propertiesOwner.fullname}
-                    onChange={e => setFormState({
-                      ...formState,
-                      propertiesOwner: { ...formState.propertiesOwner, fullname: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <User className="w-4 h-4" />
-                    Display Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Display name"
-                    value={formState.propertiesOwner.name}
-                    onChange={e => setFormState({
-                      ...formState,
-                      propertiesOwner: { ...formState.propertiesOwner, name: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Phone className="w-4 h-4" />
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="Phone number"
-                    value={formState.propertiesOwner.phone}
-                    onChange={e => setFormState({
-                      ...formState,
-                      propertiesOwner: { ...formState.propertiesOwner, phone: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <MessageCircle className="w-4 h-4" />
-                    WhatsApp
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="WhatsApp number"
-                    value={formState.propertiesOwner.watsapp}
-                    onChange={e => setFormState({
-                      ...formState,
-                      propertiesOwner: { ...formState.propertiesOwner, watsapp: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Mail className="w-4 h-4" />
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={formState.propertiesOwner.email}
-                    onChange={e => setFormState({
-                      ...formState,
-                      propertiesOwner: { ...formState.propertiesOwner, email: e.target.value }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-            </div>
+            <OwnerSection
+              formState={formState}
+              setFormState={setFormState}
+            />
           )}
 
-          {/* Additional Details Section */}
           {activeSection === 'additional' && (
-            <div className="p-6 space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Plus className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-bold text-base-content">Additional Details</h2>
-              </div>
-
-              {/* Basic Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <PawPrint className="w-4 h-4" />
-                    Allow Pets
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-primary"
-                      checked={formState.additionalDetails.allow_pets}
-                      onChange={e => setFormState({
-                        ...formState,
-                        additionalDetails: {
-                          ...formState.additionalDetails,
-                          allow_pets: e.target.checked
-                        }
-                      })}
-                    />
-                    <span>Allowed</span>
-                  </label>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Construction className="w-4 h-4" />
-                    Construction Nearby
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-primary"
-                      checked={formState.additionalDetails.construction_nearby}
-                      onChange={e => setFormState({
-                        ...formState,
-                        additionalDetails: {
-                          ...formState.additionalDetails,
-                          construction_nearby: e.target.checked
-                        }
-                      })}
-                    />
-                    <span>Yes, construction nearby</span>
-                  </label>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Sparkles className="w-4 h-4" />
-                    Cleaning Frequency
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Weekly, Monthly"
-                    value={formState.additionalDetails.cleaning_requency}
-                    onChange={e => setFormState({
-                      ...formState,
-                      additionalDetails: {
-                        ...formState.additionalDetails,
-                        cleaning_requency: e.target.value
-                      }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm font-medium text-base-content">
-                    <Package className="w-4 h-4" />
-                    Linen Change
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Every 3 days"
-                    value={formState.additionalDetails.linen_chaneg}
-                    onChange={e => setFormState({
-                      ...formState,
-                      additionalDetails: {
-                        ...formState.additionalDetails,
-                        linen_chaneg: e.target.value
-                      }
-                    })}
-                    className="input input-bordered w-full focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-
-              {/* Parking Options */}
-              <div className="pt-4 border-t border-base-300">
-                <div className="flex items-center gap-2 mb-4">
-                  <Car className="w-5 h-5 text-primary" />
-                  <h3 className="font-medium text-base-content">Parking Facilities</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {Object.entries(formState.additionalDetails.parking).map(([key, value]) => (
-                    <label
-                      key={key}
-                      className="flex items-center gap-3 p-3 border border-base-300 rounded-lg hover:bg-base-200 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        className="checkbox checkbox-primary"
-                        checked={value}
-                        onChange={e => setFormState({
-                          ...formState,
-                          additionalDetails: {
-                            ...formState.additionalDetails,
-                            parking: {
-                              ...formState.additionalDetails.parking,
-                              [key]: e.target.checked
-                            }
-                          }
-                        })}
-                      />
-                      <div>
-                        <div className="font-medium capitalize">{key.replace(/_/g, ' ')}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* View Options */}
-              <div className="pt-4 border-t border-base-300">
-                <div className="flex items-center gap-2 mb-4">
-                  <Eye className="w-5 h-5 text-primary" />
-                  <h3 className="font-medium text-base-content">Property Views</h3>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {Object.entries(viewIcons).map(([key, Icon]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() =>
-                        setFormState({
-                          ...formState,
-                          additionalDetails: {
-                            ...formState.additionalDetails,
-                            view: {
-                              ...formState.additionalDetails.view,
-                              [key]: !formState.additionalDetails.view[key]
-                            }
-                          }
-                        })
-                      }
-                      className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${formState.additionalDetails.view[key]
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-base-300 hover:border-base-400 text-base-content/70 hover:text-base-content'
-                        }`}
-                    >
-                      <Icon className="w-5 h-5 mb-2" />
-                      <span className="text-xs text-center capitalize">
-                        {key.replace(/_/g, ' ')}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <AdditionalSection
+              formState={formState}
+              setFormState={setFormState}
+            />
           )}
 
-          {/* Navigation Buttons */}
-          <div className="p-6 border-t border-base-300 bg-base-200/50">
-            <div className="flex justify-between">
+          {/* Bottom Controls */}
+          <div className="p-6 border-t border-base-200 bg-base-200/40 flex justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                const currentIndex = sections.findIndex(s => s.id === activeSection);
+                if (currentIndex > 0) {
+                  setActiveSection(sections[currentIndex - 1].id);
+                }
+              }}
+              className="btn btn-outline rounded-xl gap-2 text-xs"
+              disabled={activeSection === 'basic'}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Previous</span>
+            </button>
+
+            {activeSection !== 'additional' ? (
               <button
+                key="nav-next-btn"
                 type="button"
                 onClick={() => {
                   const currentIndex = sections.findIndex(s => s.id === activeSection);
-                  if (currentIndex > 0) {
-                    setActiveSection(sections[currentIndex - 1].id);
+                  if (currentIndex < sections.length - 1) {
+                    setActiveSection(sections[currentIndex + 1].id);
                   }
                 }}
-                className="btn btn-outline gap-2"
-                disabled={activeSection === 'basic'}
+                className="btn btn-primary rounded-xl gap-2 text-white text-xs shadow-md"
               >
-                <ArrowLeft className="w-4 h-4" />
-                Previous
+                <span>Next</span>
+                <ChevronRight className="w-4 h-4" />
               </button>
-
-              {activeSection !== 'additional' ? (
-                <button
-                  key="nav-next"
-                  type="button"
-                  onClick={() => {
-                    const currentIndex = sections.findIndex(s => s.id === activeSection);
-                    if (currentIndex < sections.length - 1) {
-                      setActiveSection(sections[currentIndex + 1].id);
-                    }
-                  }}
-                  className="btn btn-primary gap-2"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  key="nav-submit"
-                  type="submit"
-                  className="btn btn-primary gap-2 shadow-lg hover:shadow-xl"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Update Property
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
+            ) : (
+              <button
+                key="nav-submit-btn"
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary rounded-xl gap-2 text-white text-xs shadow-lg hover:shadow-xl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Updating Property...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>Save Changes</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
+
         </form>
-          </>
-        )}
       </div>
     </div>
   );
