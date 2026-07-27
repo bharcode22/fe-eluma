@@ -1,6 +1,7 @@
 import React from 'react'
 import AddProperty from './AddNewProperty'
 import NavbarUsers from "../../../../components/NavbarUser.jsx";
+import FooterLandingPage from "../../../../components/FooterLandingPage.jsx";
 
 function index() {
     return (
@@ -10,6 +11,9 @@ function index() {
             </div>
             <div>
                 <AddProperty />
+            </div>
+            <div>
+                <FooterLandingPage />
             </div>
         </div>
     )

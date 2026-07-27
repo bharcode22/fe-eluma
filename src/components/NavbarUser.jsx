@@ -34,8 +34,8 @@ const NavbarUsers = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [hasNotifications, setHasNotifications] = useState(true);
     const navigate = useNavigate();
-    
-    const { setIsAuthenticated, setUserRole } = useContext(AuthContext);
+
+    const { user, setIsAuthenticated, setUserRole } = useContext(AuthContext);
     const { lang, setLang } = useLanguage();
     const { currency, setCurrency } = useCurrency();
 
@@ -63,10 +63,10 @@ const NavbarUsers = () => {
 
     const userMenuItems = [
         { label: "My Profile", icon: User, path: "/user/profile" },
-        { label: "Settings", icon: Settings, path: "/user/settings" },
-        { label: "Booking History", icon: History, path: "/user/bookings" },
-        { label: "Messages", icon: MessageSquare, path: "/user/messages" },
-        { label: "Help Center", icon: HelpCircle, path: "/user/help" },
+        // { label: "Settings", icon: Settings, path: "/user/settings" },
+        // { label: "Booking History", icon: History, path: "/user/bookings" },
+        // { label: "Messages", icon: MessageSquare, path: "/user/messages" },
+        // { label: "Help Center", icon: HelpCircle, path: "/user/help" },
     ];
 
     const LanguageSelector = ({ value, onChange, className = '' }) => {
@@ -198,9 +198,9 @@ const NavbarUsers = () => {
                             <div className="flex items-center gap-2">
                                 {navItems.map((item) => (
                                     <div key={item.path} className="group">
-                                        <NavItem 
-                                            path={item.path} 
-                                            label={item.label} 
+                                        <NavItem
+                                            path={item.path}
+                                            label={item.label}
                                             icon={item.icon}
                                             isCTA={item.isCTA}
                                         />
@@ -211,16 +211,16 @@ const NavbarUsers = () => {
 
                         {/* Desktop Controls */}
                         <div className="hidden lg:flex items-center gap-3">
-                            
+
                             {/* Language & Currency */}
                             <div className="flex items-center gap-2">
                                 <LanguageSelector value={lang} onChange={handleLanguageChange} />
                                 <CurrencySelector value={currency} onChange={handleCurrencyChange} />
                             </div>
-                            
+
                             {/* User Menu */}
                             <div className="relative group">
-                                <button 
+                                <button
                                     className="flex items-center gap-2 px-3 py-2 bg-base-200 hover:bg-base-300 rounded-lg transition-colors"
                                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                 >
@@ -229,22 +229,22 @@ const NavbarUsers = () => {
                                     </div>
                                     <ChevronDown className="w-3 h-3" />
                                 </button>
-                                
+
                                 {/* User Dropdown */}
                                 {isUserMenuOpen && (
                                     <div className="absolute top-full right-0 mt-1 w-64 bg-base-100 border border-base-300 rounded-lg shadow-xl z-50">
                                         <div className="p-4 border-b border-base-300">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                                                    <User className="w-5 h-5 text-white" />
+                                                <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center font-bold text-white text-sm">
+                                                    {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-white" />}
                                                 </div>
-                                                <div>
-                                                    <div className="font-medium text-base-content">John Doe</div>
-                                                    <div className="text-sm text-base-content/60">john@example.com</div>
+                                                <div className="overflow-hidden">
+                                                    <div className="font-medium text-base-content truncate">{user?.name || user?.username || 'User Profile'}</div>
+                                                    <div className="text-xs text-base-content/60 truncate">{user?.email || 'user@elumaproperty.com'}</div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="p-2">
                                             {userMenuItems.map((item, index) => (
                                                 <Link
@@ -258,7 +258,7 @@ const NavbarUsers = () => {
                                                 </Link>
                                             ))}
                                         </div>
-                                        
+
                                         <div className="p-2 border-t border-base-300">
                                             <button
                                                 onClick={logout}
@@ -304,12 +304,12 @@ const NavbarUsers = () => {
                             {/* User Info */}
                             <div className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                                        <User className="w-6 h-6 text-white" />
+                                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                        {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-6 h-6 text-white" />}
                                     </div>
-                                    <div>
-                                        <div className="font-bold text-base-content">John Doe</div>
-                                        <div className="text-xs text-base-content/60">john@example.com</div>
+                                    <div className="overflow-hidden">
+                                        <div className="font-bold text-base-content truncate">{user?.name || user?.username || 'User Profile'}</div>
+                                        <div className="text-xs text-base-content/60 truncate">{user?.email || 'user@elumaproperty.com'}</div>
                                     </div>
                                 </div>
                             </div>

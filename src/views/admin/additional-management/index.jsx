@@ -1,27 +1,16 @@
+import React from 'react';
 import NavbarAdmin from '../../../components/NavbarAdmin.jsx';
-import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie'
+import AdditionalManagementPage from './additionalManagement.jsx';
 
 export default function AdditionalManagement() {
-    const [username, setUsername] = useState([]);
-    useEffect(() => {
-        const userData = Cookies.get('user');
-        
-        if (userData) {
-            setUsername(JSON.parse(userData));
-        }
-    }, []);
-
     return (
-        <div>
+        <div className="flex min-h-screen bg-base-200/50">
             <div>
                 <NavbarAdmin />
             </div>
-            <div>
-                <h1 className='mt-20 text-4xl font-bold text-center text-primary'>
-                    Additional management
-                </h1>
+            <div className="flex-1 min-w-0">
+                <AdditionalManagementPage />
             </div>
         </div>
-    )
+    );
 }

@@ -8,6 +8,8 @@ import DetailPropertyLandingPage from "../views/landingPAge/components/landingPa
 import ServicePage from "../views/landingPAge/Service/servicePage.jsx";
 import Contact from "../views/landingPAge/Contact/Contact.jsx";
 import About from "../views/landingPAge/About/About.jsx";
+import PrivacyPolicy from "../views/landingPAge/PrivacyPolicy.jsx";
+import TermsOfService from "../views/landingPAge/TermsOfService.jsx";
 
 // halaman admin
 // dashboard
@@ -34,6 +36,8 @@ import UpdateContactPage from "../views/admin/contact/updateContact/updateContac
 import AdditionalManagement from "../views/admin/additional-management/index.jsx"
 // service management
 import ServiceManagement from "../views/admin/service-managemenet/index.jsx"
+// admin profile
+import AdminProfile from "../views/admin/profile/AdminProfile.jsx"
 
 // halaman user
 import HomeUsers from "../views/user/HomeUser.jsx"
@@ -44,6 +48,7 @@ import GetAllPropertyByUsers from "../views/user/propertyManagement/getAllProper
 import GetPrivateProperty from "../views/user/propertyManagement/getPrivateProperty/index.jsx"
 import GetSavedProperty from "../views/user/propertyManagement/savedProperty/index.jsx"
 import ServicePageUser from "../views/user/Service/servicePage.jsx"
+import UserProfile from "../views/user/UserProfile.jsx"
 
 export default function AppRoutes() {
     const { isAuthenticated, userRole } = useContext(AuthContext);
@@ -55,6 +60,8 @@ export default function AppRoutes() {
             <Route path="/service" element={<ServicePage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
 
             {/* admin */}
             {/* dashboard */}
@@ -110,6 +117,10 @@ export default function AppRoutes() {
             <Route path="/admin/service-management" element={
                 isAuthenticated && userRole === 'admin' ? <ServiceManagement /> : <Navigate to="/" replace />
             } />
+            {/* admin profile */}
+            <Route path="/admin/profile" element={
+                isAuthenticated && userRole === 'admin' ? <AdminProfile /> : <Navigate to="/" replace />
+            } />
 
             {/* user */}
             <Route path="/user/home" element={
@@ -135,6 +146,9 @@ export default function AppRoutes() {
             } />
             <Route path="/user/update/image/property/:id" element={
                 isAuthenticated && userRole === 'user' ? <UpdateImageOnly /> : <Navigate to="/" replace />
+            } />
+            <Route path="/user/profile" element={
+                isAuthenticated && userRole === 'user' ? <UserProfile /> : <Navigate to="/" replace />
             } />
         </Routes>
     );

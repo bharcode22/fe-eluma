@@ -1,17 +1,18 @@
+import React from 'react';
 import NavbarLandingPage from "../../../components/NavbarLandingPage.jsx";
+import FooterLandingPage from "../../../components/FooterLandingPage.jsx";
 import Service from './service';
 
 function servicePage() {
     return (
-        <div>
-            <div>
-                <NavbarLandingPage />
-            </div>
-            <div>
+        <div className="flex flex-col min-h-screen">
+            <NavbarLandingPage />
+            <main className="flex-grow">
                 <Service />
-            </div>
+            </main>
+            <FooterLandingPage />
         </div>
-    )
+    );
 }
 
-export default servicePage
+export default servicePage;

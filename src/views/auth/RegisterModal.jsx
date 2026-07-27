@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import api from '../../service/api.js';
 import { Link } from "react-router-dom";
+import AithGoogle from "./GoogleAuth.jsx";
 
 const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -88,7 +89,7 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
         setIsLoading(true);
         setValidation([]);
         setRegisterFailed([]);
-        
+
         try {
             const response = await api.post('/auth/register', {
                 username: formData.username,
@@ -98,24 +99,24 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                 phone: formData.phone,
                 company: formData.company
             });
-            
+
             // Show success message
             setShowSuccess(true);
-            
+
             // Wait a moment then redirect to login
             setTimeout(() => {
                 if (onSuccess) onSuccess();
                 onClose();
                 onLoginClick();
             }, 1500);
-            
+
         } catch (error) {
             if (error.response) {
                 setValidation(error.response.data.errors || []);
                 setRegisterFailed(error.response.data);
             } else {
-                setRegisterFailed({ 
-                    message: "Network error. Please check your connection." 
+                setRegisterFailed({
+                    message: "Network error. Please check your connection."
                 });
             }
         } finally {
@@ -132,23 +133,23 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div 
+            <div
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
-            
+
             {/* Modal */}
             <div className="relative w-full max-w-lg transform transition-all">
                 <div className="bg-gradient-to-br from-base-100 to-base-200 rounded-2xl shadow-2xl overflow-hidden border border-base-300">
                     {/* Header */}
                     <div className="relative p-6 bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border-b border-base-300">
-                        <button 
+                        <button
                             onClick={onClose}
                             className="absolute right-4 top-4 p-2 hover:bg-base-300 rounded-lg transition-colors"
                         >
                             <X className="w-5 h-5 text-base-content/70" />
                         </button>
-                        
+
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-secondary/10 rounded-lg">
                                 <UserCircle className="w-6 h-6 text-secondary" />
@@ -204,10 +205,10 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            className={`input input-bordered w-full pl-10 ${getFieldError('username') 
-                                                ? 'input-error' 
+                                            className={`input input-bordered w-full pl-10 ${getFieldError('username')
+                                                ? 'input-error'
                                                 : 'focus:border-primary focus:ring-2 focus:ring-primary/20'
-                                            }`}
+                                                }`}
                                             type="text"
                                             name="username"
                                             value={formData.username}
@@ -230,10 +231,10 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            className={`input input-bordered w-full pl-10 ${getFieldError('name') 
-                                                ? 'input-error' 
+                                            className={`input input-bordered w-full pl-10 ${getFieldError('name')
+                                                ? 'input-error'
                                                 : 'focus:border-primary focus:ring-2 focus:ring-primary/20'
-                                            }`}
+                                                }`}
                                             type="text"
                                             name="name"
                                             value={formData.name}
@@ -258,10 +259,10 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            className={`input input-bordered w-full pl-10 ${getFieldError('email') 
-                                                ? 'input-error' 
+                                            className={`input input-bordered w-full pl-10 ${getFieldError('email')
+                                                ? 'input-error'
                                                 : 'focus:border-primary focus:ring-2 focus:ring-primary/20'
-                                            }`}
+                                                }`}
                                             type="email"
                                             name="email"
                                             value={formData.email}
@@ -284,10 +285,10 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </label>
                                     <div className="relative">
                                         <input
-                                            className={`input input-bordered w-full pl-10 ${getFieldError('phone') 
-                                                ? 'input-error' 
+                                            className={`input input-bordered w-full pl-10 ${getFieldError('phone')
+                                                ? 'input-error'
                                                 : 'focus:border-primary focus:ring-2 focus:ring-primary/20'
-                                            }`}
+                                                }`}
                                             type="tel"
                                             name="phone"
                                             value={formData.phone}
@@ -311,10 +312,10 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                 </label>
                                 <div className="relative">
                                     <input
-                                        className={`input input-bordered w-full pl-10 pr-10 ${getFieldError('password') 
-                                            ? 'input-error' 
+                                        className={`input input-bordered w-full pl-10 pr-10 ${getFieldError('password')
+                                            ? 'input-error'
                                             : 'focus:border-primary focus:ring-2 focus:ring-primary/20'
-                                        }`}
+                                            }`}
                                         type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={formData.password}
@@ -336,58 +337,56 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                         )}
                                     </button>
                                 </div>
-                                
+
                                 {/* Password Strength Indicator */}
                                 {formData.password && (
                                     <div className="space-y-1">
                                         <div className="flex justify-between text-xs">
                                             <span className="text-base-content/70">Password strength:</span>
-                                            <span className={`font-medium ${
-                                                passwordStrength === 0 ? 'text-error' :
+                                            <span className={`font-medium ${passwordStrength === 0 ? 'text-error' :
                                                 passwordStrength === 1 ? 'text-warning' :
-                                                passwordStrength === 2 ? 'text-info' :
-                                                'text-success'
-                                            }`}>
+                                                    passwordStrength === 2 ? 'text-info' :
+                                                        'text-success'
+                                                }`}>
                                                 {getPasswordStrengthText()}
                                             </span>
                                         </div>
                                         <div className="flex gap-1">
                                             {[1, 2, 3, 4].map((level) => (
-                                                <div 
+                                                <div
                                                     key={level}
-                                                    className={`h-1 flex-1 rounded-full transition-all ${
-                                                        level <= passwordStrength 
-                                                            ? getPasswordStrengthColor() 
-                                                            : 'bg-base-300'
-                                                    }`}
+                                                    className={`h-1 flex-1 rounded-full transition-all ${level <= passwordStrength
+                                                        ? getPasswordStrengthColor()
+                                                        : 'bg-base-300'
+                                                        }`}
                                                 />
                                             ))}
                                         </div>
                                         <ul className="text-xs text-base-content/60 space-y-1 mt-2">
                                             <li className={`flex items-center gap-1 ${formData.password.length >= 8 ? 'text-success' : ''}`}>
-                                                {formData.password.length >= 8 ? 
-                                                    <CheckCircle className="w-3 h-3" /> : 
+                                                {formData.password.length >= 8 ?
+                                                    <CheckCircle className="w-3 h-3" /> :
                                                     <span className="w-3 h-3 rounded-full border border-base-300" />
                                                 }
                                                 At least 8 characters
                                             </li>
                                             <li className={`flex items-center gap-1 ${/[A-Z]/.test(formData.password) ? 'text-success' : ''}`}>
-                                                {/[A-Z]/.test(formData.password) ? 
-                                                    <CheckCircle className="w-3 h-3" /> : 
+                                                {/[A-Z]/.test(formData.password) ?
+                                                    <CheckCircle className="w-3 h-3" /> :
                                                     <span className="w-3 h-3 rounded-full border border-base-300" />
                                                 }
                                                 One uppercase letter
                                             </li>
                                             <li className={`flex items-center gap-1 ${/[0-9]/.test(formData.password) ? 'text-success' : ''}`}>
-                                                {/[0-9]/.test(formData.password) ? 
-                                                    <CheckCircle className="w-3 h-3" /> : 
+                                                {/[0-9]/.test(formData.password) ?
+                                                    <CheckCircle className="w-3 h-3" /> :
                                                     <span className="w-3 h-3 rounded-full border border-base-300" />
                                                 }
                                                 One number
                                             </li>
                                             <li className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(formData.password) ? 'text-success' : ''}`}>
-                                                {/[^A-Za-z0-9]/.test(formData.password) ? 
-                                                    <CheckCircle className="w-3 h-3" /> : 
+                                                {/[^A-Za-z0-9]/.test(formData.password) ?
+                                                    <CheckCircle className="w-3 h-3" /> :
                                                     <span className="w-3 h-3 rounded-full border border-base-300" />
                                                 }
                                                 One special character
@@ -421,7 +420,7 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                         </Link>
                                     </span>
                                 </label>
-                                
+
                                 <div className="flex items-center gap-2 text-xs text-success">
                                     <Shield className="w-3 h-3" />
                                     <span>Your information is secure and protected</span>
@@ -447,6 +446,21 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </>
                                 )}
                             </button>
+
+                            {/* Divider */}
+                            <div className="relative my-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-base-300"></div>
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="px-2 bg-base-100 text-base-content/50 font-medium">Or register with</span>
+                                </div>
+                            </div>
+
+                            {/* Social Google Register */}
+                            <div className="space-y-3">
+                                <AithGoogle />
+                            </div>
                         </form>
 
                         {/* Footer */}
@@ -467,7 +481,7 @@ const RegisterModal = ({ isOpen, onClose, onLoginClick, onSuccess }) => {
                                     </button>
                                 </p>
                             </div>
-                            
+
                             {/* Benefits */}
                             <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-base-content/60">
                                 <div className="flex items-center gap-1">

@@ -17,7 +17,8 @@ import {
   Building,
   ShieldCheck,
   Package,
-  Layers
+  Layers,
+  UserCheck
 } from "lucide-react";
 
 export default function NavbarAdmin() {
@@ -47,7 +48,7 @@ export default function NavbarAdmin() {
     },
     {
       path: "/admin/users-management",
-      label: "Users Management",
+      label: "Users",
       icon: Users
     },
     {
@@ -57,18 +58,23 @@ export default function NavbarAdmin() {
     },
     {
       path: "/admin/contact",
-      label: "Contact Management",
+      label: "Contact",
       icon: Mail
     },
     {
       path: "/admin/service-management",
-      label: "Service Management",
+      label: "Service",
       icon: Settings
     },
     {
       path: "/admin/additional-management",
-      label: "Additional Management",
+      label: "Additional",
       icon: FolderPlus
+    },
+    {
+      path: "/admin/profile",
+      label: "My Profile",
+      icon: UserCheck
     },
   ];
 
@@ -98,19 +104,22 @@ export default function NavbarAdmin() {
 
         {/* User Info */}
         {!isCollapsed && (
-          <div className="mx-3 my-4 p-3 bg-gradient-to-r from-primary/5 to-secondary/5 border border-base-300/60 rounded-xl">
+          <Link
+            to="/admin/profile"
+            className="mx-3 my-4 p-3 bg-gradient-to-r from-primary/5 to-secondary/5 border border-base-300/60 rounded-xl hover:bg-base-200/80 transition-colors group block"
+          >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-base-content truncate">Admin Panel</p>
+                <p className="text-sm font-semibold text-base-content truncate group-hover:text-primary transition-colors">Admin Profile</p>
                 <span className="inline-block px-2 py-0.5 text-xs font-semibold text-primary bg-primary/10 rounded-full capitalize">
                   {userRole || 'Administrator'}
                 </span>
               </div>
             </div>
-          </div>
+          </Link>
         )}
 
         {/* Navigation Links */}

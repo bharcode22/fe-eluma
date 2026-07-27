@@ -1,6 +1,7 @@
 import React from 'react'
 import UpdateProperty from './UpdateProperty.jsx'
 import NavbarUsers from "../../../../components/NavbarUser.jsx";
+import FooterLandingPage from "../../../../components/FooterLandingPage.jsx";
 
 function index() {
     return (
@@ -10,6 +11,9 @@ function index() {
             </div>
             <div className='text-4xl flex justify-center'>
                 <UpdateProperty />
+            </div>
+            <div>
+                <FooterLandingPage />
             </div>
         </div>
     )

@@ -1,18 +1,18 @@
-import React from 'react'
+import React from 'react';
 import NavbarLandingPage from "../../../components/NavbarLandingPage.jsx";
+import FooterLandingPage from "../../../components/FooterLandingPage.jsx";
 import ContactContent from './ContactContent.jsx';
 
 function Contact() {
     return (
-        <div>
-            <div>
-                <NavbarLandingPage />
-            </div>
-            <div>
+        <div className="flex flex-col min-h-screen">
+            <NavbarLandingPage />
+            <main className="flex-grow">
                 <ContactContent />
-            </div>
+            </main>
+            <FooterLandingPage />
         </div>
-    )
+    );
 }
 
-export default Contact
+export default Contact;

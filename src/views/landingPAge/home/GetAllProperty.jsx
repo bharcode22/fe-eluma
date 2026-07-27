@@ -231,23 +231,26 @@ function GetAllProperty({ bannerFilters, onClearFilters }) {
         <div className="space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-1">
+              <div className="flex flex-wrap items-center gap-3 mb-1">
                 <div className="p-2.5 bg-primary/10 rounded-2xl text-primary">
                   <Home className="w-7 h-7" />
                 </div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-base-content tracking-tight">
-                  Discover Amazing Properties
+                <h1 className="text-3xl md:text-4xl font-extrabold text-base-content tracking-tight flex items-center gap-2">
+                  <span>Discover Amazing Properties</span>
+                  <span className="badge badge-primary font-bold text-xs sm:text-sm px-3 py-1 rounded-xl">
+                    {properties.length} Items
+                  </span>
                 </h1>
               </div>
               <p className="text-sm text-base-content/70">
-                Browse our curated collection of premium properties
+                Showing <span className="font-bold text-base-content">{filteredProperties.length}</span> of <span className="font-bold text-primary">{totalData || properties.length}</span> curated premium properties from backend database
               </p>
             </div>
 
             <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 self-start md:self-auto">
               <Award className="w-5 h-5 text-primary" />
               <span className="font-bold text-primary text-sm">
-                {totalData} Properties Available
+                {totalData || properties.length} Total Properties Available
               </span>
             </div>
           </div>
@@ -350,8 +353,8 @@ function GetAllProperty({ bannerFilters, onClearFilters }) {
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}
                         className={`btn btn-sm btn-circle text-xs font-semibold ${currentPage === pageNum
-                            ? 'btn-primary text-white shadow-md'
-                            : 'btn-ghost text-base-content/70 hover:bg-base-200'
+                          ? 'btn-primary text-white shadow-md'
+                          : 'btn-ghost text-base-content/70 hover:bg-base-200'
                           }`}
                       >
                         {pageNum}

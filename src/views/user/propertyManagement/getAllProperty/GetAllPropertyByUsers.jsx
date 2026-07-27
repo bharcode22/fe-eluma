@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import {
   ChevronLeft,
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 import api from '../../../../service/api.js';
-import PropertyFilter from '../../../landingPAge/home/PropertyFilter.jsx'; 
+import UserBanner from './components/UserBanner.jsx';
 import { useLanguage } from '../../../../context/LanguageContext';
 import { useCurrency } from '../../../../context/CurrencyContext';
 import { translateNodes } from '../../../../utils/translator';
@@ -29,10 +29,7 @@ function GetAllPropertyByUsers() {
   const [error, setError] = useState(null);
   const [totalData, setTotalData] = useState(0);
   const [carouselIndexes, setCarouselIndexes] = useState({});
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [priceView, setPriceView] = useState('monthly');
-  const [filteredProperties, setFilteredProperties] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
   const [paginationInfo, setPaginationInfo] = useState({
@@ -44,6 +41,12 @@ function GetAllPropertyByUsers() {
     hasPreviousPage: false,
   });
   const [favorites, setFavorites] = useState(new Set());
+
+  const [userFilters, setUserFilters] = useState({
+    searchLocation: '',
+    propertyType: '',
+    priceRange: ''
+  });
 
   const divRef = useRef(null);
   const { lang } = useLanguage();
@@ -66,8 +69,7 @@ function GetAllPropertyByUsers() {
         const props = response.data.data?.properties || [];
         setProperties(props);
         setTotalData(response.data.totalData || 0);
-        setFilteredProperties(props);
-        // Use backend pagination info if available, else fallback
+
         setPaginationInfo({
           currentPage: response.data.data?.pagination?.currentPage || currentPage,
           itemsPerPage: response.data.data?.pagination?.itemsPerPage || itemsPerPage,
@@ -76,6 +78,7 @@ function GetAllPropertyByUsers() {
           hasNextPage: response.data.data?.pagination?.hasNextPage ?? (currentPage < Math.ceil((response.data.totalData || props.length) / itemsPerPage)),
           hasPreviousPage: response.data.data?.pagination?.hasPreviousPage ?? (currentPage > 1),
         });
+
         const initialIndexes = {};
         props.forEach((property) => {
           initialIndexes[property.id] = 0;
@@ -88,58 +91,113 @@ function GetAllPropertyByUsers() {
       }
     };
     fetchData();
-    // eslint-disable-next-line
   }, [currentPage, itemsPerPage]);
 
-  const handleOpenLogin = () => {
-    setIsRegisterModalOpen(false);
-    setIsLoginModalOpen(true);
-  };
+  // Compute filtered properties
+  const filteredProperties = useMemo(() => {
+    if (!userFilters) return properties;
+    const { searchLocation, propertyType, priceRange } = userFilters;
 
-  const handleOpenRegister = () => {
-    setIsLoginModalOpen(false);
-    setIsRegisterModalOpen(true);
-  };
+    if (!searchLocation && !propertyType && !priceRange) {
+      return properties;
+    }
 
-  const toggleFavorite = (propertyId, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(propertyId)) {
-        newFavorites.delete(propertyId);
-      } else {
-        newFavorites.add(propertyId);
-        setIsLoginModalOpen(true); // Prompt login if not logged in
+    return properties.filter((p) => {
+      // 1. Search Location / Title
+      if (searchLocation) {
+        const query = searchLocation.toLowerCase().trim();
+        const titleMatch = p.property_tittle?.toLowerCase().includes(query);
+        const locMatch = Array.isArray(p.location)
+          ? p.location.some((l) => l.general_area?.toLowerCase().includes(query))
+          : p.location?.general_area?.toLowerCase().includes(query);
+        if (!titleMatch && !locMatch) return false;
       }
-      return newFavorites;
+
+      // 2. Property Type
+      if (propertyType) {
+        const pType = p.type_id || p.property_type || '';
+        if (pType !== propertyType) return false;
+      }
+
+      // 3. Price Range
+      if (priceRange) {
+        const price = p.price || p.monthly_price || 0;
+        if (priceRange === 'under_100k' && price > 100000000) return false;
+        if (priceRange === '100k_500k' && (price <= 100000000 || price > 500000000)) return false;
+        if (priceRange === '500k_1m' && (price <= 500000000 || price > 1000000000)) return false;
+        if (priceRange === 'above_1m' && price <= 1000000000) return false;
+      }
+
+      return true;
     });
-  };
+  }, [properties, userFilters]);
+
+  const toggleFavorite = useCallback((propertyId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setFavorites((prev) => {
+      const newFavs = new Set(prev);
+      if (newFavs.has(propertyId)) {
+        newFavs.delete(propertyId);
+      } else {
+        newFavs.add(propertyId);
+      }
+      return newFavs;
+    });
+  }, []);
+
+  const pageNumbers = useMemo(() => {
+    const pages = [];
+    const total = paginationInfo.totalPages;
+    let start = 1;
+    let end = total;
+
+    if (total > 5) {
+      if (currentPage <= 3) {
+        start = 1;
+        end = 5;
+      } else if (currentPage >= total - 2) {
+        start = total - 4;
+        end = total;
+      } else {
+        start = currentPage - 2;
+        end = currentPage + 2;
+      }
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }, [currentPage, paginationInfo.totalPages]);
+
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  }, []);
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <LoadingSkeleton />
-      </div>
-    );
+    return <LoadingSkeleton divRef={divRef} />;
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error/10">
-            <AlertCircle className="w-8 h-8 text-error" />
+      <div className="flex justify-center items-center min-h-[60vh] p-4">
+        <div className="text-center space-y-4 max-w-md bg-base-100 p-8 rounded-3xl border border-base-300 shadow-xl">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-error/10 text-error">
+            <AlertCircle className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-error">Failed to Load Properties</h3>
-            <p className="text-base-content/70">{error}</p>
+            <h3 className="text-xl font-bold text-error">Failed to Load Catalog</h3>
+            <p className="text-sm text-base-content/70">{error}</p>
           </div>
           <button
             onClick={() => window.location.reload()}
-            className="btn btn-primary gap-2"
+            className="btn btn-primary gap-2 rounded-xl text-white w-full"
           >
-            <Loader2 className="w-4 h-4" />
+            <Loader2 className="w-4 h-4 animate-spin" />
             Try Again
           </button>
         </div>
@@ -148,81 +206,88 @@ function GetAllPropertyByUsers() {
   }
 
   return (
-    <div ref={divRef} className="min-h-screen bg-gradient-to-b from-base-100 to-base-200">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Home className="w-8 h-8 text-primary" />
-                <h1 className="text-3xl md:text-4xl font-bold text-base-content">
-                  Discover Amazing Properties
-                </h1>
-              </div>
-              <p className="text-base-content/70">
-                Browse our curated collection of premium properties
-              </p>
+    <div ref={divRef} className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-6">
+      <div className="container mx-auto px-4 space-y-6">
+
+        {/* Dedicated User Hero Banner */}
+        <UserBanner
+          filters={userFilters}
+          setFilters={setUserFilters}
+          onClearFilters={() => setUserFilters({ searchLocation: '', propertyType: '', priceRange: '' })}
+        />
+
+        {/* Properties Header Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-300 shadow-sm">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <Home className="w-6 h-6 text-primary" />
+              <h2 className="text-xl font-bold text-base-content flex items-center gap-2">
+                <span>Available Property Catalog</span>
+                <span className="badge badge-primary font-bold text-xs">
+                  {properties.length} Items
+                </span>
+              </h2>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
-              <Award className="w-5 h-5 text-primary" />
-              <span className="font-semibold text-primary">
-                {totalData} Properties Available
-              </span>
-            </div>
+            <p className="text-xs text-base-content/70">
+              Showing <span className="font-bold text-base-content">{filteredProperties.length}</span> of <span className="font-bold text-primary">{totalData || properties.length}</span> total verified properties from backend database
+            </p>
           </div>
 
-          {/* Search and Filter */}
-          <div className="mb-8">
-            <PropertyFilter properties={properties} onFilter={setFilteredProperties} />
+          <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 self-start md:self-auto">
+            <Award className="w-4 h-4 text-primary" />
+            <span className="font-bold text-primary text-xs">
+              {totalData || properties.length} Total Properties Available
+            </span>
           </div>
         </div>
 
         {/* Properties Grid */}
         {filteredProperties.length === 0 ? (
-          <div className="text-center py-16 space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning/10">
-              <Search className="w-8 h-8 text-warning" />
+          <div className="bg-base-100 rounded-3xl border border-base-300 p-12 text-center space-y-4 shadow-sm">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning/10 text-warning">
+              <Search className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-semibold text-base-content">No Properties Found</h3>
-            <p className="text-base-content/70">
-              Try adjusting your filters or search criteria
+            <h3 className="text-xl font-bold text-base-content">No Properties Found</h3>
+            <p className="text-sm text-base-content/70 max-w-sm mx-auto">
+              Try adjusting your search criteria in the banner or clearing active filters.
             </p>
             <button
-              onClick={() => setFilteredProperties(properties)}
-              className="btn btn-outline gap-2"
+              onClick={() => setUserFilters({ searchLocation: '', propertyType: '', priceRange: '' })}
+              className="btn btn-outline gap-2 rounded-xl"
             >
               <Filter className="w-4 h-4" />
-              Clear All Filters
+              Reset All Filters
             </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProperties.map((property) => {
                 const currentIndex = carouselIndexes[property.id] || 0;
                 const isFavorite = favorites.has(property.id);
+
                 const handlePrevClick = (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                  if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                   setCarouselIndexes((prev) => ({
                     ...prev,
-                    [property.id]: prev[property.id] === 0 ? property.images.length - 1 : prev[property.id] - 1,
+                    [property.id]: prev[property.id] === 0 ? (property.images?.length || 1) - 1 : prev[property.id] - 1,
                   }));
                 };
+
                 const handleNextClick = (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                  if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
                   setCarouselIndexes((prev) => ({
                     ...prev,
-                    [property.id]: (prev[property.id] + 1) % property.images.length,
+                    [property.id]: ((prev[property.id] || 0) + 1) % (property.images?.length || 1),
                   }));
                 };
-                const handleFavoriteClick = (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleFavorite(property.id, e);
-                };
+
                 return (
                   <PropertyCard
                     key={property.id}
@@ -231,7 +296,7 @@ function GetAllPropertyByUsers() {
                     isFavorite={isFavorite}
                     onPrev={handlePrevClick}
                     onNext={handleNextClick}
-                    onFavorite={handleFavoriteClick}
+                    onFavorite={(e) => toggleFavorite(property.id, e)}
                     priceView={priceView}
                     setPriceView={setPriceView}
                     getCurrencySymbol={getCurrencySymbol}
@@ -245,76 +310,63 @@ function GetAllPropertyByUsers() {
 
             {/* Pagination */}
             {paginationInfo.totalPages > 1 && (
-              <div className="mt-12 pt-8 border-t border-base-300">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="text-sm text-base-content/70">
-                    Showing {((currentPage - 1) * itemsPerPage) + 1} to{' '}
-                    {Math.min(currentPage * itemsPerPage, totalData)} of {totalData} properties
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-base-300">
+                <div className="text-xs text-base-content/70">
+                  Showing Page <span className="font-bold text-base-content">{paginationInfo.currentPage}</span> of{' '}
+                  <span className="font-bold text-base-content">{paginationInfo.totalPages}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                    className="btn btn-circle btn-sm btn-ghost disabled:opacity-30"
+                    title="First Page"
+                  >
+                    <ChevronFirst className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={!paginationInfo.hasPreviousPage}
+                    className="btn btn-circle btn-sm btn-ghost disabled:opacity-30"
+                    title="Previous Page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1 mx-1">
+                    {pageNumbers.map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`btn btn-sm btn-circle text-xs font-semibold ${currentPage === pageNum
+                          ? 'btn-primary text-white shadow-md'
+                          : 'btn-ghost text-base-content/70 hover:bg-base-200'
+                          }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage(1)}
-                      disabled={currentPage === 1}
-                      className="btn btn-square btn-sm btn-ghost disabled:opacity-50"
-                    >
-                      <ChevronFirst className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={!paginationInfo.hasPreviousPage}
-                      className="btn btn-sm btn-ghost gap-2 disabled:opacity-50"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Previous
-                    </button>
-                    <div className="flex items-center gap-1">
-                      {(() => {
-                        const pages = [];
-                        const total = paginationInfo.totalPages;
-                        let start = 1;
-                        let end = total;
-                        if (total > 5) {
-                          if (currentPage <= 3) {
-                            start = 1;
-                            end = 5;
-                          } else if (currentPage >= total - 2) {
-                            start = total - 4;
-                            end = total;
-                          } else {
-                            start = currentPage - 2;
-                            end = currentPage + 2;
-                          }
-                        }
-                        for (let i = start; i <= end; i++) {
-                          pages.push(
-                            <button
-                              key={i}
-                              onClick={() => setCurrentPage(i)}
-                              className={`btn btn-sm btn-square ${currentPage === i ? 'btn-primary' : 'btn-ghost'}`}
-                            >
-                              {i}
-                            </button>
-                          );
-                        }
-                        return pages;
-                      })()}
-                    </div>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationInfo.totalPages))}
-                      disabled={!paginationInfo.hasNextPage}
-                      className="btn btn-sm btn-ghost gap-2 disabled:opacity-50"
-                    >
-                      Next
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(paginationInfo.totalPages)}
-                      disabled={currentPage === paginationInfo.totalPages}
-                      className="btn btn-square btn-sm btn-ghost disabled:opacity-50"
-                    >
-                      <ChevronLast className="w-4 h-4" />
-                    </button>
-                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!paginationInfo.hasNextPage}
+                    className="btn btn-circle btn-sm btn-ghost disabled:opacity-30"
+                    title="Next Page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(paginationInfo.totalPages)}
+                    disabled={currentPage === paginationInfo.totalPages}
+                    className="btn btn-circle btn-sm btn-ghost disabled:opacity-30"
+                    title="Last Page"
+                  >
+                    <ChevronLast className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             )}

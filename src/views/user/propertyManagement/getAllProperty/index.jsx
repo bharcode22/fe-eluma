@@ -1,15 +1,16 @@
+import React from 'react';
 import NavbarUsers from "../../../../components/NavbarUser.jsx";
 import GetAllPropertyUser from "./GetAllPropertyByUsers.jsx";
+import FooterLandingPage from "../../../../components/FooterLandingPage.jsx";
 
 export default function Home() {
     return (
-        <div>
-            <div>
-                <NavbarUsers />
-            </div>
-            <div className="mt-12">
+        <div className="flex flex-col min-h-screen bg-base-100">
+            <NavbarUsers />
+            <main className="flex-grow">
                 <GetAllPropertyUser />
-            </div>
+            </main>
+            <FooterLandingPage />
         </div>
-    )
+    );
 }
