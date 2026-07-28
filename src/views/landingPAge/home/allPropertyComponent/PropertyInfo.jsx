@@ -93,53 +93,75 @@ const PropertyInfo = memo(({
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Bed className="w-4 h-4 text-primary" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-base-content">
-              {property.number_of_bedrooms ?? 0}
+        {(property.number_of_bedrooms !== undefined && property.number_of_bedrooms !== null) && (
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Bed className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-xs text-base-content/50">Bedrooms</div>
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {property.number_of_bedrooms}
+              </div>
+              <div className="text-xs text-base-content/50">Bedrooms</div>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-secondary/10 rounded-lg">
-            <Bath className="w-4 h-4 text-secondary" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-base-content">
-              {property.number_of_bathrooms || '-'}
+        {(property.number_of_bathrooms !== undefined && property.number_of_bathrooms !== null) && (
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-secondary/10 rounded-lg">
+              <Bath className="w-4 h-4 text-secondary" />
             </div>
-            <div className="text-xs text-base-content/50">Bathrooms</div>
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {property.number_of_bathrooms}
+              </div>
+              <div className="text-xs text-base-content/50">Bathrooms</div>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-accent/10 rounded-lg">
-            <Users className="w-4 h-4 text-accent" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-base-content">
-              {property.maximum_guest || '-'}
+        {(property.maximum_guest !== undefined && property.maximum_guest !== null) && (
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <Users className="w-4 h-4 text-accent" />
             </div>
-            <div className="text-xs text-base-content/50">Max Guests</div>
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {property.maximum_guest}
+              </div>
+              <div className="text-xs text-base-content/50">Max Guests</div>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-info/10 rounded-lg">
-            <Maximize2 className="w-4 h-4 text-info" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-base-content">
-              {property.size || '-'}
+        {(property.minimum_stay !== undefined && property.minimum_stay !== null) && (
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-info/10 rounded-lg">
+              <Clock className="w-4 h-4 text-info" />
             </div>
-            <div className="text-xs text-base-content/50">m²</div>
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {property.minimum_stay} Nights
+              </div>
+              <div className="text-xs text-base-content/50">Min Stay</div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {property.size && (
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-warning/10 rounded-lg">
+              <Maximize2 className="w-4 h-4 text-warning" />
+            </div>
+            <div>
+              <div className="text-sm font-medium text-base-content">
+                {property.size}
+              </div>
+              <div className="text-xs text-base-content/50">m²</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Facilities Icons */}

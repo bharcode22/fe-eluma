@@ -153,15 +153,21 @@ const UpdateProperty = () => {
         const propertyData = Array.isArray(rawData) ? rawData[0] : rawData;
 
         if (propertyData) {
-          const getFirstOrObj = (val) => (Array.isArray(val) ? val[0] : val) || {};
+          const getFirstOrObj = (val) => {
+            if (Array.isArray(val)) return val[0] || {};
+            return val || {};
+          };
 
           const avail = getFirstOrObj(propertyData.availability);
           const loc = getFirstOrObj(propertyData.location);
           const owner = getFirstOrObj(propertyData.propertiesOwner);
           const fac = getFirstOrObj(propertyData.facilities);
+          
           const add = getFirstOrObj(propertyData.additionalDetails);
           const parking = getFirstOrObj(add.Parking || add.parking);
           const view = getFirstOrObj(add.View || add.view);
+
+          const isPetsAllowed = add.allow_path !== undefined ? !!add.allow_path : !!add.allow_pets;
 
           setFormState({
             type_id: propertyData.type_id || '',
@@ -214,26 +220,27 @@ const UpdateProperty = () => {
               email: owner.email || ''
             },
             additionalDetails: {
-              allow_pets: !!(add.allow_pets ?? add.allow_path),
+              allow_pets: isPetsAllowed,
+              allow_path: isPetsAllowed,
               construction_nearby: !!add.construction_nearby,
               cleaning_requency: add.cleaning_requency || '',
               linen_chaneg: add.linen_chaneg || '',
               parking: {
-                car_parking: !!parking.car_parking,
-                bike_parking: !!parking.bike_parking,
-                both_car_and_bike: !!parking.both_car_and_bike,
+                car_parking: !!(parking.car_parking),
+                bike_parking: !!(parking.bike_parking),
+                both_car_and_bike: !!(parking.both_car_and_bike),
               },
               view: {
-                ocean_view: !!view.ocean_view,
-                sunset_view: !!view.sunset_view,
-                garden_view: !!view.garden_view,
-                beach_view: !!view.beach_view,
-                jungle_view: !!view.jungle_view,
-                montain_view: !!view.montain_view,
-                pool_view: !!view.pool_view,
-                rice_field: !!view.rice_field,
-                sunrise_view: !!view.sunrise_view,
-                volcano_view: !!view.volcano_view,
+                ocean_view: !!(view.ocean_view),
+                sunset_view: !!(view.sunset_view),
+                garden_view: !!(view.garden_view),
+                beach_view: !!(view.beach_view),
+                jungle_view: !!(view.jungle_view),
+                montain_view: !!(view.montain_view ?? view.mountain_view),
+                pool_view: !!(view.pool_view),
+                rice_field: !!(view.rice_field),
+                sunrise_view: !!(view.sunrise_view),
+                volcano_view: !!(view.volcano_view),
               }
             }
           });
@@ -388,11 +395,10 @@ const UpdateProperty = () => {
 
         {/* Global Alert Banner */}
         {message && (
-          <div className={`p-4 rounded-2xl flex items-center gap-3 border ${
-            message.includes('success')
+          <div className={`p-4 rounded-2xl flex items-center gap-3 border ${message.includes('success')
               ? 'bg-success/10 border-success/30 text-success'
               : 'bg-error/10 border-error/30 text-error'
-          }`}>
+            }`}>
             {message.includes('success') ? (
               <CheckCircle className="w-5 h-5 flex-shrink-0" />
             ) : (

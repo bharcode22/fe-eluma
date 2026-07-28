@@ -183,7 +183,33 @@ const AddNewProperty = () => {
       watsapp: propertiesOwner.watsapp ? parseInt(propertiesOwner.watsapp, 10) : null,
     };
     formData.append('propertiesOwner', JSON.stringify(propertiesOwnerForBackend));
-    formData.append('additionalDetails', JSON.stringify(additionalDetails));
+
+    const isPetsAllowed = !!(additionalDetails.allow_pets || additionalDetails.allow_path);
+    const additionalDetailsPayload = {
+      allow_path: isPetsAllowed,
+      allow_pets: isPetsAllowed,
+      construction_nearby: !!additionalDetails.construction_nearby,
+      cleaning_requency: additionalDetails.cleaning_requency || '',
+      linen_chaneg: additionalDetails.linen_chaneg || '',
+      parking: {
+        car_parking: !!(additionalDetails.parking?.car_parking),
+        bike_parking: !!(additionalDetails.parking?.bike_parking),
+        both_car_and_bike: !!(additionalDetails.parking?.both_car_and_bike),
+      },
+      view: {
+        ocean_view: !!(additionalDetails.view?.ocean_view),
+        sunset_view: !!(additionalDetails.view?.sunset_view),
+        garden_view: !!(additionalDetails.view?.garden_view),
+        beach_view: !!(additionalDetails.view?.beach_view),
+        jungle_view: !!(additionalDetails.view?.jungle_view),
+        montain_view: !!(additionalDetails.view?.montain_view || additionalDetails.view?.mountain_view),
+        pool_view: !!(additionalDetails.view?.pool_view),
+        rice_field: !!(additionalDetails.view?.rice_field),
+        sunrise_view: !!(additionalDetails.view?.sunrise_view),
+        volcano_view: !!(additionalDetails.view?.volcano_view),
+      }
+    };
+    formData.append('additionalDetails', JSON.stringify(additionalDetailsPayload));
 
     images.forEach((file) => {
       formData.append('images', file);

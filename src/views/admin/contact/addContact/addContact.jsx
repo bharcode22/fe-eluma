@@ -10,6 +10,7 @@ const baseUrl = api.defaults.baseURL;
 function AddContact() {
     const navigate = useNavigate();
     const [number, setNumber] = useState('');
+    const [status, setStatus] = useState('active');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -21,9 +22,11 @@ function AddContact() {
         try {
             const token = Cookies.get('token');
 
-            await axios.post(`${baseUrl}/contact`,
+            await axios.post(
+                `${baseUrl}/contact`,
                 {
                     number: number,
+                    status: status || 'active',
                 },
                 {
                     headers: {
@@ -92,6 +95,21 @@ function AddContact() {
                                 />
                             </div>
                             <p className="text-xs text-base-content/60">Include international country code for WhatsApp compatibility.</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label htmlFor="contact_status" className="block text-sm font-bold text-base-content">
+                                Status
+                            </label>
+                            <select
+                                id="contact_status"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                                className="select select-bordered w-full rounded-xl bg-base-100 border-base-300 focus:outline-none focus:border-primary text-sm"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
                         </div>
 
                         <div className="flex gap-3 pt-4 border-t border-base-200">

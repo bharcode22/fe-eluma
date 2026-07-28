@@ -130,7 +130,7 @@ function LandingPageDetailProperty() {
 
   return (
     <div ref={divRef} className="min-h-screen bg-gradient-to-b from-base-100 via-base-200/50 to-base-100 flex flex-col">
-      <NavbarLandingPage />
+      {/* <NavbarLandingPage /> */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-grow w-full">
 

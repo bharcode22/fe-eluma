@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { ArrowLeft, Phone, Sparkles, Loader2, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, Phone, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import api from '../../../../service/api.js';
 
 const baseUrl = api.defaults.baseURL;
@@ -12,7 +12,7 @@ function UpdateContact() {
     const navigate = useNavigate();
 
     const [number, setNumber] = useState('');
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('active');
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,11 +28,12 @@ function UpdateContact() {
                     },
                 });
 
-                const contact = res.data.data;
+                const rawData = res.data?.data;
+                const contactData = Array.isArray(rawData) ? rawData[0] : rawData;
 
-                if (contact && contact.length > 0) {
-                    setNumber(contact[0].number ?? '');
-                    setStatus(contact[0].status ?? 'active');
+                if (contactData) {
+                    setNumber(contactData.number ?? '');
+                    setStatus(contactData.status ?? 'active');
                 }
             } catch (err) {
                 console.error(err);
