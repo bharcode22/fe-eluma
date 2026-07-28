@@ -1,240 +1,325 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
+import {
+  Heart,
+  MapPin,
+  Bed,
+  Bath,
+  Clock,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  AlertCircle,
+  Building
+} from 'lucide-react';
 import { useLanguage } from '../../../../context/LanguageContext';
 import { useCurrency } from '../../../../context/CurrencyContext';
-import { translateNodes } from '../../../../utils/translator';
-
-import location from '../../../../assets/svg/location.svg';
-import bedroom from '../../../../assets/svg/bedroom.svg';
-import guest from '../../../../assets/svg/guest.svg';
-import calender from '../../../../assets/svg/calender.svg';
-import duration from '../../../../assets/svg/duration.svg';
-import love from '../../../../assets/svg/love.svg';
 import api from '../../../../service/api.js';
 
 const baseUrl = api.defaults.baseURL;
 
 const GetSavedProperty = () => {
-	const [properties, setProperties] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [carouselIndexes, setCarouselIndexes] = useState({});
-	const [priceView, setPriceView] = useState('monthly');
-	const token = Cookies.get('token');
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [carouselIndexes, setCarouselIndexes] = useState({});
+  const [priceView, setPriceView] = useState('monthly');
+  const token = Cookies.get('token');
 
-	const divRef = useRef(null);
-	const { lang } = useLanguage();
-	const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
+  const { currency, exchangeRates, convertPrice, getCurrencySymbol } = useCurrency();
 
-	useEffect(() => {
-		if (divRef.current) {
-			translateNodes(divRef.current, lang);
-		}
-	}, [lang]);
+  const fetchSavedProperties = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`${baseUrl}/favorite-properties`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-	const fetchData = async () => {
-		try {
-		const response = await axios.get(`${baseUrl}/favorite-properties`, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
-		setProperties(response.data.data || []);
+      const data = response.data?.data || response.data || [];
+      const propList = Array.isArray(data) ? data : [];
+      setProperties(propList);
 
-		const initialIndexes = {};
-		response.data.data.forEach((property) => {
-			initialIndexes[property.id] = 0;
-		});
-			setCarouselIndexes(initialIndexes);
-		} catch (err) {
-			setError(err.response?.data?.message || err.message);
-		} finally {
-			setLoading(false);
-		}
-	};
+      const initialIndexes = {};
+      propList.forEach((prop) => {
+        initialIndexes[prop.id] = 0;
+      });
+      setCarouselIndexes(initialIndexes);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to load saved properties');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	const DeleteData = async (propertyId) => {
-		try {
+  const handleToggleFavorite = async (propertyId, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await axios.post(
+        `${baseUrl}/favorite-properties/${propertyId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Remove from list immediately for responsive UI
+      setProperties((prev) => prev.filter((p) => p.id !== propertyId));
+    } catch (err) {
+      console.error('Failed to remove favorite:', err);
+    }
+  };
 
-		await axios.delete(`${baseUrl}/favorite-properties/${propertyId}`, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
+  useEffect(() => {
+    if (!token) {
+      setError('Authentication required. Please login first.');
+      setLoading(false);
+      return;
+    }
+    fetchSavedProperties();
+  }, []);
 
-		fetchData();
-		} catch (err) {
-			setError(err.response?.data?.message || err.message);
-		}
-	};
+  const handlePrev = (propertyId, totalImages, e) => {
+    if (e) e.stopPropagation();
+    setCarouselIndexes((prev) => ({
+      ...prev,
+      [propertyId]: prev[propertyId] === 0 ? totalImages - 1 : prev[propertyId] - 1,
+    }));
+  };
 
-	useEffect(() => {
-		if (!token) {
-				setError('Token tidak ditemukan. Harap login terlebih dahulu.');
-				setLoading(false);
-			return;
-		}
+  const handleNext = (propertyId, totalImages, e) => {
+    if (e) e.stopPropagation();
+    setCarouselIndexes((prev) => ({
+      ...prev,
+      [propertyId]: (prev[propertyId] + 1) % totalImages,
+    }));
+  };
 
-		fetchData();
-	}, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-12 px-4 flex justify-center items-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
+          <p className="text-sm font-medium text-base-content/70">Loading saved properties...</p>
+        </div>
+      </div>
+    );
+  }
 
-	const handlePrev = (propertyId, totalImages) => {
-		setCarouselIndexes((prevIndexes) => ({
-		...prevIndexes,
-		[propertyId]: prevIndexes[propertyId] === 0
-			? totalImages - 1
-			: prevIndexes[propertyId] - 1,
-		}));
-	};
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-12 px-4 flex justify-center items-center">
+        <div className="bg-base-100 rounded-2xl border border-error/30 p-8 text-center max-w-md shadow-xl space-y-4">
+          <div className="w-14 h-14 bg-error/10 text-error rounded-full flex items-center justify-center mx-auto">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-error">Failed to Load Saved Properties</h3>
+            <p className="text-base-content/70 text-sm mt-1">{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary gap-2 shadow-md"
+          >
+            <Loader2 className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-	const handleNext = (propertyId, totalImages) => {
-		setCarouselIndexes((prevIndexes) => ({
-		...prevIndexes,
-		[propertyId]: (prevIndexes[propertyId] + 1) % totalImages,
-		}));
-	};
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 py-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="bg-base-100 p-6 md:p-8 rounded-2xl border border-base-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-error/10 text-error rounded-2xl">
+              <Heart className="w-8 h-8 fill-current" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-base-content flex items-center gap-2">
+                Saved Properties
+              </h1>
+              <p className="text-base-content/70 text-xs sm:text-sm mt-0.5">
+                Properties you have bookmarked for easy access
+              </p>
+            </div>
+          </div>
+          <div className="px-4 py-2 bg-base-200 rounded-xl border border-base-300 text-xs font-semibold text-base-content/70 self-start md:self-auto">
+            Total Saved: <span className="text-primary font-bold text-sm">{properties.length}</span>
+          </div>
+        </div>
 
-	if (loading) {
-		return (
-		<div className="flex justify-center items-center min-h-screen">
-			<div className="text-center">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-				<p className="mt-4 text-primary">Loading</p>
-			</div>
-		</div>
-		);
-	}
+        {/* Empty State */}
+        {properties.length === 0 ? (
+          <div className="bg-base-100 rounded-2xl border border-base-300 p-12 text-center space-y-4 max-w-md mx-auto shadow-sm">
+            <div className="w-16 h-16 bg-error/10 text-error rounded-full flex items-center justify-center mx-auto">
+              <Heart className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-base-content">No Saved Properties Yet</h3>
+              <p className="text-xs sm:text-sm text-base-content/60 mt-1">
+                Explore our properties and click the heart icon to save your favorites here.
+              </p>
+            </div>
+            <Link to="/user/all/property" className="btn btn-primary gap-2 shadow-md">
+              <Building className="w-4 h-4" />
+              <span>Explore Properties</span>
+            </Link>
+          </div>
+        ) : (
+          /* Grid of Saved Properties */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {properties.map((property) => {
+              const images = property.images || [];
+              const currentIndex = carouselIndexes[property.id] || 0;
 
-	if (error) {
-		return (
-		<div className="flex justify-center items-center min-h-screen">
-			<div className="alert alert-error text-center p-4">
-				<span>{error}</span>
-			</div>
-		</div>
-		);
-	}
+              return (
+                <div
+                  key={property.id}
+                  className="group bg-base-100 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-base-300 hover:border-primary/40 flex flex-col"
+                >
+                  {/* Image Carousel */}
+                  <div className="relative h-60 overflow-hidden bg-base-200">
+                    {images.length > 0 ? (
+                      <div
+                        className="flex h-full transition-transform duration-500 ease-out"
+                        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                      >
+                        {images.map((img) => (
+                          <div key={img.id} className="w-full flex-shrink-0 relative h-full">
+                            <img
+                              src={`${baseUrl}/propertyImages/${img.imageName}`}
+                              alt={img.imageName}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-base-content/40">
+                        <Building className="w-10 h-10" />
+                      </div>
+                    )}
 
-	return (
-		<div ref={divRef} className="container mx-auto p-4">
-			<div className="mb-6">
-				<h2 className="text-3xl font-bold text-accent mb-2">Properti Saya</h2>
-				<p className="text-gray-600">Daftar properti milik Anda</p>
-			</div>
+                    {/* Unlike Heart Button */}
+                    <button
+                      onClick={(e) => handleToggleFavorite(property.id, e)}
+                      className="absolute top-3 right-3 p-2 bg-error/90 hover:bg-error text-white rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-110 z-20"
+                      title="Remove from saved"
+                    >
+                      <Heart className="w-4 h-4 fill-current text-white" />
+                    </button>
 
-			{properties.length === 0 ? (
-				<div className="text-center py-16 space-y-4">
-					<p className="text-gray-500 text-lg">Tidak ada properti yang disimpan.</p>
-					<Link to="/user/add/property" className="btn btn-primary gap-2 inline-flex items-center">
-						<span>+ Tambah Properti Baru</span>
-					</Link>
-				</div>
-			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{properties.map((property) => {
-						const currentIndex = carouselIndexes[property.id] || 0;
+                    {/* Carousel Nav Arrows */}
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => handlePrev(property.id, images.length, e)}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 text-white"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => handleNext(property.id, images.length, e)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 text-white"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
 
-						return (
-							<div key={property.id} className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden">
-								{/* Carousel */}
-								<div className="relative w-full h-64 overflow-hidden">
-									<div
-										className="flex transition-transform duration-700 ease-in-out h-full"
-										style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-									>
-										{property.images.map((image) => (
-											<img
-												key={image.id}
-												src={`${baseUrl}/propertyImages/${image.imageName}`}
-												alt={image.imageName}
-												className="w-full h-64 object-cover flex-shrink-0"
-											/>
-										))}
-									</div>
+                  {/* Property Details */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-base md:text-lg text-base-content truncate">
+                          {property.property_tittle || property.property_code || 'Property'}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-base-content/70">
+                        <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                        <span className="truncate">
+                          {property.location?.[0]?.general_area || 'Bali'}
+                        </span>
+                      </div>
+                    </div>
 
-									<button onClick={() => DeleteData(property.fav_id)}>
-										<img src={love} className="absolute top-3 right-3 w-9 h-9 px-1 py-1 rounded-full backdrop-blur-lg shadow-3xl bg-red-500/80" alt="favorite" />
-									</button>
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-base-200">
+                      <div className="flex items-center gap-1.5 text-base-content/80 font-medium">
+                        <Bed className="w-4 h-4 text-primary" />
+                        <span>{property.number_of_bedrooms || 0} Beds</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-base-content/80 font-medium">
+                        <Bath className="w-4 h-4 text-secondary" />
+                        <span>{property.number_of_bathrooms || 0} Baths</span>
+                      </div>
+                    </div>
 
-									{/* Carousel Nav */}
-									<div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between z-10">
-										<button onClick={() => handlePrev(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50">
-											❮
-										</button>
-										<button onClick={() => handleNext(property.id, property.images.length)} className="btn btn-circle backdrop-blur-xs bg-accent/70 hover:bg-accent/50">
-											❯
-										</button>
-									</div>
-								</div>
+                    {/* Pricing */}
+                    <div className="space-y-3 pt-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-lg font-extrabold text-primary">
+                            {getCurrencySymbol()}
+                            {convertPrice(
+                              priceView === 'monthly' ? property.monthly_price : property.yearly_price,
+                              currency,
+                              exchangeRates
+                            ).toLocaleString()}
+                          </div>
+                          <div className="text-[11px] text-base-content/60 font-light">
+                            {priceView === 'monthly' ? '/ month' : '/ year'}
+                          </div>
+                        </div>
 
-								<div className="p-4">
-									<h2 className="text-xl font-bold mb-2 text-primary">{property.property_code}</h2>
-									<hr className="border-t-2 border-accent pr-10" />
+                        {/* Price Toggle */}
+                        <div className="flex bg-base-200 rounded-lg p-0.5 border border-base-300">
+                          <button
+                            onClick={() => setPriceView('monthly')}
+                            className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${priceView === 'monthly'
+                              ? 'bg-primary text-white shadow-xs'
+                              : 'text-base-content/70 hover:text-base-content'
+                              }`}
+                          >
+                            Monthly
+                          </button>
+                          <button
+                            onClick={() => setPriceView('yearly')}
+                            className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all ${priceView === 'yearly'
+                              ? 'bg-primary text-white shadow-xs'
+                              : 'text-base-content/70 hover:text-base-content'
+                              }`}
+                          >
+                            Yearly
+                          </button>
+                        </div>
+                      </div>
 
-									<div className="flex items-center justify-between mb-4 mt-4">
-										<div>
-											<div className="flex items-center gap-3 mb-2">
-												<img src={location} alt="Location" className='w-5 h-5' />
-												<p className="text-primary font-bold">{property.location[0]?.general_area || '-'}</p>
-											</div>
-
-											<div className="flex items-center gap-3 mb-2">
-												<img src={bedroom} alt="Bedroom" className='w-5 h-5' />
-												<p className="text-primary font-bold">{property.number_of_bedrooms} kamar tidur</p>
-											</div>
-
-											<div className="flex items-center gap-3 mb-2">
-												<img src={guest} alt="Guests" className='w-5 h-5' />
-												<p className="text-primary font-bold">Max Guests: {property.maximum_guest}</p>
-											</div>
-
-											<div className="flex items-center gap-3 mb-2">
-												<img src={calender} alt="Availability" className='w-5 h-5' />
-												<p className="text-primary font-bold">
-													{property.availability.length > 0
-														? `${new Date(property.availability[0].available_from).toLocaleDateString()} - ${new Date(property.availability[0].available_to).toLocaleDateString()}`
-														: '-'}
-												</p>
-											</div>
-
-											<div className="flex items-center gap-3 mb-2">
-												<img src={duration} alt="Duration" className='w-5 h-5' />
-												<p className="text-primary font-bold">Min stay: {property.minimum_stay} bulan</p>
-											</div>
-										</div>
-									</div>
-
-									<div className="flex flex-row justify-between items-center bg-secondary/65 p-4 rounded-2xl shadow-xl">
-										<div className="border-2 border-accent p-4 rounded-lg shadow-md">
-											<p className="font-bold text-primary text-xl">
-												{getCurrencySymbol()} {convertPrice(priceView === 'monthly' ? property.monthly_price : property.yearly_price)}
-											</p>
-											<p className="text-sm text-primary">/ {priceView === 'monthly' ? 'Bulan' : 'Tahun'}</p>
-										</div>
-
-										<div>
-											<button onClick={() => setPriceView('monthly')} className={`px-2 py-1 rounded-l-lg border border-accent ${priceView === 'monthly' ? 'bg-accent text-white' : 'bg-white text-accent'}`}>
-												Bulan
-											</button>
-											<button onClick={() => setPriceView('yearly')} className={`px-2 py-1 rounded-r-lg border border-accent ${priceView === 'yearly' ? 'bg-accent text-white' : 'bg-white text-accent'}`}>
-												Tahun
-											</button>
-										</div>
-									</div>
-
-									<div className="flex justify-end text-accent mt-5 gap-5">
-										<Link to={`/detail/${property.id}`} className="font-bold flex gap-2 items-center">
-											<span>Detail</span>
-											<span>❯</span>
-										</Link>
-									</div>
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			)}
-		</div>
-	);
+                      {/* Action Button */}
+                      <Link
+                        to={`/detail/${property.id}`}
+                        className="btn btn-primary btn-sm w-full rounded-xl gap-2 font-bold shadow-sm"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span>View Detail</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default GetSavedProperty;

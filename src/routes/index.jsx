@@ -73,14 +73,17 @@ export default function AppRoutes() {
                 <Route path="/admin/property-management" element={
                     isAuthenticated && userRole === 'admin' ? <PropertyManagement /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/update/property/:id" element={
+                <Route path="/admin/update-property-management/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/detail/property/:id" element={
+                <Route path="/admin/detail-property-management/:id" element={
                     isAuthenticated && userRole === 'admin' ? <DetailPropertyPage /> : <Navigate to="/" replace />
                 } />
                 <Route path="/admin/add/property" element={
                     isAuthenticated && userRole === 'admin' ? <AddPropertyPage /> : <Navigate to="/" replace />
+                } />
+                <Route path="/admin/update-images-only/:id" element={
+                    isAuthenticated && userRole === 'admin' ? <UpdateImagesOnly /> : <Navigate to="/" replace />
                 } />
                 <Route path="/admin/update/image/property/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdateImagesOnly /> : <Navigate to="/" replace />

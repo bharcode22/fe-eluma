@@ -13,6 +13,7 @@ import {
   Award
 } from 'lucide-react';
 
+import Cookies from 'js-cookie';
 import api from '../../../../service/api.js';
 import UserBanner from './components/UserBanner.jsx';
 import { useLanguage } from '../../../../context/LanguageContext';
@@ -63,27 +64,45 @@ function GetAllPropertyByUsers() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(
-          `${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`
-        );
-        const props = response.data.data?.properties || [];
-        setProperties(props);
-        setTotalData(response.data.totalData || 0);
+        const token = Cookies.get('token');
+        const [propertyRes, favRes] = await Promise.allSettled([
+          axios.get(`${baseUrl}/property?page=${currentPage}&limit=${itemsPerPage}`),
+          token
+            ? axios.get(`${baseUrl}/favorite-properties`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            : Promise.resolve(null),
+        ]);
 
-        setPaginationInfo({
-          currentPage: response.data.data?.pagination?.currentPage || currentPage,
-          itemsPerPage: response.data.data?.pagination?.itemsPerPage || itemsPerPage,
-          totalItems: response.data.data?.pagination?.totalItems || response.data.totalData || props.length,
-          totalPages: response.data.data?.pagination?.totalPages || Math.ceil((response.data.totalData || props.length) / itemsPerPage),
-          hasNextPage: response.data.data?.pagination?.hasNextPage ?? (currentPage < Math.ceil((response.data.totalData || props.length) / itemsPerPage)),
-          hasPreviousPage: response.data.data?.pagination?.hasPreviousPage ?? (currentPage > 1),
-        });
+        if (propertyRes.status === 'fulfilled') {
+          const response = propertyRes.value;
+          const props = response.data.data?.properties || [];
+          setProperties(props);
+          setTotalData(response.data.totalData || 0);
 
-        const initialIndexes = {};
-        props.forEach((property) => {
-          initialIndexes[property.id] = 0;
-        });
-        setCarouselIndexes(initialIndexes);
+          setPaginationInfo({
+            currentPage: response.data.data?.pagination?.currentPage || currentPage,
+            itemsPerPage: response.data.data?.pagination?.itemsPerPage || itemsPerPage,
+            totalItems: response.data.data?.pagination?.totalItems || response.data.totalData || props.length,
+            totalPages: response.data.data?.pagination?.totalPages || Math.ceil((response.data.totalData || props.length) / itemsPerPage),
+            hasNextPage: response.data.data?.pagination?.hasNextPage ?? (currentPage < Math.ceil((response.data.totalData || props.length) / itemsPerPage)),
+            hasPreviousPage: response.data.data?.pagination?.hasPreviousPage ?? (currentPage > 1),
+          });
+
+          const initialIndexes = {};
+          props.forEach((property) => {
+            initialIndexes[property.id] = 0;
+          });
+          setCarouselIndexes(initialIndexes);
+        } else {
+          throw propertyRes.reason;
+        }
+
+        if (favRes.status === 'fulfilled' && favRes.value) {
+          const favData = favRes.value.data?.data || favRes.value.data || [];
+          const favSet = new Set((Array.isArray(favData) ? favData : []).map((item) => item.id));
+          setFavorites(favSet);
+        }
       } catch (error) {
         setError(error.message || 'Failed to fetch properties');
       } finally {
@@ -132,11 +151,14 @@ function GetAllPropertyByUsers() {
     });
   }, [properties, userFilters]);
 
-  const toggleFavorite = useCallback((propertyId, e) => {
+  const toggleFavorite = useCallback(async (propertyId, e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
+    const token = Cookies.get('token');
+    if (!token) return;
+
     setFavorites((prev) => {
       const newFavs = new Set(prev);
       if (newFavs.has(propertyId)) {
@@ -146,6 +168,26 @@ function GetAllPropertyByUsers() {
       }
       return newFavs;
     });
+
+    try {
+      await axios.post(
+        `${baseUrl}/favorite-properties/${propertyId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+      // Revert state if request fails
+      setFavorites((prev) => {
+        const newFavs = new Set(prev);
+        if (newFavs.has(propertyId)) {
+          newFavs.delete(propertyId);
+        } else {
+          newFavs.add(propertyId);
+        }
+        return newFavs;
+      });
+    }
   }, []);
 
   const pageNumbers = useMemo(() => {
