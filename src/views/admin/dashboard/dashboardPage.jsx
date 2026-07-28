@@ -4,9 +4,12 @@ import { LayoutDashboard, Sparkles } from 'lucide-react';
 import StatsData from './statsData.jsx';
 import LatestPropertyList from './latestPropertyList.jsx';
 import QuicAction from './quicAction.jsx';
+import DashboardSkeleton from './dashboardSkeleton.jsx';
+import ServerMetricsWidget from './components/ServerMetricsWidget.jsx';
 
 export default function DashboardPage() {
     const [username, setUsername] = useState({});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const userData = Cookies.get('user');
@@ -17,7 +20,18 @@ export default function DashboardPage() {
                 setUsername({ name: 'Admin' });
             }
         }
+
+        // Brief loading timer to ensure clean rendering transition
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 400);
+
+        return () => clearTimeout(timer);
     }, []);
+
+    if (loading) {
+        return <DashboardSkeleton />;
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 p-4 md:p-8">
@@ -43,6 +57,7 @@ export default function DashboardPage() {
                 </div>
 
                 <StatsData />
+                <ServerMetricsWidget />
                 <QuicAction />
                 <LatestPropertyList />
             </div>

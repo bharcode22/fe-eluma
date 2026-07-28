@@ -13,6 +13,7 @@ import ServiceFilter from './components/ServiceFilter.jsx';
 import ServiceCard from './components/ServiceCard.jsx';
 import ServiceDetailModal from './components/ServiceDetailModal.jsx';
 import ServiceFooterBanner from './components/ServiceFooterBanner.jsx';
+import ServiceSkeleton from './components/ServiceSkeleton.jsx';
 
 const baseUrl = api.defaults.baseURL;
 
@@ -127,20 +128,7 @@ function ServiceLanding() {
     };
 
     if (initialLoading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 flex items-center justify-center p-4">
-                <div className="text-center space-y-4">
-                    <div className="relative inline-block">
-                        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary"></div>
-                        <Wrench className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary animate-pulse" size={24} />
-                    </div>
-                    <div>
-                        <p className="text-lg font-bold text-primary">Loading Services</p>
-                        <p className="text-xs text-base-content/60">Fetching available offerings...</p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <ServiceSkeleton />;
     }
 
     if (error) {

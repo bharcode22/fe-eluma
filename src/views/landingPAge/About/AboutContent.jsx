@@ -15,7 +15,12 @@ import {
     Home
 } from 'lucide-react';
 
-function AboutContent() {
+import AboutSkeleton from './components/AboutSkeleton.jsx';
+
+function AboutContent({ isLoading = false }) {
+    if (isLoading) {
+        return <AboutSkeleton />;
+    }
     const stats = [
         { value: '500+', label: 'Luxury Properties Managed', icon: Home },
         { value: '$150M+', label: 'Total Transaction Volume', icon: Award },

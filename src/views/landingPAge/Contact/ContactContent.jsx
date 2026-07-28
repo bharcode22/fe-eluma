@@ -16,6 +16,7 @@ import {
     ExternalLink
 } from 'lucide-react';
 import api from '../../../service/api';
+import { ContactHotlineSkeleton } from './components/ContactSkeleton.jsx';
 
 const baseUrl = api.defaults.baseURL;
 
@@ -134,10 +135,7 @@ function ContactContent() {
                     </div>
 
                     {fetching ? (
-                        <div className="bg-base-100 rounded-3xl p-8 text-center space-y-3 border border-base-300 shadow-sm">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-                            <p className="text-sm font-medium text-base-content/70">Loading active contact numbers...</p>
-                        </div>
+                        <ContactHotlineSkeleton />
                     ) : fetchError ? (
                         <div className="p-4 rounded-2xl bg-error/10 border border-error/20 text-error flex items-center gap-3">
                             <AlertCircle className="w-5 h-5 flex-shrink-0" />

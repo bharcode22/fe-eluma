@@ -86,13 +86,13 @@ const PropertyInfo = memo(({ property, priceView, setPriceView, getCurrencySymbo
         </div>
         <div className="flex items-center gap-2">
           <div className="p-2 bg-info/10 rounded-lg">
-            <Maximize2 className="w-4 h-4 text-info" />
+            <CalendarDays className="w-4 h-4 text-info" />
           </div>
           <div>
             <div className="text-sm font-medium text-base-content">
-              {property.size || '-'}
+              {property.minimum_stay ? `${property.minimum_stay} Mo` : '-'}
             </div>
-            <div className="text-xs text-base-content/50">m²</div>
+            <div className="text-xs text-base-content/50">Min. Stay</div>
           </div>
         </div>
       </div>
