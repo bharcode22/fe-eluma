@@ -66,21 +66,33 @@ export default function AppRoutes() {
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
 
-                {/* Protected Admin Routes */}
+                {/* Protected Admin Routes (Matches NavbarAdmin items) */}
+                {/* 1. Dashboard */}
                 <Route path="/admin/dashboard" element={
                     isAuthenticated && userRole === 'admin' ? <Dashboard /> : <Navigate to="/" replace />
                 } />
+
+                {/* 2. Property Management & Sub-routes */}
                 <Route path="/admin/property-management" element={
                     isAuthenticated && userRole === 'admin' ? <PropertyManagement /> : <Navigate to="/" replace />
                 } />
+                <Route path="/admin/add/property" element={
+                    isAuthenticated && userRole === 'admin' ? <AddPropertyPage /> : <Navigate to="/" replace />
+                } />
                 <Route path="/admin/update-property-management/:id" element={
+                    isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
+                } />
+                <Route path="/admin/update/property-management/:id" element={
+                    isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
+                } />
+                <Route path="/admin/update/property/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdatePropertyPage /> : <Navigate to="/" replace />
                 } />
                 <Route path="/admin/detail-property-management/:id" element={
                     isAuthenticated && userRole === 'admin' ? <DetailPropertyPage /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/add/property" element={
-                    isAuthenticated && userRole === 'admin' ? <AddPropertyPage /> : <Navigate to="/" replace />
+                <Route path="/admin/detail/property/:id" element={
+                    isAuthenticated && userRole === 'admin' ? <DetailPropertyPage /> : <Navigate to="/" replace />
                 } />
                 <Route path="/admin/update-images-only/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdateImagesOnly /> : <Navigate to="/" replace />
@@ -88,21 +100,24 @@ export default function AppRoutes() {
                 <Route path="/admin/update/image/property/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdateImagesOnly /> : <Navigate to="/" replace />
                 } />
+
+                {/* 3. Users Management & Sub-routes */}
                 <Route path="/admin/users-management" element={
                     isAuthenticated && userRole === 'admin' ? <UsersManagement /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/detail/user/:id" element={
+                <Route path="/admin/users-management/detail/:id" element={
                     isAuthenticated && userRole === 'admin' ? <DetailUserPage /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/update/user/:id" element={
+                <Route path="/admin/users-management/update/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdateUserPage /> : <Navigate to="/" replace />
                 } />
+
+                {/* 4. Property Owners */}
                 <Route path="/admin/property-owner-management" element={
                     isAuthenticated && userRole === 'admin' ? <PropertyOwnerManagement /> : <Navigate to="/" replace />
                 } />
-                <Route path="/admin/additional-management" element={
-                    isAuthenticated && userRole === 'admin' ? <AdditionalManagement /> : <Navigate to="/" replace />
-                } />
+
+                {/* 5. Contact Management & Sub-routes */}
                 <Route path="/admin/contact" element={
                     isAuthenticated && userRole === 'admin' ? <ContactMabagement /> : <Navigate to="/" replace />
                 } />
@@ -112,9 +127,18 @@ export default function AppRoutes() {
                 <Route path="/admin/update/contact/:id" element={
                     isAuthenticated && userRole === 'admin' ? <UpdateContactPage /> : <Navigate to="/" replace />
                 } />
+
+                {/* 6. Service Management */}
                 <Route path="/admin/service-management" element={
                     isAuthenticated && userRole === 'admin' ? <ServiceManagement /> : <Navigate to="/" replace />
                 } />
+
+                {/* 7. Additional Management */}
+                <Route path="/admin/additional-management" element={
+                    isAuthenticated && userRole === 'admin' ? <AdditionalManagement /> : <Navigate to="/" replace />
+                } />
+
+                {/* 8. My Profile */}
                 <Route path="/admin/profile" element={
                     isAuthenticated && userRole === 'admin' ? <AdminProfile /> : <Navigate to="/" replace />
                 } />
